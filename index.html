@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="India 14:00" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>インド株 14:00 CHECK</title>
+  <style>
+    :root{
+      --bg:#07111f; --card:#0e1a2b; --card2:#132238; --text:#eef4ff; --muted:#9fb0c7;
+      --accent:#55c2ff; --good:#5fd39b; --warn:#ffca6a; --bad:#ff7c7c; --line:#223752;
+      --input:#0a1626;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#07111f 0%,#0b1523 100%); color:var(--text);
+      min-height:100vh; padding-bottom:calc(28px + env(safe-area-inset-bottom));
+    }
+    .wrap{max-width:780px;margin:0 auto;padding:16px}
+    .top{
+      position:sticky;top:0;z-index:10;background:rgba(7,17,31,.92);
+      backdrop-filter: blur(16px);padding:calc(10px + env(safe-area-inset-top)) 0 10px;
+      border-bottom:1px solid rgba(255,255,255,.06)
+    }
+    .top-inner{max-width:780px;margin:0 auto;padding:0 16px}
+    h1{font-size:22px;margin:0;font-weight:750;letter-spacing:.2px}
+    .sub{color:var(--muted);font-size:12px;margin-top:4px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:rgba(14,26,43,.96);border:1px solid var(--line);border-radius:16px;
+      padding:14px;margin:12px 0;box-shadow:0 8px 28px rgba(0,0,0,.15)
+    }
+    .card h2{font-size:15px;margin:0 0 12px;color:#dce9f8}
+    label{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
+    input,select,textarea{
+      width:100%;background:var(--input);border:1px solid #2b425f;color:var(--text);
+      padding:12px;border-radius:11px;font-size:16px;outline:none
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+    .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media(max-width:560px){.row3{grid-template-columns:1fr}}
+    button{
+      border:0;border-radius:12px;padding:13px 14px;font-size:15px;font-weight:700;
+      background:var(--accent);color:#06111c;width:100%;
+    }
+    button.secondary{background:#1b2e48;color:var(--text);border:1px solid #2a4566}
+    button.danger{background:#3a1f28;color:#ffdce3;border:1px solid #62303d}
+    .btnrow{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:12px}
+    .scorebox{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center}
+    .score{
+      width:112px;height:112px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      flex-direction:column;border:10px solid #28435e;background:#0a1626
+    }
+    .score strong{font-size:32px}.score small{color:var(--muted);font-size:11px}
+    .status{font-size:20px;font-weight:800;margin-bottom:4px}
+    .muted{color:var(--muted);font-size:13px;line-height:1.55}
+    .metric{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .metric:last-child{border-bottom:0}
+    .metric span:first-child{color:var(--muted)}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+    .b-good{background:rgba(95,211,155,.15);color:#8aefbd}
+    .b-warn{background:rgba(255,202,106,.15);color:#ffd789}
+    .b-bad{background:rgba(255,124,124,.15);color:#ffabab}
+    .stage{display:grid;grid-template-columns:82px 1fr 70px;gap:10px;align-items:center;padding:8px 0}
+    .bar{height:9px;background:#233650;border-radius:999px;overflow:hidden}
+    .bar>div{height:100%;background:#55c2ff;width:0%}
+    .history-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+    .history-item:last-child{border-bottom:0}
+    .history-head{display:flex;justify-content:space-between;font-size:13px}
+    .history-sub{color:var(--muted);font-size:12px;margin-top:3px}
+    details summary{cursor:pointer;color:#dce9f8;font-weight:700}
+    .note{
+      padding:10px 12px;border-left:3px solid var(--warn);background:rgba(255,202,106,.08);
+      color:#eadfc8;border-radius:8px;font-size:12px;line-height:1.6
+    }
+    .footer{color:#7f93aa;font-size:11px;line-height:1.6;margin-top:16px}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="top-inner">
+      <h1>インド株 14:00 CHECK</h1>
+      <div class="sub">同じ条件で毎日確認するためのローカル判断支援ツール</div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>1. 市場データ</h2>
+      <div class="grid">
+        <div>
+          <label>確認日時</label>
+          <input id="checkTime" type="datetime-local" />
+        </div>
+        <div>
+          <label>NIFTY 50 現在値</label>
+          <input id="price" type="number" inputmode="decimal" step="0.01" placeholder="例 25250" />
+        </div>
+        <div>
+          <label>前日終値</label>
+          <input id="prev" type="number" inputmode="decimal" step="0.01" />
+        </div>
+        <div>
+          <label>直近支持線</label>
+          <input id="support" type="number" inputmode="decimal" step="0.01" placeholder="直近安値など" />
+        </div>
+      </div>
+
+      <div class="row3">
+        <div><label>5日移動平均</label><input id="ma5" type="number" inputmode="decimal" step="0.01"></div>
+        <div><label>25日移動平均</label><input id="ma25" type="number" inputmode="decimal" step="0.01"></div>
+        <div><label>75日移動平均</label><input id="ma75" type="number" inputmode="decimal" step="0.01"></div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>RSI（14日）</label>
+          <input id="rsi" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="0〜100" />
+        </div>
+        <div>
+          <label>MACDヒストグラム</label>
+          <input id="macd" type="number" inputmode="decimal" step="0.001" placeholder="マイナス可" />
+        </div>
+        <div>
+          <label>MACDの方向</label>
+          <select id="macdDir">
+            <option value="rising">改善中（前日より上向き）</option>
+            <option value="flat">横ばい</option>
+            <option value="falling">悪化中（前日より下向き）</option>
+          </select>
+        </div>
+        <div>
+          <label>出来高倍率（20日平均=1.0）</label>
+          <input id="volumeRatio" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 1.3" />
+        </div>
+        <div>
+          <label>USD/INR</label>
+          <input id="usdinr" type="number" inputmode="decimal" step="0.001" placeholder="参考表示用" />
+        </div>
+        <div>
+          <label>USD/INR 前日比（%）</label>
+          <input id="usdinrChg" type="number" inputmode="decimal" step="0.01" placeholder="例 +0.25" />
+        </div>
+      </div>
+
+      <label>メモ</label>
+      <textarea id="memo" rows="3" placeholder="ニュース、イベント、購入を見送る理由など"></textarea>
+
+      <div class="btnrow">
+        <button id="calcBtn">判定する</button>
+        <button class="secondary" id="sampleBtn">サンプル</button>
+      </div>
+    </section>
+
+    <section class="card" id="resultCard">
+      <h2>2. ルール一致度</h2>
+      <div class="scorebox">
+        <div class="score" id="scoreCircle">
+          <strong id="score">--</strong><small>/ 100</small>
+        </div>
+        <div>
+          <div class="status" id="status">未判定</div>
+          <div class="muted" id="summary">必要項目を入力して「判定する」を押してください。</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px" id="metrics"></div>
+
+      <div class="note" style="margin-top:12px">
+        このスコアは「将来の上昇確率」ではありません。入力したテクニカル条件が、
+        あらかじめ設定した押し目条件にどの程度一致しているかを数値化したものです。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3. 3分割購入ルール</h2>
+      <div class="stage">
+        <strong>第1回</strong><div class="bar"><div id="bar1"></div></div><span id="stage1">60点</span>
+      </div>
+      <div class="stage">
+        <strong>第2回</strong><div class="bar"><div id="bar2"></div></div><span id="stage2">75点</span>
+      </div>
+      <div class="stage">
+        <strong>第3回</strong><div class="bar"><div id="bar3"></div></div><span id="stage3">90点</span>
+      </div>
+      <div class="muted" id="stageMessage" style="margin-top:8px">
+        既定値は60 / 75 / 90点です。下の設定から変更できます。
+      </div>
+      <div class="btnrow">
+        <button id="saveBtn">今日の記録を保存</button>
+        <button class="secondary" id="exportBtn">履歴を書き出す</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <details>
+        <summary>判定ルール設定</summary>
+        <div class="row3" style="margin-top:10px">
+          <div><label>第1回しきい値</label><input id="th1" type="number" min="0" max="100" value="60"></div>
+          <div><label>第2回しきい値</label><input id="th2" type="number" min="0" max="100" value="75"></div>
+          <div><label>第3回しきい値</label><input id="th3" type="number" min="0" max="100" value="90"></div>
+        </div>
+        <button class="secondary" id="saveSettingsBtn" style="margin-top:10px">設定を保存</button>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>4. 履歴</h2>
+      <div id="history"><div class="muted">まだ保存された記録はありません。</div></div>
+      <button class="danger" id="clearBtn" style="margin-top:12px">履歴を全削除</button>
+    </section>
+
+    <div class="footer">
+      データはこの端末のブラウザ内（localStorage）に保存されます。API送信は行いません。
+      ブラウザデータを消去すると履歴も消えるため、必要に応じて「履歴を書き出す」でバックアップしてください。
+    </div>
+  </main>
+
+<script>
+const ids = ["checkTime","price","prev","support","ma5","ma25","ma75","rsi","macd","macdDir","volumeRatio","usdinr","usdinrChg","memo"];
+const $ = id => document.getElementById(id);
+let lastResult = null;
+
+function setDefaultTime(){
+  const d = new Date();
+  d.setHours(14,0,0,0);
+  const pad=n=>String(n).padStart(2,"0");
+  $("checkTime").value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function n(id){ const v=parseFloat($(id).value); return Number.isFinite(v)?v:null; }
+function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+function pct(a,b){ return (a-b)/b*100; }
+
+function calc(){
+  const p=n("price"), prev=n("prev"), ma5=n("ma5"), ma25=n("ma25"), ma75=n("ma75");
+  const rsi=n("rsi"), macd=n("macd"), support=n("support"), vr=n("volumeRatio");
+  if(p===null || rsi===null || ma25===null){
+    alert("最低限「NIFTY現在値・25日移動平均・RSI」を入力してください。");
+    return;
+  }
+
+  let score=0, rows=[], notes=[];
+
+  // RSI 0-25
+  let sRsi=0;
+  if(rsi<=30) sRsi=25;
+  else if(rsi<=40) sRsi=20;
+  else if(rsi<=50) sRsi=11;
+  else if(rsi<=60) sRsi=5;
+  else if(rsi>=70) sRsi=0;
+  else sRsi=2;
+  score+=sRsi;
+  rows.push(["RSI", `${rsi.toFixed(1)} / +${sRsi}点`, rsi<=40?"good":rsi>=70?"bad":"warn"]);
+
+  // 25日線との距離 0-20
+  const d25=pct(p,ma25);
+  let s25=0;
+  if(d25<=-4) s25=20;
+  else if(d25<=-2) s25=17;
+  else if(d25<=0) s25=14;
+  else if(d25<=2) s25=8;
+  else if(d25<=4) s25=4;
+  score+=s25;
+  rows.push(["25日線乖離", `${d25>=0?"+":""}${d25.toFixed(2)}% / +${s25}点`, d25<=0?"good":d25>4?"bad":"warn"]);
+
+  // 支持線距離 0-20
+  let sSup=0, dSup=null;
+  if(support!==null && support>0){
+    dSup=pct(p,support);
+    if(dSup>=0 && dSup<=1.5) sSup=20;
+    else if(dSup>1.5 && dSup<=3) sSup=15;
+    else if(dSup>3 && dSup<=5) sSup=8;
+    else if(dSup<0 && dSup>=-1.0) sSup=7;
+    else if(dSup<-1.0){ sSup=0; notes.push("支持線を明確に割れているため、下落継続リスクを優先して扱っています。"); }
+    score+=sSup;
+    rows.push(["支持線まで", `${dSup>=0?"+":""}${dSup.toFixed(2)}% / +${sSup}点`, dSup>=0&&dSup<=3?"good":dSup<0?"bad":"warn"]);
+  } else {
+    rows.push(["支持線まで", "未入力 / 0点", "warn"]);
+  }
+
+  // トレンド健全性 0-15
+  let sTrend=0;
+  if(ma75!==null && ma25!==null){
+    if(ma25>=ma75) sTrend+=8;
+    if(p>=ma75) sTrend+=4;
+  }
+  if(ma5!==null && ma25!==null && ma5<ma25) sTrend+=3; // short-term pullback in longer trend
+  score+=sTrend;
+  const trendText = ma75===null ? "75日線未入力" : `25日線 ${ma25>=ma75?"＞":"＜"} 75日線`;
+  rows.push(["中期トレンド", `${trendText} / +${sTrend}点`, sTrend>=8?"good":sTrend>=4?"warn":"bad"]);
+
+  // MACD 0-10
+  let sMacd=0;
+  const dir=$("macdDir").value;
+  if(macd!==null){
+    if(macd<0 && dir==="rising") sMacd=10;
+    else if(macd<0 && dir==="flat") sMacd=6;
+    else if(macd>=0 && dir==="rising") sMacd=4;
+    else if(dir==="falling") sMacd=0;
+  }
+  score+=sMacd;
+  rows.push(["MACD", `${macd===null?"未入力":macd.toFixed(3)}・${dir==="rising"?"改善":dir==="falling"?"悪化":"横ばい"} / +${sMacd}点`, sMacd>=8?"good":sMacd>=4?"warn":"bad"]);
+
+  // 1日下落 0-5
+  let sDay=0, dayChg=null;
+  if(prev!==null && prev>0){
+    dayChg=pct(p,prev);
+    if(dayChg<=-2.5) sDay=5;
+    else if(dayChg<=-1) sDay=3;
+    else if(dayChg<0) sDay=1;
+    score+=sDay;
+    rows.push(["前日比", `${dayChg>=0?"+":""}${dayChg.toFixed(2)}% / +${sDay}点`, dayChg<0?"good":dayChg>1.5?"bad":"warn"]);
+  } else rows.push(["前日比","未入力 / 0点","warn"]);
+
+  // Volume 0-5
+  let sVol=0;
+  if(vr!==null){
+    if(vr>=1.5 && dayChg!==null && dayChg<0) sVol=5;
+    else if(vr>=1.2) sVol=3;
+    else if(vr>=0.9) sVol=1;
+    score+=sVol;
+    rows.push(["出来高", `${vr.toFixed(2)}倍 / +${sVol}点`, vr>=1.2?"good":"warn"]);
+  } else rows.push(["出来高","未入力 / 0点","warn"]);
+
+  score=clamp(Math.round(score),0,100);
+
+  let status, summary;
+  if(score>=90){status="条件一致度：非常に高い";summary="複数の押し目条件が同時に一致しています。支持線割れやイベント要因がないかを別途確認してください。";}
+  else if(score>=75){status="条件一致度：高い";summary="押し目条件の一致が多い状態です。第2段階の条件と照合してください。";}
+  else if(score>=60){status="条件一致度：中〜高";summary="第1段階の確認対象に入る水準です。週足や主要イベントも確認してください。";}
+  else if(score>=40){status="条件一致度：中程度";summary="一部条件は一致していますが、まだ待機条件も残っています。";}
+  else {status="条件一致度：低い";summary="現在の入力条件では押し目条件の一致が少ない状態です。";}
+
+  $("score").textContent=score;
+  $("status").textContent=status;
+  $("summary").textContent=summary + (notes.length? " " + notes.join(" "):"");
+
+  const cls = score>=75?"#5fd39b":score>=60?"#ffca6a":score<40?"#ff7c7c":"#55c2ff";
+  $("scoreCircle").style.borderColor=cls;
+
+  $("metrics").innerHTML = rows.map(r => `
+    <div class="metric"><span>${r[0]}</span><span><span class="badge b-${r[2]}">${r[1]}</span></span></div>
+  `).join("");
+
+  updateStages(score);
+
+  lastResult = {
+    score, status, summary, rows,
+    values:Object.fromEntries(ids.map(id=>[id,$(id).value])),
+    createdAt:new Date().toISOString()
+  };
+}
+
+function getSettings(){
+  const s=JSON.parse(localStorage.getItem("india1400_settings")||"{}");
+  return {th1:Number(s.th1||60),th2:Number(s.th2||75),th3:Number(s.th3||90)};
+}
+function loadSettings(){
+  const s=getSettings(); $("th1").value=s.th1; $("th2").value=s.th2; $("th3").value=s.th3;
+}
+function updateStages(score){
+  const s=getSettings();
+  [["bar1","stage1",s.th1],["bar2","stage2",s.th2],["bar3","stage3",s.th3]].forEach(([bar,lab,t])=>{
+    $(bar).style.width=`${Math.min(100,score/t*100)}%`;
+    $(lab).textContent=score>=t?"到達":`${t}点`;
+  });
+  let msg;
+  if(score>=s.th3) msg="第3回しきい値まで到達しています。実行前に週足・イベント・資金配分を確認してください。";
+  else if(score>=s.th2) msg="第2回しきい値まで到達しています。";
+  else if(score>=s.th1) msg="第1回しきい値まで到達しています。";
+  else msg=`第1回しきい値まであと ${Math.max(0,s.th1-score)} 点です。`;
+  $("stageMessage").textContent=msg;
+}
+function saveSettings(){
+  const th1=clamp(Number($("th1").value||60),0,100);
+  const th2=clamp(Number($("th2").value||75),0,100);
+  const th3=clamp(Number($("th3").value||90),0,100);
+  if(!(th1<th2 && th2<th3)){alert("しきい値は 第1回 < 第2回 < 第3回 の順にしてください。");return;}
+  localStorage.setItem("india1400_settings",JSON.stringify({th1,th2,th3}));
+  if(lastResult) updateStages(lastResult.score);
+  alert("設定を保存しました。");
+}
+function historyData(){ return JSON.parse(localStorage.getItem("india1400_history")||"[]"); }
+function saveHistory(){
+  if(!lastResult){calc(); if(!lastResult)return;}
+  const h=historyData();
+  h.unshift({...lastResult, savedAt:new Date().toISOString()});
+  localStorage.setItem("india1400_history",JSON.stringify(h.slice(0,180)));
+  renderHistory();
+  alert("保存しました。");
+}
+function renderHistory(){
+  const h=historyData();
+  if(!h.length){$("history").innerHTML='<div class="muted">まだ保存された記録はありません。</div>';return;}
+  $("history").innerHTML=h.slice(0,30).map(x=>{
+    const dt=(x.values?.checkTime||x.savedAt||"").replace("T"," ");
+    const p=x.values?.price||"-";
+    return `<div class="history-item">
+      <div class="history-head"><strong>${dt}</strong><strong>${x.score}点</strong></div>
+      <div class="history-sub">NIFTY ${p} / ${x.status}</div>
+    </div>`;
+  }).join("");
+}
+function exportHistory(){
+  const blob = new Blob([JSON.stringify({settings:getSettings(),history:historyData()},null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`india1400_history_${new Date().toISOString().slice(0,10)}.json`; a.click();
+  URL.revokeObjectURL(a.href);
+}
+function sample(){
+  const vals={price:25020,prev:25390,support:24900,ma5:25180,ma25:25220,ma75:24680,rsi:38.5,macd:-82.4,macdDir:"rising",volumeRatio:1.35,usdinr:84.12,usdinrChg:0.18,memo:"サンプルデータ"};
+  Object.entries(vals).forEach(([k,v])=>$(k).value=v); calc();
+}
+$("calcBtn").addEventListener("click",calc);
+$("sampleBtn").addEventListener("click",sample);
+$("saveBtn").addEventListener("click",saveHistory);
+$("exportBtn").addEventListener("click",exportHistory);
+$("saveSettingsBtn").addEventListener("click",saveSettings);
+$("clearBtn").addEventListener("click",()=>{
+  if(confirm("保存した履歴をすべて削除しますか？")){
+    localStorage.removeItem("india1400_history"); renderHistory();
+  }
+});
+setDefaultTime(); loadSettings(); renderHistory();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
