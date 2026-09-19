@@ -11,11 +11,13 @@ Goals
 - Backtest the NIFTY-only technical core of the buy/sell setup score.
 - Keep 1-month analog outlook and anomalies descriptive, not deterministic.
 
-v4.4 is designed for a zero-cost operating model and adds a persistent official NIFTY daily-history cache. It first tries the NSE Indices historical endpoint, then falls back to NSE Archives daily index-close CSV files and stores the resulting history locally so later runs only need incremental updates. NIFTY current price uses Google Finance
-with NSE Indices historical data where available; USD/INR prefers the free Twelve Data
-FX allowance; Brent and India VIX use Google Finance. Yahoo Finance remains a last-resort
-fallback because GitHub-hosted runners can be rate-limited. Optional official NSE calls may
-fail from hosted runners; failures do not stop core processing and are surfaced explicitly.
+v4.5 keeps the zero-cost model but removes first-run dependence on NSE history endpoints.
+It bootstraps NIFTY daily history from public GitHub CSV mirrors when the local cache is empty,
+then maintains that cache itself using Google Finance's previous-close/current-close values.
+Official NSE Indices / NSE Archives remain optional validation and gap-fill sources. The workflow
+also runs once after the Indian close so the next day's 14:00 check already has the prior close.
+USD/INR uses the free Twelve Data FX allowance; Brent and India VIX use Google Finance.
+Yahoo Finance remains a last-resort fallback because GitHub-hosted runners can be rate-limited.
 """
 from __future__ import annotations
 
@@ -45,10 +47,21 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/
 JST = ZoneInfo("Asia/Tokyo")
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA_VERSION = 4
-APP_VERSION = "4.4"
+APP_VERSION = "4.5"
 TWELVEDATA_API_KEY = os.getenv("TWELVEDATA_API_KEY", "").strip()
 TWELVEDATA_BASE = "https://api.twelvedata.com"
 GOOGLE_FINANCE_BASE = "https://www.google.com/finance/beta/quote"
+
+NIFTY_BOOTSTRAP_SOURCES = [
+    (
+        "kalilurrahman/NIFTY_50_STOCK_DATA",
+        "https://raw.githubusercontent.com/kalilurrahman/NIFTY_50_STOCK_DATA/main/NIFTY50_stock_history.csv",
+    ),
+    (
+        "VatsalSin/Stock-Market-Indices-Dataset",
+        "https://raw.githubusercontent.com/VatsalSin/Stock-Market-Indices-Dataset/main/NIFTY%2050.csv",
+    ),
+]
 
 # NSE cash-market trading holidays for calendar year 2026.
 # Source: NSE circular "Trading holidays for the calendar year 2026".
@@ -645,7 +658,22 @@ def google_finance_quote(quote_code: str, tz_hint=timezone.utc):
     ts = _parse_google_time(raw_time, tz_hint)
     if ts is None:
         raise RuntimeError(f"Google Finance quote timestamp not found for {quote_code}")
-    return ts, price, {"quote_code": quote_code, "url": url, "display_time": raw_time}
+
+    previous_close = None
+    for pat in (
+        r"Previous close\s+[₹$€£]?\s*([0-9][0-9,]*(?:\.[0-9]+)?)",
+        r"Prev(?:ious)? close\s+[₹$€£]?\s*([0-9][0-9,]*(?:\.[0-9]+)?)",
+    ):
+        m = re.search(pat, plain, re.I)
+        if m:
+            candidate = _parse_number(m.group(1))
+            if _google_price_is_sane(quote_code, candidate):
+                previous_close = candidate
+                break
+    return ts, price, {
+        "quote_code": quote_code, "url": url, "display_time": raw_time,
+        "previous_close": previous_close,
+    }
 
 
 def _rows_to_daily_series(rows):
@@ -680,6 +708,159 @@ def _rows_to_daily_series(rows):
     result.sort(key=lambda x: x[0])
     return result
 
+
+
+
+def yahoo_history_html_recent(days: int = 420):
+    """Best-effort recent NIFTY daily closes from Yahoo's public history webpage.
+
+    This deliberately avoids the query1/query2 chart API that often returns HTTP 429
+    on shared GitHub runners. It is only a gap-fill source; failure is non-fatal.
+    """
+    now = datetime.now(timezone.utc)
+    p2 = int(now.timestamp())
+    p1 = int((now - timedelta(days=days)).timestamp())
+    errors = []
+    for host in ("finance.yahoo.com", "uk.finance.yahoo.com", "ca.finance.yahoo.com"):
+        url = (
+            f"https://{host}/quote/%5ENSEI/history/?period1={p1}&period2={p2}"
+            "&interval=1d&filter=history&frequency=1d"
+        )
+        try:
+            text = http_text(
+                url, tries=1, timeout=25,
+                headers={
+                    "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Referer": f"https://{host}/quote/%5ENSEI/",
+                },
+            )
+            cache = {}
+            for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", text, flags=re.I | re.S):
+                cells = [_plain_html(x) for x in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", tr, flags=re.I | re.S)]
+                if len(cells) < 5:
+                    continue
+                day = None
+                for fmt in ("%b %d, %Y", "%d %b %Y", "%Y-%m-%d"):
+                    try:
+                        day = datetime.strptime(cells[0].strip(), fmt).date()
+                        break
+                    except Exception:
+                        pass
+                if day is None:
+                    continue
+                try:
+                    close = float(cells[4].replace(",", "").replace("-", ""))
+                except Exception:
+                    continue
+                if 1000.0 <= close <= 100000.0:
+                    cache[day.isoformat()] = close
+            if len(cache) < 40:
+                raise RuntimeError(f"Yahoo history HTML too short ({len(cache)} rows)")
+            return cache, {"source": host, "rows": len(cache), "last_date": max(cache)}
+        except Exception as e:
+            errors.append(f"{host}: {e}")
+    raise RuntimeError("; ".join(errors))
+
+
+def _parse_public_nifty_csv(text: str):
+    """Parse a public NIFTY daily CSV into {YYYY-MM-DD: close} defensively."""
+    reader = csv.DictReader(io.StringIO(text))
+    out = {}
+    for row in reader:
+        norm = {str(k).strip().lower(): v for k, v in row.items() if k is not None}
+        date_raw = norm.get("date") or norm.get("timestamp")
+        close_raw = norm.get("close") or norm.get("adj close") or norm.get("adj_close")
+        if not date_raw or close_raw in (None, "", "-"):
+            continue
+        day = None
+        raw = str(date_raw).strip()
+        for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d", "%d %b %Y", "%b %d, %Y"):
+            try:
+                day = datetime.strptime(raw[:24], fmt).date()
+                break
+            except Exception:
+                pass
+        if day is None:
+            # ISO timestamps are common in exported finance datasets.
+            try:
+                day = datetime.fromisoformat(raw.replace("Z", "+00:00")).date()
+            except Exception:
+                continue
+        try:
+            close = float(str(close_raw).replace(",", ""))
+        except Exception:
+            continue
+        if 1000.0 <= close <= 100000.0:
+            out[day.isoformat()] = close
+    return out
+
+
+def bootstrap_public_git_history(cache: dict):
+    """Seed an empty/small local cache from public, key-free GitHub CSV mirrors.
+
+    These mirrors are only a bootstrap. New closes are maintained locally afterwards,
+    so day-to-day operation does not depend on the mirror continuing to update.
+    """
+    reports = []
+    merged = dict(cache)
+    for label, url in NIFTY_BOOTSTRAP_SOURCES:
+        try:
+            text = http_text(url, tries=2, timeout=35, headers={"Accept": "text/csv,text/plain,*/*"})
+            rows = _parse_public_nifty_csv(text)
+            # Require enough rows to avoid accepting an HTML/error body that happened to parse.
+            if len(rows) < 500:
+                raise RuntimeError(f"history too short ({len(rows)} rows)")
+            before = len(merged)
+            # Bootstrap sources only fill missing days; official/self-maintained cache wins.
+            for day, close in rows.items():
+                merged.setdefault(day, close)
+            reports.append({
+                "source": label,
+                "status": "ok",
+                "rows_seen": len(rows),
+                "rows_added": len(merged) - before,
+                "last_date": max(rows) if rows else None,
+            })
+        except Exception as e:
+            reports.append({"source": label, "status": "error", "error": str(e)})
+    return merged, reports
+
+
+def _previous_regular_trading_day(day):
+    d = day - timedelta(days=1)
+    for _ in range(12):
+        if d.weekday() < 5 and (d.year != 2026 or d.isoformat() not in NSE_HOLIDAYS_2026):
+            return d
+        d -= timedelta(days=1)
+    return None
+
+
+def update_cache_from_google_quote(cache: dict, quote_ts: int, quote_price: float, quote_meta: dict, now_jst=None):
+    """Maintain daily closes without a historical API.
+
+    - During the trading day, Google Finance's Previous close can fill yesterday.
+    - After 15:30 IST, the displayed current quote can be committed as today's close.
+    """
+    now_jst = now_jst or datetime.now(JST)
+    now_ist = now_jst.astimezone(IST)
+    qdt = datetime.fromtimestamp(quote_ts, timezone.utc).astimezone(IST)
+    added = []
+
+    prev = (quote_meta or {}).get("previous_close")
+    if prev is not None and qdt.date() == now_ist.date() and qdt.date().weekday() < 5:
+        pd = _previous_regular_trading_day(qdt.date())
+        if pd and pd.isoformat() not in cache and 1000.0 <= float(prev) <= 100000.0:
+            cache[pd.isoformat()] = float(prev)
+            added.append({"date": pd.isoformat(), "close": float(prev), "basis": "Google Finance Previous close"})
+
+    # Treat a same-day quote stamped near/after the regular close as an EOD close.
+    quote_age_days = (now_ist.date() - qdt.date()).days
+    if 0 <= quote_age_days <= 4 and qdt.date().weekday() < 5 and qdt.time() >= dtime(15, 25):
+        if 1000.0 <= float(quote_price) <= 100000.0:
+            cache[qdt.date().isoformat()] = float(quote_price)
+            added.append({"date": qdt.date().isoformat(), "close": float(quote_price), "basis": "Google Finance post-close quote"})
+    return cache, added
 
 def niftyindices_direct_series(years: int = 11):
     """Official NSE Indices price-index history via legacy ASP.NET endpoint.
@@ -792,7 +973,7 @@ def _cache_to_series(cache):
     return out
 
 
-def _nse_archive_one_day(day):
+def _nse_archive_one_day(day, opener=None):
     """Fetch one official all-indices close CSV. Weekends/holidays return None."""
     if day.weekday() >= 5:
         return None
@@ -809,7 +990,8 @@ def _nse_archive_one_day(day):
                 "Accept": "text/csv,text/plain,*/*",
                 "Accept-Language": "en-US,en;q=0.9",
             })
-            with urllib.request.urlopen(req, timeout=15) as r:
+            client = opener.open if opener is not None else urllib.request.urlopen
+            with client(req, timeout=15) as r:
                 raw = r.read()
             if len(raw) < 1000:
                 raise RuntimeError(f"short archive body ({len(raw)} bytes)")
@@ -846,12 +1028,36 @@ def _nse_archive_one_day(day):
     return None
 
 
-def _latest_archive_probe_day(end_date):
+def _nse_archive_session():
+    """Warm an NSE session before requesting archive files.
+
+    Several NSE endpoints expect cookies set by a visit to the main site. The archive
+    hostname is under nseindia.com, so the shared cookie jar can materially improve
+    access from hosted runners. Failure to warm the session is non-fatal.
+    """
+    cj = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+    try:
+        http_text(
+            "https://www.nseindia.com/all-reports", tries=1, timeout=15, opener=opener,
+            headers={
+                "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Referer": "https://www.nseindia.com/",
+            },
+        )
+        time.sleep(1.0)
+    except Exception:
+        pass
+    return opener
+
+
+def _latest_archive_probe_day(end_date, opener=None):
     day = end_date
     for _ in range(10):
         if day.weekday() < 5:
             try:
-                row = _nse_archive_one_day(day)
+                row = _nse_archive_one_day(day, opener=opener)
                 if row:
                     return row
             except Exception:
@@ -869,7 +1075,8 @@ def update_nse_archive_cache(cache: dict, bootstrap_start=None):
     """
     now_ist = datetime.now(IST)
     end_date = now_ist.date() - timedelta(days=1)  # today's close is not published at 14:00 JST
-    probe_day, probe_close = _latest_archive_probe_day(end_date)
+    opener = _nse_archive_session()
+    probe_day, probe_close = _latest_archive_probe_day(end_date, opener=opener)
     cache[probe_day] = probe_close
 
     if cache:
@@ -892,9 +1099,9 @@ def update_nse_archive_cache(cache: dict, bootstrap_start=None):
         day += timedelta(days=1)
 
     errors = []
-    # Six workers keeps the one-time backfill practical without aggressive bursts.
-    with ThreadPoolExecutor(max_workers=6) as ex:
-        futs = {ex.submit(_nse_archive_one_day, d): d for d in days}
+    # Three workers balance initial gap-fill speed with NSE rate-limit caution.
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        futs = {ex.submit(_nse_archive_one_day, d, opener): d for d in days}
         for fut in as_completed(futs):
             d = futs[fut]
             try:
@@ -907,59 +1114,97 @@ def update_nse_archive_cache(cache: dict, bootstrap_start=None):
     return cache, errors
 
 
-def fetch_nifty_daily_history(years: int = 11):
-    """Free NIFTY daily-history chain with persistent official cache.
+def fetch_nifty_daily_history(years: int = 11, quote_ts=None, quote_price=None, quote_meta=None):
+    """Zero-cost NIFTY history with bootstrap + official gap-fill + self-maintenance.
 
-    Primary: NSE Indices historical ScriptService (single-call, official).
-    Fallback: NSE Archives static daily multi-index CSVs, persisted in
-    nifty_daily_history.json and updated incrementally on later runs.
+    The persistent cache is the source of truth. Public GitHub mirrors only seed it.
+    NSE official endpoints are used for recent gap filling when reachable. Google
+    Finance previous-close/post-close values maintain new days without a history API.
     """
-    direct_error = None
-    try:
-        ds = niftyindices_direct_series(years)
-        cache = _series_to_cache(ds)
-        _save_nifty_daily_cache(cache, "NSE Indices Historical API")
-        return ds, {
-            "source": "NSE Indices Historical API",
-            "status": "fresh",
-            "cache_rows": len(cache),
-            "direct_error": None,
-            "archive_errors": [],
-        }
-    except Exception as e:
-        direct_error = str(e)
-
     cache = _load_nifty_daily_cache()
+    bootstrap_reports = []
+    direct_error = None
     archive_errors = []
+    self_updates = []
+    source_parts = []
+
+    if len(cache) < 500:
+        cache, bootstrap_reports = bootstrap_public_git_history(cache)
+        if len(cache) >= 500:
+            source_parts.append("public GitHub bootstrap")
+
+    yahoo_html_report = None
+    try:
+        recent, yahoo_html_report = yahoo_history_html_recent(420)
+        cache.update(recent)
+        source_parts.append("Yahoo Finance history webpage gap-fill")
+    except Exception as e:
+        yahoo_html_report = {"status": "error", "error": str(e)}
+
+    # Only attempt the fragile legacy bulk endpoint if the bootstrap did not give us
+    # a usable long history. Once seeded, prefer the static official daily archives.
+    if len(cache) < 500:
+        try:
+            ds_official = niftyindices_direct_series(years)
+            official_cache = _series_to_cache(ds_official)
+            if len(official_cache) >= 120:
+                cache.update(official_cache)
+                source_parts.append("NSE Indices Historical API")
+        except Exception as e:
+            direct_error = str(e)
+
+    # Fill only the missing/recent gap from official daily reports. The helper skips
+    # already cached old dates, so a seeded cache avoids thousands of requests.
     try:
         cache, archive_errors = update_nse_archive_cache(cache)
-        if len(cache) >= 120:
-            _save_nifty_daily_cache(cache, "NSE Archives ind_close_all (persistent cache)")
+        if cache:
+            source_parts.append("NSE Archives gap-fill")
     except Exception as e:
         archive_errors.append(str(e))
+
+    if quote_ts is not None and quote_price is not None:
+        try:
+            cache, self_updates = update_cache_from_google_quote(cache, quote_ts, quote_price, quote_meta or {})
+            if self_updates:
+                source_parts.append("self-maintained Google close")
+        except Exception as e:
+            archive_errors.append("self-maintenance: " + str(e))
 
     ds = _cache_to_series(cache)
     if len(ds) < 120:
         raise RuntimeError(
-            f"official NIFTY history unavailable; direct={direct_error}; archive/cache rows={len(ds)}; "
-            f"archive errors={'; '.join(archive_errors[-3:])}"
+            f"NIFTY history unavailable; cache rows={len(ds)}; direct={direct_error}; "
+            f"bootstrap={bootstrap_reports}; archive errors={'; '.join(archive_errors[-3:])}"
         )
+
+    source_note = " + ".join(dict.fromkeys(source_parts)) or "persistent local cache"
+    _save_nifty_daily_cache(cache, source_note)
     return ds, {
-        "source": "NSE Archives persistent cache",
-        "status": "fresh" if not archive_errors else "fresh_with_partial_archive_errors",
+        "source": source_note,
+        "status": "fresh",
         "cache_rows": len(ds),
+        "cache_first_date": min(cache) if cache else None,
+        "cache_last_date": max(cache) if cache else None,
+        "bootstrap_reports": bootstrap_reports,
+        "yahoo_html_report": yahoo_html_report,
         "direct_error": direct_error,
         "archive_errors": archive_errors[-10:],
+        "self_updates": self_updates,
     }
 
 def google_nifty_bundle(old_result=None):
     ts, price, quote_meta = google_finance_quote("NIFTY_50:INDEXNSE", IST)
     meta = {"quote": quote_meta}
     try:
-        ds, hmeta = fetch_nifty_daily_history(11)
+        ds, hmeta = fetch_nifty_daily_history(11, ts, price, quote_meta)
         meta["history_source"] = hmeta.get("source")
         meta["history_status"] = hmeta.get("status") or "fresh"
         meta["history_cache_rows"] = hmeta.get("cache_rows")
+        meta["history_cache_first_date"] = hmeta.get("cache_first_date")
+        meta["history_cache_last_date"] = hmeta.get("cache_last_date")
+        meta["history_bootstrap_reports"] = hmeta.get("bootstrap_reports")
+        meta["history_yahoo_html_report"] = hmeta.get("yahoo_html_report")
+        meta["history_self_updates"] = hmeta.get("self_updates")
         if hmeta.get("direct_error"):
             meta["history_direct_error"] = hmeta.get("direct_error")
         if hmeta.get("archive_errors"):
@@ -2085,13 +2330,14 @@ def main():
             provider_symbols["twelvedata"]["nifty"] = provider_symbol
 
         history_error = (provider_meta or {}).get("history_error") if isinstance(provider_meta, dict) else None
-        if len(ds) >= 100:
+        quote_date = datetime.fromtimestamp(t_now, timezone.utc).astimezone(IST).date()
+        last_daily_date = datetime.fromtimestamp(ds[-1][0], timezone.utc).astimezone(IST).date() if ds else None
+        history_recent = bool(last_daily_date and (quote_date - last_daily_date).days <= 7)
+        if len(ds) >= 100 and history_recent:
             daily_vals = [c for _, c in ds]
             daily_dates = [datetime.fromtimestamp(t, timezone.utc).astimezone(IST).date().isoformat() for t, _ in ds]
             arrays = build_indicator_arrays(daily_vals)
             i = len(daily_vals) - 1
-            quote_date = datetime.fromtimestamp(t_now, timezone.utc).astimezone(IST).date()
-            last_daily_date = datetime.fromtimestamp(ds[-1][0], timezone.utc).astimezone(IST).date()
             previous_close = daily_vals[-2] if quote_date == last_daily_date and len(daily_vals) >= 2 else daily_vals[-1]
             provisional = build_provisional_technicals(daily_dates, daily_vals, p_now, t_now)
             result["nifty"] = {
@@ -2153,6 +2399,8 @@ def main():
                 "provisional": {"available": False, "message": "日足履歴を今回更新できないため暫定テクニカルは省略"},
             })
             technical_status = "cached"
+            if ds and last_daily_date and not history_recent:
+                optional_errors.append(f"NIFTY historical cache is stale: latest={last_daily_date.isoformat()}, quote={quote_date.isoformat()}")
             if history_error:
                 optional_errors.append("NIFTY historical: " + history_error)
 
@@ -2167,6 +2415,11 @@ def main():
             "technical_error": history_error,
             "history_source": (provider_meta or {}).get("history_source") if isinstance(provider_meta, dict) else None,
             "history_cache_rows": (provider_meta or {}).get("history_cache_rows") if isinstance(provider_meta, dict) else None,
+            "history_cache_first_date": (provider_meta or {}).get("history_cache_first_date") if isinstance(provider_meta, dict) else None,
+            "history_cache_last_date": (provider_meta or {}).get("history_cache_last_date") if isinstance(provider_meta, dict) else None,
+            "history_bootstrap_reports": (provider_meta or {}).get("history_bootstrap_reports") if isinstance(provider_meta, dict) else None,
+            "history_yahoo_html_report": (provider_meta or {}).get("history_yahoo_html_report") if isinstance(provider_meta, dict) else None,
+            "history_self_updates": (provider_meta or {}).get("history_self_updates") if isinstance(provider_meta, dict) else None,
             "history_direct_error": (provider_meta or {}).get("history_direct_error") if isinstance(provider_meta, dict) else None,
             "history_archive_errors": (provider_meta or {}).get("history_archive_errors") if isinstance(provider_meta, dict) else None,
             "error": None,
@@ -2282,10 +2535,10 @@ def main():
             "status": status,
             "core_fetch": core_fetch,
             "provider_symbols": provider_symbols,
-            "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=NSE Indices historical API -> persistent NSE Archives ind_close_all cache; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance is last-resort fallback",
+            "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=local persistent cache seeded from public GitHub CSV mirrors, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
             "errors": errors,
             "optional_errors": optional_errors,
-            "note": "v4.4 free-only: NIFTY daily history is persisted locally from official NSE sources, so after the first successful backfill later runs are incremental. Public web sources can still change or throttle; failed core fetches never qualify as a fresh trading decision.",
+            "note": "v4.5 free-only: NIFTY daily history is bootstrapped once from public GitHub mirrors and thereafter maintained inside this repository from Google Finance previous/post-close values. Official NSE history is optional validation/gap-fill. Failed core fetches never qualify as a fresh trading decision.",
         }
     )
 

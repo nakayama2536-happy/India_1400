@@ -1,8 +1,8 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "description": "インド株14:00定点確認 v4.4・取得失敗時フォールバック明示・判断ゲート・前兆・1か月見通し",
-  "start_url": "./?v=4.4",
+  "description": "インド株14:00定点確認 v4.5・取得失敗時フォールバック明示・判断ゲート・前兆・1か月見通し",
+  "start_url": "./?v=4.5",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
