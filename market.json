@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-09-19T03:10:14+00:00",
-  "generated_at_jst": "2026-09-19T12:10:14+09:00",
-  "status": "ok",
-  "source": "Yahoo Finance chart endpoint (reference data; no API key)",
+  "generated_at_utc": "2026-09-19T09:26:07+00:00",
+  "generated_at_jst": "2026-09-19T18:26:07+09:00",
+  "status": "error",
+  "source": "Yahoo Finance chart endpoint for core reference data; official NSE/NSE Indices optional cross-check/context",
   "nifty": {
     "symbol": "^NSEI",
     "price": 23346.4,
@@ -28,6 +28,89 @@
     "price": 98.77,
     "as_of_jst": "2026-09-19T05:58+09:00"
   },
-  "errors": [],
-  "note": "Technicals use completed daily closes. Current quotes may be delayed."
+  "errors": [
+    "NIFTY: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
+    "usdinr: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
+    "brent: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+  ],
+  "note": "Current quotes may be delayed. Confirmed technicals use completed daily closes; provisional technicals treat the current intraday price as a temporary close.",
+  "india_vix": {
+    "symbol": "^INDIAVIX",
+    "price": null,
+    "change_5d_pct": null
+  },
+  "crosscheck": {
+    "available": false,
+    "source": "NSE Indices Live Indices Watch"
+  },
+  "breadth": {
+    "available": false,
+    "source": "NSE India NIFTY 50 constituent live data"
+  },
+  "fii_dii": {
+    "available": false,
+    "source": "NSE India FII/FPI & DII activity"
+  },
+  "schema_version": 4,
+  "optional_errors": [
+    "India VIX: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
+    "NIFTY official cross-check: <urlopen error [Errno -2] Name or service not known>",
+    "NSE session: HTTP Error 403: Forbidden"
+  ],
+  "signals": {
+    "buy_setup_score": 26,
+    "sell_setup_score": 0,
+    "technical_buy_score": 26,
+    "technical_sell_score": 0,
+    "buy_setup_label": "弱い",
+    "sell_setup_label": "弱い",
+    "buy_factors": [
+      {
+        "points": 16,
+        "label": "RSI低位",
+        "detail": "RSI 33.7"
+      },
+      {
+        "points": 10,
+        "label": "5日線を上回る",
+        "detail": "価格 23346 / 5日線 23270"
+      }
+    ],
+    "sell_factors": [],
+    "technical_basis_used": "確定日足テクニカル",
+    "definition": "0〜100は条件一致度であり、将来の上昇・下落確率ではありません。",
+    "backtest_scope": "検証タブはNIFTY日足だけで再現できるテクニカル中核スコアを検証します。"
+  },
+  "outlook_1m": {
+    "available": false,
+    "message": "日足データ不足"
+  },
+  "anomalies": {
+    "available": false
+  },
+  "score_backtest": {
+    "available": false,
+    "message": "日足データ不足"
+  },
+  "data_quality": {
+    "freshness": "UNKNOWN",
+    "nifty_age_minutes": 1406.1,
+    "decision_gate": {
+      "code": "HOLD",
+      "label": "売買ルール判定保留",
+      "allow_rule": false
+    },
+    "reasons": [
+      "NIFTY・USD/INR・Brentのコアデータが全てそろっていません。",
+      "通常取引時間中ではないため、第1弾購入ルールは自動確定しません。"
+    ],
+    "optional_context_available_count": 0,
+    "official_holiday_calendar_loaded": true
+  },
+  "comparison": {
+    "available": false,
+    "basis": "前回14:00保存値",
+    "message": "14:00履歴を蓄積中です。異なる営業日の保存値が2回分以上あると比較できます。"
+  },
+  "summary": "短期は5日線を上回っています。25日線・75日線より下です。RSIは33.7で低位です。データ判定は「売買ルール判定保留」です。"
 }
