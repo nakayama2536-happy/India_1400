@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-19T21:22:54+00:00",
-  "generated_at_jst": "2026-09-20T06:22:54+09:00",
+  "generated_at_utc": "2026-09-19T21:47:37+00:00",
+  "generated_at_jst": "2026-09-20T06:47:37+09:00",
   "status": "ok",
   "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=local persistent cache seeded from public GitHub CSV mirrors, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
   "nifty": {
@@ -9,54 +9,54 @@
     "provider": "Google Finance + NSE Indices",
     "price": 23346.4,
     "as_of_jst": "2026-09-18T19:01+09:00",
-    "previous_close": 23842.65,
-    "change_pct": -2.081,
+    "previous_close": 23270.6,
+    "change_pct": 0.326,
     "technical_close": 23346.4,
     "technical_date": "2026-09-18",
-    "ma5": 23802.42,
-    "ma25": 23386.42,
-    "ma75": 24891.84,
-    "rsi14": 46.12,
-    "rsi14_prev": 51.68,
-    "macd": -204.213,
-    "macd_signal": -375.52,
-    "macd_hist": 171.308,
-    "macd_hist_prev": 208.481,
-    "ret5_pct": 0.96,
-    "ret20_pct": -1.24,
-    "vol20_annualized_pct": 28.65,
-    "price_vs_ma5_pct": -1.92,
-    "price_vs_ma25_pct": -0.17,
-    "price_vs_ma75_pct": -6.21,
+    "ma5": 23270.26,
+    "ma25": 23875.81,
+    "ma75": 24002.02,
+    "rsi14": 33.66,
+    "rsi14_prev": 29.95,
+    "macd": -257.38,
+    "macd_signal": -199.911,
+    "macd_hist": -57.469,
+    "macd_hist_prev": -75.578,
+    "ret5_pct": -0.56,
+    "ret20_pct": -3.65,
+    "vol20_annualized_pct": 7.12,
+    "price_vs_ma5_pct": 0.33,
+    "price_vs_ma25_pct": -2.22,
+    "price_vs_ma75_pct": -2.73,
     "technical_basis": "前営業日までの確定日足",
     "provisional": {
       "available": true,
       "basis": "14:00時点価格を当日終値と仮定した暫定計算",
       "date": "2026-09-18",
       "price": 23346.4,
-      "ma5": 23802.42,
-      "ma25": 23386.42,
-      "ma75": 24891.84,
-      "rsi14": 46.12,
-      "rsi14_prev": 51.68,
-      "macd": -204.213,
-      "macd_signal": -375.52,
-      "macd_hist": 171.308,
-      "macd_hist_prev": 208.481,
-      "ret5_pct": 0.96,
-      "vol20_annualized_pct": 28.65,
-      "price_vs_ma5_pct": -1.92,
-      "price_vs_ma25_pct": -0.17,
-      "price_vs_ma75_pct": -6.21
+      "ma5": 23270.26,
+      "ma25": 23875.81,
+      "ma75": 24002.02,
+      "rsi14": 33.66,
+      "rsi14_prev": 29.95,
+      "macd": -257.38,
+      "macd_signal": -199.911,
+      "macd_hist": -57.469,
+      "macd_hist_prev": -75.578,
+      "ret5_pct": -0.56,
+      "vol20_annualized_pct": 7.12,
+      "price_vs_ma5_pct": 0.33,
+      "price_vs_ma25_pct": -2.22,
+      "price_vs_ma75_pct": -2.73
     }
   },
   "usdinr": {
     "symbol": "INR=X",
     "provider_symbol": "USD/INR",
     "provider": "Twelve Data",
-    "price": 95.9814,
+    "price": 95.994,
     "as_of_jst": "2026-09-20T06:00+09:00",
-    "change_5d_pct": -0.01
+    "change_5d_pct": 0.01
   },
   "brent": {
     "symbol": "BZ=F",
@@ -67,7 +67,7 @@
     "change_5d_pct": null
   },
   "errors": [],
-  "note": "v4.5 free-only: NIFTY daily history is bootstrapped once from public GitHub mirrors and thereafter maintained inside this repository from Google Finance previous/post-close values. Official NSE history is optional validation/gap-fill. Failed core fetches never qualify as a fresh trading decision.",
+  "note": "v4.6 free-only: NIFTY long history is bootstrapped from public GitHub mirrors, the current-year gap is bridged from Tickjournal's public daily table, and new closes are then maintained inside this repository from Google Finance previous/post-close values. A continuity gate prevents sparse history from being used for current technicals. Failed core fetches never qualify as a fresh trading decision.",
   "india_vix": {
     "symbol": "^INDIAVIX",
     "provider": "Google Finance",
@@ -97,31 +97,35 @@
   "schema_version": 4,
   "optional_errors": [],
   "signals": {
-    "buy_setup_score": 6,
-    "sell_setup_score": 22,
-    "technical_buy_score": 0,
-    "technical_sell_score": 22,
-    "buy_setup_label": "弱い",
+    "buy_setup_score": 50,
+    "sell_setup_score": 0,
+    "technical_buy_score": 50,
+    "technical_sell_score": 0,
+    "buy_setup_label": "中立〜前兆",
     "sell_setup_label": "弱い",
     "buy_factors": [
       {
-        "points": 6,
-        "label": "USD/INR 5日変化が落ち着く",
-        "detail": "-0.0%"
-      }
-    ],
-    "sell_factors": [
-      {
-        "points": 14,
-        "label": "MACDヒストグラム悪化",
-        "detail": "208.48 → 171.31"
+        "points": 16,
+        "label": "RSI低位",
+        "detail": "RSI 33.7"
       },
       {
-        "points": 8,
-        "label": "5日線を下回る",
-        "detail": "価格 23346 / 5日線 23802"
+        "points": 14,
+        "label": "MACDヒストグラム改善",
+        "detail": "-75.58 → -57.47"
+      },
+      {
+        "points": 10,
+        "label": "RSI改善",
+        "detail": "29.9 → 33.7"
+      },
+      {
+        "points": 10,
+        "label": "5日線を上回る",
+        "detail": "価格 23346 / 5日線 23270"
       }
     ],
+    "sell_factors": [],
     "technical_basis_used": "確定日足テクニカル",
     "definition": "0〜100は条件一致度であり、将来の上昇・下落確率ではありません。",
     "backtest_scope": "検証タブはNIFTY日足だけで再現できるテクニカル中核スコアを検証します。",
@@ -132,80 +136,80 @@
   },
   "outlook_1m": {
     "available": true,
-    "label": "上向き",
-    "statistical_reference": "低〜中",
+    "label": "中立",
+    "statistical_reference": "中",
     "basis_date": "2026-09-18",
     "horizon": "20営業日（約1か月）",
     "analog_count": 35,
     "up_rate_pct": 62.9,
-    "mean_return_pct": 2.83,
-    "median_return_pct": 3.44,
-    "q25_return_pct": -1.58,
-    "q75_return_pct": 6.79,
-    "median_max_drawdown_pct": -1.8,
-    "median_similarity_distance": 1.55,
+    "mean_return_pct": 1.13,
+    "median_return_pct": 0.72,
+    "q25_return_pct": -1.64,
+    "q75_return_pct": 3.74,
+    "median_max_drawdown_pct": -2.18,
+    "median_similarity_distance": 0.79,
     "method": "RSI、25日線乖離、25/75日線関係、MACDヒストグラム、5日騰落率、20日ボラティリティが近い過去局面を検索。",
     "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。統計参考度が低い場合は方向判定を弱く扱ってください。",
     "examples": [
       {
-        "date": "2011-09-09",
-        "distance": 0.661,
-        "return_20d_pct": -1.58,
-        "max_drawdown_20d_pct": -6.09
+        "date": "2025-08-08",
+        "distance": 0.388,
+        "return_20d_pct": 2.07,
+        "max_drawdown_20d_pct": 0.26
       },
       {
-        "date": "2007-03-29",
-        "distance": 0.897,
-        "return_20d_pct": 7.51,
-        "max_drawdown_20d_pct": -4.33
+        "date": "2024-10-31",
+        "distance": 0.451,
+        "return_20d_pct": 0.29,
+        "max_drawdown_20d_pct": -3.53
       },
       {
-        "date": "2000-11-01",
-        "distance": 0.907,
-        "return_20d_pct": 5.33,
-        "max_drawdown_20d_pct": 0.6
+        "date": "2026-01-22",
+        "distance": 0.452,
+        "return_20d_pct": 0.65,
+        "max_drawdown_20d_pct": -1.84
       },
       {
-        "date": "2011-02-21",
-        "distance": 0.991,
-        "return_20d_pct": -1.9,
-        "max_drawdown_20d_pct": -4.64
+        "date": "2023-11-01",
+        "distance": 0.509,
+        "return_20d_pct": 6.73,
+        "max_drawdown_20d_pct": 0.76
       },
       {
-        "date": "2011-03-07",
-        "distance": 1.002,
-        "return_20d_pct": 8.15,
-        "max_drawdown_20d_pct": -1.8
+        "date": "2016-11-03",
+        "distance": 0.563,
+        "return_20d_pct": -4.69,
+        "max_drawdown_20d_pct": -6.55
       },
       {
-        "date": "2011-10-18",
-        "distance": 1.024,
-        "return_20d_pct": -2.61,
-        "max_drawdown_20d_pct": -2.61
+        "date": "2026-06-11",
+        "distance": 0.59,
+        "return_20d_pct": 4.51,
+        "max_drawdown_20d_pct": 1.99
       },
       {
-        "date": "2002-06-13",
-        "distance": 1.133,
-        "return_20d_pct": -2.42,
-        "max_drawdown_20d_pct": -3.57
+        "date": "2015-11-06",
+        "distance": 0.599,
+        "return_20d_pct": -3.18,
+        "max_drawdown_20d_pct": -3.18
       },
       {
-        "date": "2018-11-01",
-        "distance": 1.145,
-        "return_20d_pct": 4.85,
-        "max_drawdown_20d_pct": 0.98
+        "date": "2023-02-02",
+        "distance": 0.63,
+        "return_20d_pct": -1.64,
+        "max_drawdown_20d_pct": -1.74
       },
       {
-        "date": "2015-09-21",
-        "distance": 1.163,
-        "return_20d_pct": 3.44,
-        "max_drawdown_20d_pct": -2.27
+        "date": "2025-09-30",
+        "distance": 0.635,
+        "return_20d_pct": 5.15,
+        "max_drawdown_20d_pct": 0.92
       },
       {
-        "date": "2007-04-12",
-        "distance": 1.227,
-        "return_20d_pct": 7.95,
-        "max_drawdown_20d_pct": 2.28
+        "date": "2024-12-31",
+        "distance": 0.655,
+        "return_20d_pct": -2.91,
+        "max_drawdown_20d_pct": -3.45
       }
     ],
     "_data_status": "fresh"
@@ -214,42 +218,42 @@
     "available": true,
     "basis": "NIFTY 50 日足・取得可能な過去約10年（最終 2026-09-18）",
     "baseline": {
-      "sample_count": 6380,
+      "sample_count": 6489,
       "avg_return_pct": 0.05,
-      "up_rate_pct": 53.9
+      "up_rate_pct": 53.8
     },
     "weekday": [
       {
         "weekday": "月",
-        "sample_count": 1270,
+        "sample_count": 1291,
         "avg_return_pct": -0.0,
-        "up_rate_pct": 55.0,
+        "up_rate_pct": 55.1,
         "excess_vs_baseline_pct": -0.05
       },
       {
         "weekday": "火",
-        "sample_count": 1281,
-        "avg_return_pct": 0.06,
-        "up_rate_pct": 53.7,
-        "excess_vs_baseline_pct": 0.0
+        "sample_count": 1303,
+        "avg_return_pct": 0.05,
+        "up_rate_pct": 53.2,
+        "excess_vs_baseline_pct": -0.0
       },
       {
         "weekday": "水",
-        "sample_count": 1276,
+        "sample_count": 1299,
         "avg_return_pct": 0.11,
         "up_rate_pct": 54.3,
         "excess_vs_baseline_pct": 0.06
       },
       {
         "weekday": "木",
-        "sample_count": 1274,
+        "sample_count": 1296,
         "avg_return_pct": 0.03,
-        "up_rate_pct": 53.5,
+        "up_rate_pct": 53.4,
         "excess_vs_baseline_pct": -0.02
       },
       {
         "weekday": "金",
-        "sample_count": 1256,
+        "sample_count": 1276,
         "avg_return_pct": 0.06,
         "up_rate_pct": 52.7,
         "excess_vs_baseline_pct": 0.01
@@ -265,9 +269,9 @@
       },
       {
         "month": 2,
-        "sample_count": 535,
+        "sample_count": 536,
         "avg_return_pct": -0.02,
-        "up_rate_pct": 50.3,
+        "up_rate_pct": 50.4,
         "excess_vs_baseline_pct": -0.07
       },
       {
@@ -279,44 +283,44 @@
       },
       {
         "month": 4,
-        "sample_count": 490,
+        "sample_count": 502,
         "avg_return_pct": 0.11,
-        "up_rate_pct": 55.5,
+        "up_rate_pct": 55.4,
         "excess_vs_baseline_pct": 0.06
       },
       {
         "month": 5,
-        "sample_count": 535,
-        "avg_return_pct": 0.03,
-        "up_rate_pct": 51.2,
-        "excess_vs_baseline_pct": -0.02
+        "sample_count": 554,
+        "avg_return_pct": 0.02,
+        "up_rate_pct": 50.9,
+        "excess_vs_baseline_pct": -0.03
       },
       {
         "month": 6,
-        "sample_count": 554,
+        "sample_count": 575,
         "avg_return_pct": 0.07,
-        "up_rate_pct": 54.7,
+        "up_rate_pct": 54.6,
         "excess_vs_baseline_pct": 0.02
       },
       {
         "month": 7,
-        "sample_count": 566,
+        "sample_count": 589,
         "avg_return_pct": 0.09,
-        "up_rate_pct": 54.1,
+        "up_rate_pct": 54.2,
         "excess_vs_baseline_pct": 0.04
       },
       {
         "month": 8,
-        "sample_count": 525,
+        "sample_count": 546,
         "avg_return_pct": 0.05,
-        "up_rate_pct": 57.5,
-        "excess_vs_baseline_pct": 0.0
+        "up_rate_pct": 56.8,
+        "excess_vs_baseline_pct": -0.0
       },
       {
         "month": 9,
-        "sample_count": 510,
+        "sample_count": 522,
         "avg_return_pct": 0.08,
-        "up_rate_pct": 55.1,
+        "up_rate_pct": 54.8,
         "excess_vs_baseline_pct": 0.03
       },
       {
@@ -345,15 +349,15 @@
       "definition": "各月の最初3営業日と最後3営業日",
       "current_applicable": true,
       "turn_days": {
-        "sample_count": 1873,
+        "sample_count": 1902,
         "avg_return_pct": 0.15,
         "up_rate_pct": 56.3,
         "excess_vs_baseline_pct": 0.1
       },
       "other_days": {
-        "sample_count": 4507,
+        "sample_count": 4587,
         "avg_return_pct": 0.01,
-        "up_rate_pct": 52.9,
+        "up_rate_pct": 52.7,
         "excess_vs_baseline_pct": -0.04
       }
     },
@@ -361,32 +365,32 @@
       "definition": "3営業日連続下落後",
       "current_applicable": false,
       "next_1d": {
-        "sample_count": 732,
+        "sample_count": 746,
         "avg_return_pct": 0.01,
-        "up_rate_pct": 48.6,
+        "up_rate_pct": 48.5,
         "excess_vs_baseline_pct": -0.04
       },
       "next_20d": {
-        "sample_count": 732,
-        "avg_return_pct": 1.11,
-        "up_rate_pct": 62.2,
-        "excess_vs_baseline_pct": 1.06
+        "sample_count": 746,
+        "avg_return_pct": 1.08,
+        "up_rate_pct": 61.9,
+        "excess_vs_baseline_pct": 1.03
       }
     },
     "after_large_down": {
       "definition": "1日で-1.5%以下下落した後",
-      "current_applicable": true,
+      "current_applicable": false,
       "next_1d": {
-        "sample_count": 548,
-        "avg_return_pct": 0.03,
-        "up_rate_pct": 54.0,
-        "excess_vs_baseline_pct": -0.02
+        "sample_count": 557,
+        "avg_return_pct": 0.04,
+        "up_rate_pct": 54.4,
+        "excess_vs_baseline_pct": -0.01
       },
       "next_20d": {
-        "sample_count": 548,
-        "avg_return_pct": 1.28,
-        "up_rate_pct": 60.0,
-        "excess_vs_baseline_pct": 1.23
+        "sample_count": 557,
+        "avg_return_pct": 1.32,
+        "up_rate_pct": 60.5,
+        "excess_vs_baseline_pct": 1.27
       }
     },
     "warning": "アノマリーは過去の統計的傾向です。全期間平均との差も併記しますが、偶然・制度変更・相場環境変化で再現しない可能性があります。",
@@ -396,116 +400,116 @@
     "available": true,
     "basis": "NIFTY 50 日足・取得可能な約10年、重複局面を5営業日間隔で間引き（最終 2026-09-18）",
     "baseline": {
-      "sample_count": 6261,
+      "sample_count": 6370,
       "up_rate_pct": 60.9,
       "down_rate_pct": 39.1,
-      "avg_return_20d_pct": 1.09,
-      "median_return_20d_pct": 1.32
+      "avg_return_20d_pct": 1.08,
+      "median_return_20d_pct": 1.3
     },
     "buy": [
       {
         "threshold": 35,
-        "sample_count": 155,
-        "success_rate_20d_pct": 66.5,
-        "success_rate_lift_vs_baseline_pctpt": 5.6,
-        "avg_return_5d_pct": 0.24,
-        "avg_return_20d_pct": 1.77,
-        "median_return_20d_pct": 2.35,
-        "median_max_drawdown_20d_pct": -2.33,
-        "median_max_upside_20d_pct": 4.5,
+        "sample_count": 158,
+        "success_rate_20d_pct": 67.1,
+        "success_rate_lift_vs_baseline_pctpt": 6.2,
+        "avg_return_5d_pct": 0.25,
+        "avg_return_20d_pct": 1.82,
+        "median_return_20d_pct": 2.56,
+        "median_max_drawdown_20d_pct": -2.43,
+        "median_max_upside_20d_pct": 4.63,
         "recent_examples": [
-          {
-            "date": "2025-03-10",
-            "score": 40,
-            "return_5d_pct": 1.6651602471513538,
-            "return_20d_pct": -0.27225989188910393,
-            "max_drawdown_20d_pct": -1.329907265197261,
-            "max_upside_20d_pct": 5.37993511816075
-          },
-          {
-            "date": "2025-08-18",
-            "score": 42,
-            "return_5d_pct": 0.3649996647561604,
-            "return_20d_pct": 1.4557668926382883,
-            "max_drawdown_20d_pct": -1.8093038877763812,
-            "max_upside_20d_pct": 1.4557668926382883
-          },
-          {
-            "date": "2026-01-22",
-            "score": 40,
-            "return_5d_pct": 0.12159003999636653,
-            "return_20d_pct": 1.1124978945322272,
-            "max_drawdown_20d_pct": -0.9539381186706164,
-            "max_upside_20d_pct": 2.6253532378329503
-          },
           {
             "date": "2026-02-03",
             "score": 42,
-            "return_5d_pct": 0.806915555779586,
-            "return_20d_pct": -4.847141462679916,
-            "max_drawdown_20d_pct": -4.847141462679916,
-            "max_upside_20d_pct": 0.8795972459606505
+            "return_5d_pct": 0.80691709859666,
+            "return_20d_pct": -4.847138573241527,
+            "max_drawdown_20d_pct": -4.847138573241527,
+            "max_upside_20d_pct": 0.8796018276128192
           },
           {
             "date": "2026-03-10",
             "score": 48,
-            "return_5d_pct": -2.804634606561829,
-            "return_20d_pct": -0.8696870915241184,
-            "max_drawdown_20d_pct": -7.955778884439857,
-            "max_upside_20d_pct": -0.8696870915241184
+            "return_5d_pct": -2.804637781514807,
+            "return_20d_pct": -0.8696870775216858,
+            "max_drawdown_20d_pct": -7.955781976456611,
+            "max_upside_20d_pct": -0.8696870775216858
+          },
+          {
+            "date": "2026-03-17",
+            "score": 58,
+            "return_5d_pct": -2.8359515969322957,
+            "return_20d_pct": 3.323417220958258,
+            "max_drawdown_20d_pct": -5.299783937594227,
+            "max_upside_20d_pct": 3.323417220958258
+          },
+          {
+            "date": "2026-03-24",
+            "score": 48,
+            "return_5d_pct": -0.869834674673986,
+            "return_20d_pct": 5.151359089401364,
+            "max_drawdown_20d_pct": -2.5357448368569013,
+            "max_upside_20d_pct": 7.263315933730197
+          },
+          {
+            "date": "2026-04-02",
+            "score": 40,
+            "return_5d_pct": 5.888672175968934,
+            "return_20d_pct": 5.810303305141096,
+            "max_drawdown_20d_pct": 1.123360527625028,
+            "max_upside_20d_pct": 8.204516336387368
           }
         ]
       },
       {
         "threshold": 55,
-        "sample_count": 14,
-        "success_rate_20d_pct": 64.3,
-        "success_rate_lift_vs_baseline_pctpt": 3.4,
-        "avg_return_5d_pct": -0.21,
-        "avg_return_20d_pct": -1.42,
-        "median_return_20d_pct": 2.21,
-        "median_max_drawdown_20d_pct": -4.09,
-        "median_max_upside_20d_pct": 4.6,
+        "sample_count": 15,
+        "success_rate_20d_pct": 66.7,
+        "success_rate_lift_vs_baseline_pctpt": 5.8,
+        "avg_return_5d_pct": -0.38,
+        "avg_return_20d_pct": -1.1,
+        "median_return_20d_pct": 3.22,
+        "median_max_drawdown_20d_pct": -4.11,
+        "median_max_upside_20d_pct": 4.45,
         "recent_examples": [
-          {
-            "date": "2016-11-23",
-            "score": 58,
-            "return_5d_pct": 2.380095352608813,
-            "return_20d_pct": 0.34854917257864937,
-            "max_drawdown_20d_pct": -0.8439844937436325,
-            "max_upside_20d_pct": 2.8437902339857546
-          },
           {
             "date": "2018-10-10",
             "score": 58,
-            "return_5d_pct": -0.06739710854360981,
-            "return_20d_pct": 1.1959789161603895,
-            "max_drawdown_20d_pct": -4.111811793737774,
-            "max_upside_20d_pct": 1.322174610326332
+            "return_5d_pct": -0.06739897324118393,
+            "return_20d_pct": 1.1959732698540115,
+            "max_drawdown_20d_pct": -4.1118153746140145,
+            "max_upside_20d_pct": 1.3221670920928075
           },
           {
             "date": "2020-03-05",
             "score": 58,
-            "return_5d_pct": -11.658530523449285,
-            "return_20d_pct": -21.97887838040199,
+            "return_5d_pct": -11.658532256633237,
+            "return_20d_pct": -21.97888011358594,
             "max_drawdown_20d_pct": -32.46738841068417,
-            "max_upside_20d_pct": -2.4806975302821943
+            "max_upside_20d_pct": -2.480699263466135
           },
           {
             "date": "2020-03-20",
             "score": 64,
-            "return_5d_pct": -0.9742230921189976,
-            "return_20d_pct": 6.49995349144159,
-            "max_drawdown_20d_pct": -12.980466070471241,
-            "max_upside_20d_pct": 6.49995349144159
+            "return_5d_pct": -0.9742208805721964,
+            "return_20d_pct": 6.49995140330113,
+            "max_drawdown_20d_pct": -12.980464127060365,
+            "max_upside_20d_pct": 6.49995140330113
           },
           {
             "date": "2020-03-31",
             "score": 58,
-            "return_5d_pct": 5.980057464162125,
-            "return_20d_pct": 7.069868388531875,
-            "max_drawdown_20d_pct": -5.977729002500654,
-            "max_upside_20d_pct": 14.680008032624814
+            "return_5d_pct": 5.98005292082231,
+            "return_20d_pct": 7.069872931871712,
+            "max_drawdown_20d_pct": -5.977726730830735,
+            "max_upside_20d_pct": 14.680003489284976
+          },
+          {
+            "date": "2026-03-17",
+            "score": 58,
+            "return_5d_pct": -2.8359515969322957,
+            "return_20d_pct": 3.323417220958258,
+            "max_drawdown_20d_pct": -5.299783937594227,
+            "max_upside_20d_pct": 3.323417220958258
           }
         ]
       },
@@ -525,54 +529,54 @@
     "sell": [
       {
         "threshold": 35,
-        "sample_count": 324,
-        "success_rate_20d_pct": 34.9,
-        "success_rate_lift_vs_baseline_pctpt": -4.2,
+        "sample_count": 325,
+        "success_rate_20d_pct": 34.8,
+        "success_rate_lift_vs_baseline_pctpt": -4.3,
         "avg_return_5d_pct": 0.25,
         "avg_return_20d_pct": 1.37,
-        "median_return_20d_pct": 1.6,
-        "median_max_drawdown_20d_pct": -1.8,
+        "median_return_20d_pct": 1.63,
+        "median_max_drawdown_20d_pct": -1.78,
         "median_max_upside_20d_pct": 3.1,
         "recent_examples": [
           {
-            "date": "2025-10-23",
-            "score": 36,
-            "return_5d_pct": -0.05233699624415111,
-            "return_20d_pct": 0.6826590965856028,
-            "max_drawdown_20d_pct": -1.5414369379553094,
-            "max_upside_20d_pct": 1.1615825929172097
-          },
-          {
             "date": "2025-10-30",
             "score": 40,
-            "return_5d_pct": -1.4898796999937902,
-            "return_20d_pct": 1.25628525662822,
-            "max_drawdown_20d_pct": -1.4898796999937902,
-            "max_upside_20d_pct": 1.3049815845311175
+            "return_5d_pct": -1.4898842059908324,
+            "return_20d_pct": 1.256286747160229,
+            "max_drawdown_20d_pct": -1.4898842059908324,
+            "max_upside_20d_pct": 1.3049770363457558
           },
           {
             "date": "2025-11-18",
             "score": 40,
-            "return_5d_pct": -0.09745252995904119,
-            "return_20d_pct": -0.19278685440148324,
-            "max_drawdown_20d_pct": -0.5868409233687477,
-            "max_upside_20d_pct": 1.179079124850957
+            "return_5d_pct": -0.09745253289746847,
+            "return_20d_pct": -0.19278233735559036,
+            "max_drawdown_20d_pct": -0.5868379258241463,
+            "max_upside_20d_pct": 1.179079160403007
           },
           {
             "date": "2025-11-25",
             "score": 40,
-            "return_5d_pct": 0.569440107905983,
-            "return_20d_pct": 1.1294257655124262,
-            "max_drawdown_20d_pct": -0.4898657800057271,
-            "max_upside_20d_pct": 1.2777768807074708
+            "return_5d_pct": 0.5694461614538238,
+            "return_20d_pct": 1.1294273086908335,
+            "max_drawdown_20d_pct": -0.48986277661020594,
+            "max_upside_20d_pct": 1.2777769192730881
           },
           {
             "date": "2025-12-02",
             "score": 40,
-            "return_5d_pct": -0.7396564020849761,
-            "return_20d_pct": 0.3741535235134652,
-            "max_drawdown_20d_pct": -1.0533079300979908,
-            "max_upside_20d_pct": 0.5925354162505725
+            "return_5d_pct": -0.7396608815236516,
+            "return_20d_pct": 0.3741520117392927,
+            "max_drawdown_20d_pct": -1.0533108995782192,
+            "max_upside_20d_pct": 0.5925353984680415
+          },
+          {
+            "date": "2026-07-14",
+            "score": 40,
+            "return_5d_pct": 0.5639851904515547,
+            "return_20d_pct": 1.74475772335414,
+            "max_drawdown_20d_pct": -1.183267122760845,
+            "max_upside_20d_pct": 3.002862541862328
           }
         ]
       },
@@ -590,42 +594,42 @@
           {
             "date": "2022-08-04",
             "score": 58,
-            "return_5d_pct": 1.8188378243297665,
-            "return_20d_pct": 1.5740398652341447,
-            "max_drawdown_20d_pct": -0.39753543536417135,
+            "return_5d_pct": 1.8188355770337283,
+            "return_20d_pct": 1.574042112530205,
+            "max_drawdown_20d_pct": -0.3975376826602095,
             "max_upside_20d_pct": 3.3051432516396195
           },
           {
             "date": "2023-12-07",
             "score": 58,
-            "return_5d_pct": 1.347049434423897,
-            "return_20d_pct": 3.8737120947570425,
-            "max_drawdown_20d_pct": 0.0251182346515888,
-            "max_upside_20d_pct": 4.198567120585928
+            "return_5d_pct": 1.347055066348024,
+            "return_20d_pct": 3.8737102982371763,
+            "max_drawdown_20d_pct": 0.025118235121035504,
+            "max_upside_20d_pct": 4.198572805802558
           },
           {
             "date": "2023-12-18",
             "score": 58,
-            "return_5d_pct": 0.10597875373108412,
-            "return_20d_pct": 2.8650282787826553,
-            "max_drawdown_20d_pct": -1.2535803848664706,
-            "max_upside_20d_pct": 3.169195144163295
+            "return_5d_pct": 0.10598240318600016,
+            "return_20d_pct": 2.86502650727285,
+            "max_drawdown_20d_pct": -1.2535804077287827,
+            "max_upside_20d_pct": 3.169200673245043
           },
           {
             "date": "2024-01-02",
             "score": 62,
-            "return_5d_pct": -0.5582584880946317,
-            "return_20d_pct": 0.1460755492932897,
-            "max_drawdown_20d_pct": -1.970847993624747,
-            "max_upside_20d_pct": 1.9923031779815803
+            "return_5d_pct": -0.5582530993547441,
+            "return_20d_pct": 0.14608276638758966,
+            "max_drawdown_20d_pct": -1.9708480646918214,
+            "max_upside_20d_pct": 1.9923104616492493
           },
           {
             "date": "2024-07-19",
             "score": 56,
-            "return_5d_pct": 1.2390463208034497,
-            "return_20d_pct": 0.1701935083310513,
-            "max_drawdown_20d_pct": -2.194577454567226,
-            "max_upside_20d_pct": 1.9567157844048833
+            "return_5d_pct": 1.2390495252925682,
+            "return_20d_pct": 0.1701935110411723,
+            "max_drawdown_20d_pct": -2.1945790818926447,
+            "max_upside_20d_pct": 1.9567158155632258
           }
         ]
       },
@@ -663,7 +667,7 @@
         "provider": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
         "as_of_jst": "2026-09-18T19:01+09:00",
-        "age_minutes": 2121.9,
+        "age_minutes": 2146.6,
         "error": null
       },
       "usdinr": {
@@ -673,7 +677,7 @@
         "provider": "Twelve Data",
         "provider_symbol": "USD/INR",
         "as_of_jst": "2026-09-20T06:00+09:00",
-        "age_minutes": 22.9,
+        "age_minutes": 47.6,
         "error": null
       },
       "brent": {
@@ -683,7 +687,7 @@
         "provider": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
         "as_of_jst": "2026-09-19T06:50+09:00",
-        "age_minutes": 1412.9,
+        "age_minutes": 1437.6,
         "error": null
       }
     },
@@ -697,14 +701,14 @@
     "basis": "前回14:00保存値",
     "message": "14:00履歴を蓄積中です。異なる営業日の保存値が2回分以上あると比較できます。"
   },
-  "summary": "短期は5日線を下回っています。25日線・75日線より下です。RSIは46.1で中立圏です。過去類似局面の20営業日見通しは「上向き」です。データ判定は「売買ルール判定保留」です。",
+  "summary": "短期は5日線を上回っています。25日線・75日線より下です。RSIは33.7で低位です。過去類似局面の20営業日見通しは「中立」です。データ判定は「売買ルール判定保留」です。",
   "market_state": {
     "code": "CLOSED",
     "label": "休場",
     "detail": "週末。NIFTY価格は 2026/09/18 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "4.5",
+  "app_version": "4.6",
   "core_fetch": {
     "nifty": {
       "status": "fresh",
@@ -715,29 +719,26 @@
       "technical_status": "fresh",
       "technical_date": "2026-09-18",
       "technical_error": null,
-      "history_source": "public GitHub bootstrap + self-maintained Google close",
-      "history_cache_rows": 6381,
+      "history_source": "Tickjournal recent-history bridge + self-maintained Google close",
+      "history_cache_rows": 6490,
       "history_cache_first_date": "2000-01-03",
       "history_cache_last_date": "2026-09-18",
-      "history_bootstrap_reports": [
-        {
-          "source": "kalilurrahman/NIFTY_50_STOCK_DATA",
-          "status": "ok",
-          "rows_seen": 4554,
-          "rows_added": 4554,
-          "last_date": "2026-04-13"
-        },
-        {
-          "source": "VatsalSin/Stock-Market-Indices-Dataset",
-          "status": "ok",
-          "rows_seen": 4807,
-          "rows_added": 1826,
-          "last_date": "2019-12-02"
-        }
-      ],
+      "history_bootstrap_reports": [],
+      "history_tickjournal_report": {
+        "source": "Tickjournal NIFTY 50 daily YTD",
+        "rows": 177,
+        "first_date": "2026-01-01",
+        "last_date": "2026-09-18"
+      },
       "history_yahoo_html_report": {
         "status": "error",
-        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: Yahoo history HTML too short (0 rows); ca.finance.yahoo.com: Yahoo history HTML too short (0 rows)"
+        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: HTTP Error 404: Not Found; ca.finance.yahoo.com: Yahoo history HTML too short (0 rows)"
+      },
+      "history_recent_contiguous": true,
+      "history_continuity": {
+        "latest": "2026-09-18",
+        "rows_120d": 84,
+        "max_gap_days": 4
       },
       "history_self_updates": [
         {
