@@ -1,11 +1,33 @@
 {
-  "generated_at_utc": null,
-  "generated_at_jst": null,
-  "status": "waiting_first_update",
+  "generated_at_utc": "2026-09-19T03:10:14+00:00",
+  "generated_at_jst": "2026-09-19T12:10:14+09:00",
+  "status": "ok",
   "source": "Yahoo Finance chart endpoint (reference data; no API key)",
-  "nifty": {},
-  "usdinr": {},
-  "brent": {},
+  "nifty": {
+    "symbol": "^NSEI",
+    "price": 23346.4,
+    "as_of_jst": "2026-09-18T19:00+09:00",
+    "previous_close": 23346.4,
+    "change_pct": 0.0,
+    "ma5": 23270.26,
+    "ma25": 23875.81,
+    "ma75": 24002.01,
+    "rsi14": 33.66,
+    "macd": -257.38,
+    "macd_signal": -199.911,
+    "technical_as_of_jst": "2026-09-18T12:45+09:00",
+    "technical_basis": "completed daily closes"
+  },
+  "usdinr": {
+    "symbol": "INR=X",
+    "price": 95.863,
+    "as_of_jst": "2026-09-19T06:50+09:00"
+  },
+  "brent": {
+    "symbol": "BZ=F",
+    "price": 98.77,
+    "as_of_jst": "2026-09-19T05:58+09:00"
+  },
   "errors": [],
-  "note": "Run GitHub Actions once after deployment."
+  "note": "Technicals use completed daily closes. Current quotes may be delayed."
 }
