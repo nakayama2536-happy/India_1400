@@ -11,7 +11,7 @@ Goals
 - Backtest the NIFTY-only technical core of the buy/sell setup score.
 - Keep 1-month analog outlook and anomalies descriptive, not deterministic.
 
-v4.3 is designed for a zero-cost operating model. NIFTY current price uses Google Finance
+v4.3.1 is designed for a zero-cost operating model and adds strict quote sanity checks plus legacy technical-cache migration. NIFTY current price uses Google Finance
 with NSE Indices historical data where available; USD/INR prefers the free Twelve Data
 FX allowance; Brent and India VIX use Google Finance. Yahoo Finance remains a last-resort
 fallback because GitHub-hosted runners can be rate-limited. Optional official NSE calls may
@@ -42,7 +42,7 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/
 JST = ZoneInfo("Asia/Tokyo")
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA_VERSION = 4
-APP_VERSION = "4.3"
+APP_VERSION = "4.3.1"
 TWELVEDATA_API_KEY = os.getenv("TWELVEDATA_API_KEY", "").strip()
 TWELVEDATA_BASE = "https://api.twelvedata.com"
 GOOGLE_FINANCE_BASE = "https://www.google.com/finance/beta/quote"
@@ -449,6 +449,90 @@ def _parse_google_time(raw: str, tz_hint=timezone.utc):
         return None
 
 
+GOOGLE_PRICE_BOUNDS = {
+    "NIFTY_50:INDEXNSE": (5000.0, 100000.0),
+    "USD-INR": (40.0, 200.0),
+    "BZW00:NYMEX": (10.0, 300.0),
+    "INDIA_VIX:INDEXNSE": (1.0, 100.0),
+}
+
+GOOGLE_QUOTE_LABELS = {
+    "NIFTY_50:INDEXNSE": ("NIFTY 50",),
+    "USD-INR": ("United States Dollar to Indian Rupee", "Indian Rupee"),
+    "BZW00:NYMEX": ("Brent Crude Oil Last Day Financial Futures",),
+    "INDIA_VIX:INDEXNSE": ("Nifty VIX", "India VIX"),
+}
+
+
+def _google_price_is_sane(quote_code: str, value) -> bool:
+    try:
+        v = float(value)
+    except Exception:
+        return False
+    if not math.isfinite(v):
+        return False
+    lo, hi = GOOGLE_PRICE_BOUNDS.get(quote_code, (1e-12, float("inf")))
+    return lo <= v <= hi
+
+
+def _parse_number(text):
+    if text is None:
+        return None
+    m = re.search(r"-?\d[\d,]*(?:\.\d+)?", html_lib.unescape(str(text)))
+    if not m:
+        return None
+    try:
+        return float(m.group(0).replace(",", ""))
+    except Exception:
+        return None
+
+
+def _google_targeted_price(plain: str, quote_code: str):
+    """Prefer a price located immediately after the instrument name.
+
+    Google Finance pages can contain many hidden/secondary numeric nodes. In v4.3 a
+    generic class match occasionally captured 0.00 for Brent. The instrument-name
+    anchor plus a market-specific sanity range prevents that value from being marked
+    fresh.
+    """
+    for label in GOOGLE_QUOTE_LABELS.get(quote_code, ()):
+        m = re.search(
+            re.escape(label) + r"\s+[$₹€£]?\s*([0-9][0-9,]*(?:\.\d+)?)",
+            plain,
+            flags=re.I,
+        )
+        if m:
+            value = _parse_number(m.group(1))
+            if _google_price_is_sane(quote_code, value):
+                return value
+    return None
+
+
+def _derive_saved_technical_date(old_n: dict):
+    """Migrate older v4/v4.1/v4.2 technical metadata to v4.3-style technical_date."""
+    raw = old_n.get("technical_date")
+    if raw:
+        try:
+            return datetime.strptime(str(raw)[:10], "%Y-%m-%d").date().isoformat()
+        except Exception:
+            pass
+    for key in ("technical_as_of_jst", "as_of_jst"):
+        raw = old_n.get(key)
+        if not raw:
+            continue
+        try:
+            dt = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=JST)
+            return dt.astimezone(IST).date().isoformat()
+        except Exception:
+            try:
+                return datetime.strptime(str(raw)[:10], "%Y-%m-%d").date().isoformat()
+            except Exception:
+                pass
+    return None
+
+
 def google_finance_quote(quote_code: str, tz_hint=timezone.utc):
     """Fetch a public Google Finance quote page without an API key.
 
@@ -466,28 +550,37 @@ def google_finance_quote(quote_code: str, tz_hint=timezone.utc):
             "Cache-Control": "no-cache",
         },
     )
-    price = None
-    for pat in (
-        r'<div[^>]*class="[^"]*YMlKec[^"]*fxKbKc[^"]*"[^>]*>([^<]+)</div>',
-        r'<div[^>]*class="[^"]*fxKbKc[^"]*YMlKec[^"]*"[^>]*>([^<]+)</div>',
-        r'class="YMlKec fxKbKc"[^>]*>([^<]+)<',
-    ):
-        m = re.search(pat, text, flags=re.I)
-        if m:
-            raw_price = html_lib.unescape(m.group(1)).replace(",", "")
-            n = re.search(r"-?\d+(?:\.\d+)?", raw_price)
-            if n:
-                price = float(n.group(0))
-                break
     plain = _plain_html(text)
+    # Instrument-name anchored extraction is preferred. It is materially safer for
+    # pages such as Brent futures that contain hidden/secondary numeric nodes.
+    price = _google_targeted_price(plain[:7000], quote_code)
+
     if price is None:
-        # Conservative fallback: price immediately after the quote name/research header.
-        head = plain[:5000]
-        m = re.search(r"(?:Research|NIFTY 50|Nifty VIX|Indian Rupee|Brent Crude Oil Last Day Financial Futures)\s+[^0-9]{0,120}([0-9][0-9,]*(?:\.\d+)?)", head, re.I)
+        for pat in (
+            r'<div[^>]*class="[^"]*YMlKec[^"]*fxKbKc[^"]*"[^>]*>([^<]+)</div>',
+            r'<div[^>]*class="[^"]*fxKbKc[^"]*YMlKec[^"]*"[^>]*>([^<]+)</div>',
+            r'class="YMlKec fxKbKc"[^>]*>([^<]+)<',
+        ):
+            for m in re.finditer(pat, text, flags=re.I):
+                candidate = _parse_number(m.group(1))
+                if _google_price_is_sane(quote_code, candidate):
+                    price = candidate
+                    break
+            if price is not None:
+                break
+
+    if price is None:
+        # Final text fallback, still guarded by market-specific sanity ranges.
+        head = plain[:7000]
+        m = re.search(r"(?:NIFTY 50|Nifty VIX|India VIX|Indian Rupee|Brent Crude Oil Last Day Financial Futures)\s+[^0-9]{0,160}([0-9][0-9,]*(?:\.\d+)?)", head, re.I)
         if m:
-            price = float(m.group(1).replace(",", ""))
+            candidate = _parse_number(m.group(1))
+            if _google_price_is_sane(quote_code, candidate):
+                price = candidate
     if price is None:
-        raise RuntimeError(f"Google Finance price not found for {quote_code}")
+        bounds = GOOGLE_PRICE_BOUNDS.get(quote_code)
+        suffix = f" within sanity range {bounds}" if bounds else ""
+        raise RuntimeError(f"Google Finance valid price not found for {quote_code}{suffix}")
 
     raw_time = None
     mt = re.search(r'<div[^>]*class="[^"]*ygUjEc[^"]*"[^>]*>(.*?)</div>', text, flags=re.I | re.S)
@@ -1746,14 +1839,19 @@ def main():
             technical_status = "fresh"
         else:
             old_n = (old.get("nifty") or {}) if isinstance(old, dict) else {}
-            required = ("technical_date", "ma5", "ma25", "ma75", "rsi14", "macd", "macd_signal")
-            if not all(old_n.get(k) is not None for k in required):
-                raise RuntimeError("NIFTY current quote fetched, but daily history unavailable and no saved technical cache exists")
-            # Confirmed technicals are intentionally based on completed daily closes, so
-            # reusing the most recent saved set briefly is preferable to pretending the
-            # current quote itself is stale. The data-quality gate checks its age below.
+            cached_date = _derive_saved_technical_date(old_n)
+            required_metrics = ("ma5", "ma25", "ma75", "rsi14", "macd", "macd_signal")
+            if not cached_date or not all(old_n.get(k) is not None for k in required_metrics):
+                raise RuntimeError("NIFTY current quote fetched, but daily history unavailable and no usable saved technical cache exists")
+            # v4.1/v4.2 stored technical_as_of_jst rather than technical_date. Migrate it
+            # in-place so the cached technicals can be used safely during the grace period.
             result["nifty"] = dict(old_n)
-            previous_close = old_n.get("technical_close") or old_n.get("previous_close")
+            result["nifty"]["technical_date"] = cached_date
+            if result["nifty"].get("technical_close") is None:
+                result["nifty"]["technical_close"] = old_n.get("previous_close")
+            if result["nifty"].get("macd_hist") is None and old_n.get("macd") is not None and old_n.get("macd_signal") is not None:
+                result["nifty"]["macd_hist"] = round_or_none(float(old_n["macd"]) - float(old_n["macd_signal"]), 3)
+            previous_close = result["nifty"].get("technical_close") or old_n.get("previous_close")
             result["nifty"].update({
                 "symbol": "^NSEI",
                 "provider_symbol": provider_symbol,
@@ -1897,7 +1995,7 @@ def main():
             "source": "Zero-cost provider priority: NIFTY=Google Finance quote + official NSE Indices history; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance is last-resort fallback; optional NSE live context may be unavailable on hosted runners",
             "errors": errors,
             "optional_errors": optional_errors,
-            "note": "v4.3 free-only: no paid market-data plan is required. Public web sources can change or throttle; failed core fetches retain the previous value only for continuity and never qualify as a fresh trading decision.",
+            "note": "v4.3.1 free-only: no paid market-data plan is required. Public web sources can change or throttle; failed core fetches retain the previous value only for continuity and never qualify as a fresh trading decision.",
         }
     )
 
