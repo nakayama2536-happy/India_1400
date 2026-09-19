@@ -11,24 +11,28 @@ Goals
 - Backtest the NIFTY-only technical core of the buy/sell setup score.
 - Keep 1-month analog outlook and anomalies descriptive, not deterministic.
 
-Core market data uses Twelve Data when a GitHub Secret API key is configured, with Yahoo Finance as a fallback reference source.
-Optional official NSE/NSE Indices calls may fail from hosted runners; failures do not
-stop core processing and are surfaced explicitly in market.json.
+v4.3 is designed for a zero-cost operating model. NIFTY current price uses Google Finance
+with NSE Indices historical data where available; USD/INR prefers the free Twelve Data
+FX allowance; Brent and India VIX use Google Finance. Yahoo Finance remains a last-resort
+fallback because GitHub-hosted runners can be rate-limited. Optional official NSE calls may
+fail from hosted runners; failures do not stop core processing and are surfaced explicitly.
 """
 from __future__ import annotations
 
 import csv
+import html as html_lib
 import http.cookiejar
 import io
 import json
 import math
 import os
+import re
 import statistics
 import time
 import urllib.parse
 import urllib.request
 from collections import defaultdict
-from datetime import datetime, time as dtime, timezone
+from datetime import datetime, time as dtime, timezone, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -38,9 +42,10 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/
 JST = ZoneInfo("Asia/Tokyo")
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA_VERSION = 4
-APP_VERSION = "4.2"
+APP_VERSION = "4.3"
 TWELVEDATA_API_KEY = os.getenv("TWELVEDATA_API_KEY", "").strip()
 TWELVEDATA_BASE = "https://api.twelvedata.com"
+GOOGLE_FINANCE_BASE = "https://www.google.com/finance/beta/quote"
 
 # NSE cash-market trading holidays for calendar year 2026.
 # Source: NSE circular "Trading holidays for the calendar year 2026".
@@ -97,6 +102,29 @@ def http_text(url: str, tries: int = 3, timeout: int = 25, headers=None, opener=
             time.sleep(1.5 * (i + 1))
     raise RuntimeError(str(last))
 
+
+
+def http_post_json(url: str, payload: dict, tries: int = 2, timeout: int = 30, headers=None, opener=None):
+    last = None
+    hdr = {
+        "User-Agent": UA,
+        "Accept": "application/json,text/javascript,*/*;q=0.01",
+        "Content-Type": "application/json; charset=UTF-8",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    if headers:
+        hdr.update(headers)
+    body = json.dumps(payload).encode("utf-8")
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, data=body, headers=hdr, method="POST")
+            client = opener.open if opener is not None else urllib.request.urlopen
+            with client(req, timeout=timeout) as r:
+                return json.loads(r.read().decode("utf-8", errors="replace"))
+        except Exception as e:
+            last = e
+            time.sleep(1.5 * (i + 1))
+    raise RuntimeError(str(last))
 
 def yahoo_chart(symbol: str, range_: str = "10d", interval: str = "5m"):
     """Lightweight Yahoo chart fetch with host fallback and modest backoff.
@@ -385,14 +413,212 @@ def twelve_simple_bundle(kind: str, old_result=None):
     return None, ts, price, series, change5, symbol
 
 
-def fetch_nifty_bundle(old_result=None):
-    errs = []
-    if TWELVEDATA_API_KEY:
+
+def _plain_html(text: str):
+    text = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", text)
+    text = re.sub(r"(?is)<style[^>]*>.*?</style>", " ", text)
+    text = re.sub(r"(?s)<[^>]+>", " ", text)
+    text = html_lib.unescape(text).replace("\u202f", " ").replace("\xa0", " ")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _parse_google_time(raw: str, tz_hint=timezone.utc):
+    if not raw:
+        return None
+    raw = html_lib.unescape(str(raw)).replace("\u202f", " ").replace("\xa0", " ").strip()
+    raw = re.sub(r"\s+", " ", raw)
+    # Examples: Sep 18, 3:31:14 PM GMT+5:30 / Sep 18, 1:11:10 PM UTC
+    m = re.search(r"([A-Z][a-z]{2})\s+(\d{1,2}),\s+(\d{1,2}:\d{2}:\d{2})\s+([AP]M)\s+(GMT[+-]\d{1,2}:\d{2}|UTC)", raw)
+    if not m:
+        return None
+    mon, day, clock, ampm, zone = m.groups()
+    now = datetime.now(tz_hint)
+    if zone == "UTC":
+        offset = "+0000"
+    else:
+        off = zone[3:]
+        sign = "+" if off.startswith("+") else "-"
+        hh, mm = off[1:].split(":")
+        offset = f"{sign}{int(hh):02d}{int(mm):02d}"
+    try:
+        dt = datetime.strptime(f"{now.year} {mon} {day} {clock} {ampm} {offset}", "%Y %b %d %I:%M:%S %p %z")
+        if dt > datetime.now(timezone.utc) + timedelta(days=2):
+            dt = dt.replace(year=dt.year - 1)
+        return int(dt.astimezone(timezone.utc).timestamp())
+    except Exception:
+        return None
+
+
+def google_finance_quote(quote_code: str, tz_hint=timezone.utc):
+    """Fetch a public Google Finance quote page without an API key.
+
+    Google Finance is used as a free reference source, not a licensed exchange feed.
+    The parser has class-based and plain-text fallbacks and refuses to mark a quote
+    fresh if its displayed timestamp cannot be parsed.
+    """
+    code = urllib.parse.quote(quote_code, safe=":-")
+    url = f"{GOOGLE_FINANCE_BASE}/{code}?hl=en"
+    text = http_text(
+        url, tries=2, timeout=25,
+        headers={
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.google.com/finance/",
+            "Cache-Control": "no-cache",
+        },
+    )
+    price = None
+    for pat in (
+        r'<div[^>]*class="[^"]*YMlKec[^"]*fxKbKc[^"]*"[^>]*>([^<]+)</div>',
+        r'<div[^>]*class="[^"]*fxKbKc[^"]*YMlKec[^"]*"[^>]*>([^<]+)</div>',
+        r'class="YMlKec fxKbKc"[^>]*>([^<]+)<',
+    ):
+        m = re.search(pat, text, flags=re.I)
+        if m:
+            raw_price = html_lib.unescape(m.group(1)).replace(",", "")
+            n = re.search(r"-?\d+(?:\.\d+)?", raw_price)
+            if n:
+                price = float(n.group(0))
+                break
+    plain = _plain_html(text)
+    if price is None:
+        # Conservative fallback: price immediately after the quote name/research header.
+        head = plain[:5000]
+        m = re.search(r"(?:Research|NIFTY 50|Nifty VIX|Indian Rupee|Brent Crude Oil Last Day Financial Futures)\s+[^0-9]{0,120}([0-9][0-9,]*(?:\.\d+)?)", head, re.I)
+        if m:
+            price = float(m.group(1).replace(",", ""))
+    if price is None:
+        raise RuntimeError(f"Google Finance price not found for {quote_code}")
+
+    raw_time = None
+    mt = re.search(r'<div[^>]*class="[^"]*ygUjEc[^"]*"[^>]*>(.*?)</div>', text, flags=re.I | re.S)
+    if mt:
+        raw_time = _plain_html(mt.group(1))
+    if not raw_time:
+        mt = re.search(r"([A-Z][a-z]{2}\s+\d{1,2},\s+\d{1,2}:\d{2}:\d{2}\s+[AP]M\s+(?:GMT[+-]\d{1,2}:\d{2}|UTC))", plain)
+        if mt:
+            raw_time = mt.group(1)
+    ts = _parse_google_time(raw_time, tz_hint)
+    if ts is None:
+        raise RuntimeError(f"Google Finance quote timestamp not found for {quote_code}")
+    return ts, price, {"quote_code": quote_code, "url": url, "display_time": raw_time}
+
+
+def niftyindices_daily_series(years: int = 11):
+    """Free official NSE Indices historical NIFTY 50 daily closes.
+
+    Uses the public historical-data endpoint behind niftyindices.com. The endpoint is
+    independent from the NSE live API that commonly returns 403 on hosted runners.
+    """
+    now_ist = datetime.now(IST)
+    start = now_ist.date() - timedelta(days=366 * years)
+    end = now_ist.date()
+    cj = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+    base = "https://www.niftyindices.com"
+    try:
+        http_text(
+            f"{base}/reports/historical-data", tries=1, timeout=10, opener=opener,
+            headers={"Accept": "text/html,application/xhtml+xml,*/*;q=0.8"},
+        )
+    except Exception:
+        # Some runs can access the data endpoint even if the bootstrap HTML is slow.
+        pass
+    info = {
+        "name": "NIFTY 50",
+        "indexName": "NIFTY 50",
+        "startDate": start.strftime("%d-%b-%Y"),
+        "endDate": end.strftime("%d-%b-%Y"),
+    }
+    data = http_post_json(
+        f"{base}/Backpage.aspx/getHistoricaldatatabletoString",
+        {"cinfo": json.dumps(info, separators=(",", ":"))},
+        tries=2, timeout=35, opener=opener,
+        headers={
+            "Origin": base,
+            "Referer": f"{base}/reports/historical-data",
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    )
+    raw = data.get("d") if isinstance(data, dict) else None
+    if isinstance(raw, str):
+        rows = json.loads(raw)
+    elif isinstance(raw, list):
+        rows = raw
+    else:
+        raise RuntimeError("NSE Indices historical response has no data")
+    out = []
+    for row in rows:
+        date_raw = row.get("HistoricalDate") or row.get("Date") or row.get("date")
+        close_raw = row.get("CLOSE") or row.get("Close") or row.get("close")
+        if not date_raw or close_raw in (None, "", "-"):
+            continue
+        dt = None
+        for fmt in ("%d %b %Y", "%d-%b-%Y", "%d/%m/%Y"):
+            try:
+                dt = datetime.strptime(str(date_raw).strip(), fmt)
+                break
+            except Exception:
+                pass
+        if dt is None:
+            continue
         try:
-            bundle = twelve_nifty_bundle(old_result)
-            return bundle[:5], "Twelve Data", bundle[5]
-        except Exception as e:
-            errs.append("Twelve Data: " + str(e))
+            close = float(str(close_raw).replace(",", ""))
+        except Exception:
+            continue
+        local = datetime.combine(dt.date(), dtime(15, 30), tzinfo=IST)
+        out.append((int(local.astimezone(timezone.utc).timestamp()), close))
+    out.sort(key=lambda x: x[0])
+    # Remove duplicate dates defensively.
+    dedup = {}
+    for ts, close in out:
+        day = datetime.fromtimestamp(ts, timezone.utc).astimezone(IST).date().isoformat()
+        dedup[day] = (ts, close)
+    out = list(dedup.values())
+    out.sort(key=lambda x: x[0])
+    if len(out) < 120:
+        raise RuntimeError(f"NSE Indices historical data too short ({len(out)} rows)")
+    return out
+
+
+def google_nifty_bundle(old_result=None):
+    ts, price, quote_meta = google_finance_quote("NIFTY_50:INDEXNSE", IST)
+    meta = {"quote": quote_meta, "history_source": "NSE Indices Historical"}
+    try:
+        ds = niftyindices_daily_series(11)
+        meta["history_status"] = "fresh"
+    except Exception as e:
+        # A fresh Google quote is still useful. Main() may safely pair it with the
+        # last saved confirmed technicals for a short grace period.
+        ds = []
+        meta["history_status"] = "cached"
+        meta["history_error"] = str(e)
+    return meta, ts, price, ds, None, "NIFTY_50:INDEXNSE"
+
+
+def google_simple_bundle(kind: str):
+    if kind == "usdinr":
+        code, tz = "USD-INR", timezone.utc
+    elif kind == "brent":
+        code, tz = "BZW00:NYMEX", timezone.utc
+    else:
+        raise ValueError(kind)
+    ts, price, _ = google_finance_quote(code, tz)
+    return None, ts, price, [], None, code
+
+def fetch_nifty_bundle(old_result=None):
+    """Zero-cost NIFTY provider chain.
+
+    1) Google Finance current quote + official NSE Indices historical daily data.
+    2) Yahoo Finance chart as last-resort fallback.
+    Twelve Data is intentionally not used for NIFTY because the free plan may not
+    include the required international-index history.
+    """
+    errs = []
+    try:
+        b = google_nifty_bundle(old_result)
+        return b[:5], "Google Finance + NSE Indices", b[5]
+    except Exception as e:
+        errs.append("Google/NSE Indices: " + str(e))
     try:
         return yahoo_daily_bundle("^NSEI", "10y"), "Yahoo Finance", "^NSEI"
     except Exception as e:
@@ -401,19 +627,29 @@ def fetch_nifty_bundle(old_result=None):
 
 
 def fetch_simple_bundle(kind: str, yahoo_symbol: str, old_result=None):
+    """Zero-cost provider chain for FX and Brent.
+
+    USD/INR uses the free Twelve Data FX allowance first, then Google Finance.
+    Brent uses Google Finance first because Twelve Data commodity access can require
+    a paid tier. Yahoo Finance is kept only as a last-resort fallback.
+    """
     errs = []
-    if TWELVEDATA_API_KEY:
+    if kind == "usdinr" and TWELVEDATA_API_KEY:
         try:
             b = twelve_simple_bundle(kind, old_result)
             return b[:5], "Twelve Data", b[5]
         except Exception as e:
             errs.append("Twelve Data: " + str(e))
     try:
+        b = google_simple_bundle(kind)
+        return b[:5], "Google Finance", b[5]
+    except Exception as e:
+        errs.append("Google Finance: " + str(e))
+    try:
         return yahoo_daily_bundle(yahoo_symbol, "1mo"), "Yahoo Finance", yahoo_symbol
     except Exception as e:
         errs.append("Yahoo Finance: " + str(e))
     raise RuntimeError("; ".join(errs))
-
 
 def iso_age_minutes(value, now_jst):
     try:
@@ -1302,6 +1538,7 @@ def build_data_quality(result, now_jst):
     all_fresh = True
     any_fallback = False
     live_stale = False
+    technical_stale = False
 
     for key, label in core_defs:
         meta = core_fetch.get(key) or {}
@@ -1312,6 +1549,8 @@ def build_data_quality(result, now_jst):
             "label": label,
             "status": status,
             "fetched_this_run": bool(meta.get("fetched_this_run")),
+            "provider": meta.get("provider") or (result.get(key) or {}).get("provider"),
+            "provider_symbol": meta.get("provider_symbol") or (result.get(key) or {}).get("provider_symbol"),
             "as_of_jst": as_of,
             "age_minutes": round_or_none(age, 1),
             "error": meta.get("error"),
@@ -1326,6 +1565,20 @@ def build_data_quality(result, now_jst):
         if state.get("code") == "LIVE" and age is not None and age > 30:
             live_stale = True
             reasons.append(f"取引中ですが{label}の価格時刻が約{age:.0f}分古い状態です。")
+        if key == "nifty":
+            tstatus = meta.get("technical_status")
+            tdate = meta.get("technical_date") or (result.get("nifty") or {}).get("technical_date")
+            if tstatus == "cached":
+                reasons.append(f"NIFTY確定テクニカルは前回保存値（{tdate or '日付不明'}）を使用しています。")
+                try:
+                    td = datetime.strptime(str(tdate), "%Y-%m-%d").date()
+                    age_days = (now_jst.astimezone(IST).date() - td).days
+                    if age_days > 5:
+                        technical_stale = True
+                        reasons.append(f"NIFTY確定テクニカルが{age_days}日古いため、最新判断を保留します。")
+                except Exception:
+                    technical_stale = True
+                    reasons.append("NIFTY確定テクニカルの基準日を確認できないため、最新判断を保留します。")
 
     cc = result.get("crosscheck") or {}
     crosscheck_mismatch = bool(cc.get("available") and cc.get("diff_pct") is not None and abs(cc["diff_pct"]) > 0.5)
@@ -1341,7 +1594,7 @@ def build_data_quality(result, now_jst):
     else:
         freshness = "UNKNOWN"
 
-    if all_fresh and state.get("code") == "LIVE" and not live_stale and not crosscheck_mismatch:
+    if all_fresh and state.get("code") == "LIVE" and not live_stale and not crosscheck_mismatch and not technical_stale:
         gate = {"code": "OK", "label": "判断データ良好", "allow_rule": True}
     else:
         gate = {"code": "HOLD", "label": "売買ルール判定保留", "allow_rule": False}
@@ -1351,6 +1604,8 @@ def build_data_quality(result, now_jst):
             reasons.append("通常取引時間中ではないため、第1弾購入ルールは自動確定しません。")
         elif live_stale:
             reasons.append("取引中の主要価格に遅延があるため、最新判断を保留します。")
+        elif technical_stale:
+            reasons.append("確定テクニカルの更新が古いため、最新判断を保留します。")
 
     optional_available = sum(
         bool((result.get(k) or {}).get("available"))
@@ -1440,59 +1695,101 @@ def main():
                 "error": msg,
             }
 
-    # NIFTY: one 10-year daily request supplies both current reference price (meta)
-    # and the long history needed for analytics.
+    # NIFTY v4.3: current quote is free Google Finance; long history is the official
+    # NSE Indices historical endpoint. If history is temporarily unavailable, a fresh
+    # quote may use recently saved confirmed technicals instead of falsely becoming a
+    # stale price. Yahoo remains the last-resort full-bundle fallback.
     try:
         bundle, provider_name, provider_symbol = fetch_nifty_bundle(old)
-        _, t_now, p_now, ds, _ = bundle
+        provider_meta, t_now, p_now, ds, _ = bundle
         if provider_name == "Twelve Data":
             provider_symbols["twelvedata"]["nifty"] = provider_symbol
-        if len(ds) < 100:
-            raise RuntimeError("insufficient daily history")
-        daily_vals = [c for _, c in ds]
-        daily_dates = [datetime.fromtimestamp(t, timezone.utc).astimezone(IST).date().isoformat() for t, _ in ds]
-        arrays = build_indicator_arrays(daily_vals)
-        i = len(daily_vals) - 1
-        quote_date = datetime.fromtimestamp(t_now, timezone.utc).astimezone(IST).date()
-        last_daily_date = datetime.fromtimestamp(ds[-1][0], timezone.utc).astimezone(IST).date()
-        previous_close = daily_vals[-2] if quote_date == last_daily_date and len(daily_vals) >= 2 else daily_vals[-1]
-        provisional = build_provisional_technicals(daily_dates, daily_vals, p_now, t_now)
-        result["nifty"] = {
-            "symbol": "^NSEI",
-            "provider_symbol": provider_symbol,
-            "provider": provider_name,
-            "price": round_or_none(p_now, 2),
+
+        history_error = (provider_meta or {}).get("history_error") if isinstance(provider_meta, dict) else None
+        if len(ds) >= 100:
+            daily_vals = [c for _, c in ds]
+            daily_dates = [datetime.fromtimestamp(t, timezone.utc).astimezone(IST).date().isoformat() for t, _ in ds]
+            arrays = build_indicator_arrays(daily_vals)
+            i = len(daily_vals) - 1
+            quote_date = datetime.fromtimestamp(t_now, timezone.utc).astimezone(IST).date()
+            last_daily_date = datetime.fromtimestamp(ds[-1][0], timezone.utc).astimezone(IST).date()
+            previous_close = daily_vals[-2] if quote_date == last_daily_date and len(daily_vals) >= 2 else daily_vals[-1]
+            provisional = build_provisional_technicals(daily_dates, daily_vals, p_now, t_now)
+            result["nifty"] = {
+                "symbol": "^NSEI",
+                "provider_symbol": provider_symbol,
+                "provider": provider_name,
+                "price": round_or_none(p_now, 2),
+                "as_of_jst": iso_jst(t_now),
+                "previous_close": round_or_none(previous_close, 2),
+                "change_pct": round_or_none(pct_change(p_now, previous_close), 3),
+                "technical_close": round_or_none(daily_vals[i], 2),
+                "technical_date": daily_dates[i],
+                "ma5": round_or_none(arrays["ma5"][i], 2),
+                "ma25": round_or_none(arrays["ma25"][i], 2),
+                "ma75": round_or_none(arrays["ma75"][i], 2),
+                "rsi14": round_or_none(arrays["rsi"][i], 2),
+                "rsi14_prev": round_or_none(arrays["rsi"][i - 1], 2),
+                "macd": round_or_none(arrays["macd"][i], 3),
+                "macd_signal": round_or_none(arrays["signal"][i], 3),
+                "macd_hist": round_or_none(arrays["hist"][i], 3),
+                "macd_hist_prev": round_or_none(arrays["hist"][i - 1], 3),
+                "ret5_pct": round_or_none(arrays["ret5"][i], 2),
+                "ret20_pct": round_or_none(arrays["ret20"][i], 2),
+                "vol20_annualized_pct": round_or_none(arrays["vol20"][i], 2),
+                "price_vs_ma5_pct": round_or_none(pct_change(p_now, arrays["ma5"][i]), 2),
+                "price_vs_ma25_pct": round_or_none(pct_change(p_now, arrays["ma25"][i]), 2),
+                "price_vs_ma75_pct": round_or_none(pct_change(p_now, arrays["ma75"][i]), 2),
+                "technical_basis": "前営業日までの確定日足",
+                "provisional": provisional,
+            }
+            technical_status = "fresh"
+        else:
+            old_n = (old.get("nifty") or {}) if isinstance(old, dict) else {}
+            required = ("technical_date", "ma5", "ma25", "ma75", "rsi14", "macd", "macd_signal")
+            if not all(old_n.get(k) is not None for k in required):
+                raise RuntimeError("NIFTY current quote fetched, but daily history unavailable and no saved technical cache exists")
+            # Confirmed technicals are intentionally based on completed daily closes, so
+            # reusing the most recent saved set briefly is preferable to pretending the
+            # current quote itself is stale. The data-quality gate checks its age below.
+            result["nifty"] = dict(old_n)
+            previous_close = old_n.get("technical_close") or old_n.get("previous_close")
+            result["nifty"].update({
+                "symbol": "^NSEI",
+                "provider_symbol": provider_symbol,
+                "provider": provider_name + " / saved technicals",
+                "price": round_or_none(p_now, 2),
+                "as_of_jst": iso_jst(t_now),
+                "previous_close": round_or_none(previous_close, 2),
+                "change_pct": round_or_none(pct_change(p_now, previous_close), 3) if previous_close else None,
+                "price_vs_ma5_pct": round_or_none(pct_change(p_now, old_n.get("ma5")), 2) if old_n.get("ma5") else None,
+                "price_vs_ma25_pct": round_or_none(pct_change(p_now, old_n.get("ma25")), 2) if old_n.get("ma25") else None,
+                "price_vs_ma75_pct": round_or_none(pct_change(p_now, old_n.get("ma75")), 2) if old_n.get("ma75") else None,
+                "technical_basis": "前回保存の確定日足（履歴取得一時失敗）",
+                "provisional": {"available": False, "message": "日足履歴を今回更新できないため暫定テクニカルは省略"},
+            })
+            technical_status = "cached"
+            if history_error:
+                optional_errors.append("NIFTY historical: " + history_error)
+
+        core_fetch["nifty"] = {
+            "status": "fresh",
+            "fetched_this_run": True,
             "as_of_jst": iso_jst(t_now),
-            "previous_close": round_or_none(previous_close, 2),
-            "change_pct": round_or_none(pct_change(p_now, previous_close), 3),
-            "technical_close": round_or_none(daily_vals[i], 2),
-            "technical_date": daily_dates[i],
-            "ma5": round_or_none(arrays["ma5"][i], 2),
-            "ma25": round_or_none(arrays["ma25"][i], 2),
-            "ma75": round_or_none(arrays["ma75"][i], 2),
-            "rsi14": round_or_none(arrays["rsi"][i], 2),
-            "rsi14_prev": round_or_none(arrays["rsi"][i - 1], 2),
-            "macd": round_or_none(arrays["macd"][i], 3),
-            "macd_signal": round_or_none(arrays["signal"][i], 3),
-            "macd_hist": round_or_none(arrays["hist"][i], 3),
-            "macd_hist_prev": round_or_none(arrays["hist"][i - 1], 3),
-            "ret5_pct": round_or_none(arrays["ret5"][i], 2),
-            "ret20_pct": round_or_none(arrays["ret20"][i], 2),
-            "vol20_annualized_pct": round_or_none(arrays["vol20"][i], 2),
-            "price_vs_ma5_pct": round_or_none(pct_change(p_now, arrays["ma5"][i]), 2),
-            "price_vs_ma25_pct": round_or_none(pct_change(p_now, arrays["ma25"][i]), 2),
-            "price_vs_ma75_pct": round_or_none(pct_change(p_now, arrays["ma75"][i]), 2),
-            "technical_basis": "前営業日までの確定日足",
-            "provisional": provisional,
+            "provider": provider_name,
+            "provider_symbol": provider_symbol,
+            "technical_status": technical_status,
+            "technical_date": (result.get("nifty") or {}).get("technical_date"),
+            "technical_error": history_error,
+            "error": None,
         }
-        core_fetch["nifty"] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(t_now), "provider": provider_name, "provider_symbol": provider_symbol, "error": None}
         result["market_state"] = market_state(t_now, now_jst)
     except Exception as e:
         record_core_failure("nifty", "NIFTY", e)
         result["market_state"] = market_state_from_saved(result.get("nifty"), now_jst)
 
-    # USD/INR and Brent: one daily request each supplies regularMarketPrice plus
-    # enough closes for the 5-session change. This halves Yahoo request volume.
+    # USD/INR: free Twelve Data FX first, then Google. Brent: Google first.
+    # Five-day external-factor changes are optional; missing change data does not block core freshness.
     for key, label, symbol in (("usdinr", "USD/INR", "INR=X"), ("brent", "Brent", "BZ=F")):
         try:
             bundle, provider_name, provider_symbol = fetch_simple_bundle(key, symbol, old)
@@ -1516,9 +1813,19 @@ def main():
     # mark it as fallback so it cannot masquerade as a fresh optional factor.
     vix_fetch_status = "unavailable"
     try:
-        _, ts, price, _, change5 = yahoo_daily_bundle("^INDIAVIX", "1mo")
+        vix_provider = None
+        vix_errors = []
+        try:
+            ts, price, _ = google_finance_quote("INDIA_VIX:INDEXNSE", IST)
+            change5 = None
+            vix_provider = "Google Finance"
+        except Exception as ge:
+            vix_errors.append("Google Finance: " + str(ge))
+            _, ts, price, _, change5 = yahoo_daily_bundle("^INDIAVIX", "1mo")
+            vix_provider = "Yahoo Finance"
         result["india_vix"] = {
             "symbol": "^INDIAVIX",
+            "provider": vix_provider,
             "price": round_or_none(price, 2),
             "as_of_jst": iso_jst(ts),
             "change_5d_pct": round_or_none(change5, 2),
@@ -1587,10 +1894,10 @@ def main():
             "status": status,
             "core_fetch": core_fetch,
             "provider_symbols": provider_symbols,
-            "source": "Core provider priority: Twelve Data (when TWELVEDATA_API_KEY is configured) -> Yahoo Finance fallback; official NSE/NSE Indices optional cross-check/context",
+            "source": "Zero-cost provider priority: NIFTY=Google Finance quote + official NSE Indices history; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance is last-resort fallback; optional NSE live context may be unavailable on hosted runners",
             "errors": errors,
             "optional_errors": optional_errors,
-            "note": "v4.2: Twelve Data can be enabled through a GitHub Secret. Failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
+            "note": "v4.3 free-only: no paid market-data plan is required. Public web sources can change or throttle; failed core fetches retain the previous value only for continuity and never qualify as a fresh trading decision.",
         }
     )
 
@@ -1598,10 +1905,10 @@ def main():
     gate = (result.get("data_quality") or {}).get("decision_gate") or {}
     all_core_fresh = bool((result.get("data_quality") or {}).get("all_core_fresh_this_run"))
 
-    if core_fetch.get("nifty", {}).get("status") == "fresh" and arrays and daily_vals:
+    if core_fetch.get("nifty", {}).get("status") == "fresh":
         n = result["nifty"]
         p = n.get("provisional") or {}
-        if (result.get("market_state") or {}).get("code") == "LIVE" and p.get("available"):
+        if arrays and daily_vals and (result.get("market_state") or {}).get("code") == "LIVE" and p.get("available"):
             score_nifty = {
                 **n,
                 **{k: p.get(k) for k in (
@@ -1611,6 +1918,9 @@ def main():
                 )}
             }
             score_basis = "14:00暫定テクニカル"
+        elif (core_fetch.get("nifty") or {}).get("technical_status") == "cached":
+            score_nifty = n
+            score_basis = "前回保存の確定日足テクニカル"
         else:
             score_nifty = n
             score_basis = "確定日足テクニカル"
@@ -1626,16 +1936,28 @@ def main():
         result["signals"].update({
             "available": True,
             "decision_eligible": bool(gate.get("allow_rule")),
-            "status": "fresh" if all_core_fresh else "technical_only_reference",
+            "status": "fresh" if all_core_fresh and arrays and daily_vals else "technical_cached_reference",
             "display_note": "最新判断に使用可能" if gate.get("allow_rule") else "参考表示。データ品質ゲートにより売買判断は保留。",
         })
 
-        result["outlook_1m"] = nearest_analog_outlook(daily_dates, daily_vals, arrays)
-        result["outlook_1m"]["_data_status"] = "fresh"
-        result["anomalies"] = anomaly_stats(daily_dates, daily_vals)
-        result["anomalies"]["_data_status"] = "fresh"
-        result["score_backtest"] = setup_backtest(daily_dates, daily_vals, arrays)
-        result["score_backtest"]["_data_status"] = "fresh"
+        if arrays and daily_vals:
+            result["outlook_1m"] = nearest_analog_outlook(daily_dates, daily_vals, arrays)
+            result["outlook_1m"]["_data_status"] = "fresh"
+            result["anomalies"] = anomaly_stats(daily_dates, daily_vals)
+            result["anomalies"]["_data_status"] = "fresh"
+            result["score_backtest"] = setup_backtest(daily_dates, daily_vals, arrays)
+            result["score_backtest"]["_data_status"] = "fresh"
+        else:
+            for key, default in (
+                ("outlook_1m", {"available": False, "message": "NIFTY日足履歴を今回更新できず算出保留"}),
+                ("anomalies", {"available": False, "message": "NIFTY日足履歴を今回更新できず算出保留"}),
+                ("score_backtest", {"available": False, "message": "NIFTY日足履歴を今回更新できず算出保留"}),
+            ):
+                prior = old.get(key)
+                if isinstance(prior, dict) and prior:
+                    result[key] = {**prior, "_data_status": "fallback", "_message": "確定日足履歴を今回更新できなかったため前回計算結果を表示"}
+                else:
+                    result[key] = default
     else:
         old_sig = old.get("signals") or {}
         result["signals"] = {

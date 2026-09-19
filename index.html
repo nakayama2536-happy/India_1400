@@ -112,8 +112,8 @@
 <body>
 <div class="app">
   <header>
-    <h1>India 14:00 Check <span style="font-size:.45em;color:#8ea3bd">v4.2</span></h1>
-    <div class="sub">現在・前回比較・前兆・1か月見通し・検証・アノマリーを、データ鮮度と根拠を確認しながら使う判断支援ツール</div>
+    <h1>India 14:00 Check <span style="font-size:.45em;color:#8ea3bd">v4.3</span></h1>
+    <div class="sub">無料データ源を優先し、現在・前回比較・前兆・1か月見通し・検証・アノマリーをデータ鮮度と根拠を確認しながら使う判断支援ツール</div>
   </header>
 
   <section id="page-check" class="page active">
@@ -151,7 +151,7 @@
       <div class="source-row"><span>NIFTY公式クロスチェック</span><b id="crosscheck">--</b></div>
       <div class="source-row"><span>NIFTY50騰落銘柄</span><b id="breadthStatus">--</b></div>
       <div class="source-row"><span>FII/DII</span><b id="fiiStatus">--</b></div>
-      <div class="small" style="margin-top:8px">通常取引時間外、コアデータ欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。前回値は継続表示しても「最新値」とは扱いません。</div>
+      <div class="small" style="margin-top:8px">無料構成: NIFTYはGoogle Finance＋NSE Indices、USD/INRはTwelve Data無料FXを優先、BrentはGoogle Finance。通常取引時間外、コアデータ欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。</div>
     </div>
 
     <div class="card">
@@ -510,9 +510,10 @@ function renderQuality(){
   const cs=q.core_sources||{};
   const coreText=(x)=>{
     if(!x)return "--";
-    if(x.status==="fresh")return `今回取得 / ${x.as_of_jst||"--"}`;
-    if(x.status==="fallback")return `前回値 / ${x.as_of_jst||"--"}`;
-    return "取得不能";
+    const provider=x.provider?` / ${x.provider}`:"";
+    if(x.status==="fresh")return `今回取得${provider} / ${x.as_of_jst||"--"}`;
+    if(x.status==="fallback")return `前回値${provider} / ${x.as_of_jst||"--"}`;
+    return `取得不能${provider}`;
   };
   setText("coreNiftyStatus",coreText(cs.nifty));
   setText("coreUsdStatus",coreText(cs.usdinr));
