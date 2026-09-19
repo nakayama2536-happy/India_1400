@@ -1,0 +1,11 @@
+{
+  "generated_at_utc": null,
+  "generated_at_jst": null,
+  "status": "waiting_first_update",
+  "source": "Yahoo Finance chart endpoint (reference data; no API key)",
+  "nifty": {},
+  "usdinr": {},
+  "brent": {},
+  "errors": [],
+  "note": "Run GitHub Actions once after deployment."
+}
