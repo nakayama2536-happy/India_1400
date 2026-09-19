@@ -3,9 +3,11 @@ name: Update India 14:00 market data
 on:
   workflow_dispatch:
   schedule:
-    # UTC. 04:55-05:05 UTC = 13:55-14:05 JST. 3回に抑えてAPI負荷を低減
-    - cron: '55 4 * * 1-5'
-    - cron: '0,5 5 * * 1-5'
+    # UTC. 04:57 / 05:03 / 05:08 UTC = 13:57 / 14:03 / 14:08 JST
+    - cron: '57 4 * * 1-5'
+    - cron: '3,8 5 * * 1-5'
+    # UTC. 10:47 UTC = 19:47 JST（インド市場引け後の日足確定用）
+    - cron: '47 10 * * 1-5'
 
 permissions:
   contents: write
@@ -41,6 +43,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "Update India 14:00 market analytics v4.4"
+            git commit -m "Update India 14:00 market analytics v4.7"
             git push
           fi
