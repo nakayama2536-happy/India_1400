@@ -1,5 +1,5 @@
-const CACHE = "india1400-v4-5-20260920";
-const SHELL = ["./?v=4.6", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v4-7-20260920";
+const SHELL = ["./?v=4.7", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -33,7 +33,7 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  if (url.pathname.endsWith("/market.json") || url.pathname.endsWith("/history.json")) {
+  if (url.pathname.endsWith("/market.json") || url.pathname.endsWith("/history.json") || url.pathname.endsWith("/nifty_daily_history.json")) {
     event.respondWith(networkFirst(event.request));
     return;
   }

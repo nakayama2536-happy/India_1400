@@ -11,12 +11,14 @@ Goals
 - Backtest the NIFTY-only technical core of the buy/sell setup score.
 - Keep 1-month analog outlook and anomalies descriptive, not deterministic.
 
-v4.6 keeps the zero-cost model and adds a recent-history bridge so the long bootstrap cache
+v4.7 keeps the zero-cost model and adds an auditable data-lineage/statistics layer on top of the recent-history bridge so the long bootstrap cache
 remains usable even when its public mirror is months behind. It seeds long NIFTY history from
 public GitHub CSV mirrors, merges the current-year daily table from Tickjournal, then maintains
 the cache itself using Google Finance previous-close/current-close values. Official NSE Indices /
 NSE Archives remain optional validation and gap-fill sources. A continuity check prevents a
-months-long hole from being mistaken for fresh technical history. The workflow also runs once
+months-long hole from being mistaken for fresh technical history. Analytics are limited to the
+most recent 10 years, monthly seasonality uses true month-to-month returns, and all displayed
+market values carry normalized lineage/freshness metadata. The workflow also runs once
 after the Indian close so the next day's 14:00 check already has the prior close.
 USD/INR uses the free Twelve Data FX allowance; Brent and India VIX use Google Finance.
 Yahoo Finance remains a last-resort fallback because GitHub-hosted runners can be rate-limited.
@@ -49,7 +51,7 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/
 JST = ZoneInfo("Asia/Tokyo")
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA_VERSION = 4
-APP_VERSION = "4.6"
+APP_VERSION = "4.7"
 TWELVEDATA_API_KEY = os.getenv("TWELVEDATA_API_KEY", "").strip()
 TWELVEDATA_BASE = "https://api.twelvedata.com"
 GOOGLE_FINANCE_BASE = "https://www.google.com/finance/beta/quote"
@@ -901,9 +903,12 @@ def history_continuity(cache: dict, quote_date):
     return True, {"latest": latest.isoformat(), "rows_120d": len(recent), "max_gap_days": max_gap}
 
 def _previous_regular_trading_day(day):
+    # Fail closed when the holiday calendar for that year has not been loaded.
+    if day.year != 2026:
+        return None
     d = day - timedelta(days=1)
     for _ in range(12):
-        if d.weekday() < 5 and (d.year != 2026 or d.isoformat() not in NSE_HOLIDAYS_2026):
+        if d.weekday() < 5 and d.isoformat() not in NSE_HOLIDAYS_2026:
             return d
         d -= timedelta(days=1)
     return None
@@ -1512,24 +1517,37 @@ def recent_change_5d(symbol):
 
 
 def is_regular_nse_trading_day(dt_jst: datetime):
+    """Return True/False for supported calendars, None when the calendar year is unverified.
+
+    Failing closed avoids treating a future Indian holiday as a normal trading day simply
+    because it is a weekday.
+    """
     d = dt_jst.date()
     key = d.isoformat()
     if d.weekday() >= 5:
         return False, "週末"
-    if d.year == 2026 and key in NSE_HOLIDAYS_2026:
+    if d.year != 2026:
+        return None, f"{d.year}年のNSE休場カレンダー未登録"
+    if key in NSE_HOLIDAYS_2026:
         return False, NSE_HOLIDAYS_2026[key]
     return True, None
-
 
 def market_state(price_ts: int, now_jst: datetime):
     price_dt = datetime.fromtimestamp(price_ts, timezone.utc).astimezone(JST)
     regular, reason = is_regular_nse_trading_day(now_jst)
-    if not regular:
+    if regular is None:
+        return {
+            "code": "CALENDAR_UNVERIFIED",
+            "label": "休場日未検証",
+            "detail": f"{reason}。安全のため売買ルールは保留します。NIFTY価格は {price_dt.strftime('%Y/%m/%d %H:%M')} JST 時点です。",
+            "calendar_source": "unsupported year / fail-closed",
+        }
+    if regular is False:
         return {
             "code": "CLOSED",
             "label": "休場",
             "detail": f"{reason}。NIFTY価格は {price_dt.strftime('%Y/%m/%d %H:%M')} JST 時点です。",
-            "calendar_source": "NSE 2026 holiday calendar" if now_jst.year == 2026 else "weekend check",
+            "calendar_source": "NSE 2026 holiday calendar",
         }
     if price_dt.date() < now_jst.date():
         return {
@@ -1955,12 +1973,47 @@ def historical_technical_score(vals, arrays, i):
     return b, s
 
 
+ANALYTICS_WINDOW_YEARS = 10
+ANALYTICS_METHOD_VERSION = "4.7-stat-1"
+
+
+def analysis_window_start_index(dates, years=ANALYTICS_WINDOW_YEARS):
+    """First index inside the requested recent calendar-year window."""
+    if not dates:
+        return 0
+    last = datetime.fromisoformat(dates[-1]).date()
+    cutoff = last - timedelta(days=int(round(365.25 * years)))
+    for i, d in enumerate(dates):
+        try:
+            if datetime.fromisoformat(d).date() >= cutoff:
+                return i
+        except Exception:
+            continue
+    return 0
+
+
+def sample_adequacy(n):
+    if n >= 80:
+        return "高"
+    if n >= 30:
+        return "中"
+    if n >= 15:
+        return "低"
+    return "不足"
+
+
 def setup_backtest(dates, vals, arrays):
     if len(vals) < 300:
         return {"available": False, "message": "バックテスト用履歴不足"}
 
+    window_start = analysis_window_start_index(dates)
+    start_i = max(100, window_start)
+    end_i = len(vals) - 20
+    if end_i - start_i < 250:
+        return {"available": False, "message": "直近10年の検証履歴が不足"}
+
     returns20 = []
-    for i in range(100, len(vals) - 20):
+    for i in range(start_i, end_i):
         r = pct_change(vals[i + 20], vals[i])
         if r is not None:
             returns20.append(r)
@@ -1975,9 +2028,9 @@ def setup_backtest(dates, vals, arrays):
     def collect(kind, threshold):
         rows = []
         last_selected = -999
-        for i in range(100, len(vals) - 20):
-            b, s = historical_technical_score(vals, arrays, i)
-            score = b if kind == "buy" else s
+        for i in range(start_i, end_i):
+            b, sscore = historical_technical_score(vals, arrays, i)
+            score = b if kind == "buy" else sscore
             if score is None or score < threshold:
                 continue
             if i - last_selected < 5:
@@ -1998,17 +2051,30 @@ def setup_backtest(dates, vals, arrays):
         r5s = [r["return_5d_pct"] for r in rows if r["return_5d_pct"] is not None]
         dds = [r["max_drawdown_20d_pct"] for r in rows if r["max_drawdown_20d_pct"] is not None]
         ups = [r["max_upside_20d_pct"] for r in rows if r["max_upside_20d_pct"] is not None]
-        success = sum(x > 0 for x in r20s) / len(r20s) * 100 if kind == "buy" and r20s else \
-                  sum(x < 0 for x in r20s) / len(r20s) * 100 if kind == "sell" and r20s else None
+        success = sum(x > 0 for x in r20s) / len(r20s) * 100 if kind == "buy" and r20s else                   sum(x < 0 for x in r20s) / len(r20s) * 100 if kind == "sell" and r20s else None
         base_rate = baseline.get("up_rate_pct") if kind == "buy" else baseline.get("down_rate_pct")
+        median20 = statistics.median(r20s) if r20s else None
+        lift = (success - base_rate) if success is not None and base_rate is not None else None
+        n = len(r20s)
+        adequate = sample_adequacy(n)
+        if n < 30:
+            calibration = "INSUFFICIENT"
+        elif kind == "buy" and (lift or 0) > 0 and (median20 or 0) > 0:
+            calibration = "SUPPORTIVE"
+        elif kind == "sell" and (lift or 0) > 0 and (median20 or 0) < 0:
+            calibration = "SUPPORTIVE"
+        else:
+            calibration = "WEAK_OR_CONTRADICTORY"
         return {
             "threshold": threshold,
-            "sample_count": len(r20s),
+            "sample_count": n,
+            "sample_adequacy": adequate,
+            "calibration": calibration,
             "success_rate_20d_pct": round_or_none(success, 1),
-            "success_rate_lift_vs_baseline_pctpt": round_or_none(success - base_rate, 1) if success is not None and base_rate is not None else None,
+            "success_rate_lift_vs_baseline_pctpt": round_or_none(lift, 1),
             "avg_return_5d_pct": round_or_none(statistics.fmean(r5s), 2) if r5s else None,
             "avg_return_20d_pct": round_or_none(statistics.fmean(r20s), 2) if r20s else None,
-            "median_return_20d_pct": round_or_none(statistics.median(r20s), 2) if r20s else None,
+            "median_return_20d_pct": round_or_none(median20, 2),
             "median_max_drawdown_20d_pct": round_or_none(statistics.median(dds), 2) if dds else None,
             "median_max_upside_20d_pct": round_or_none(statistics.median(ups), 2) if ups else None,
             "recent_examples": rows[-5:],
@@ -2016,15 +2082,18 @@ def setup_backtest(dates, vals, arrays):
 
     return {
         "available": True,
-        "basis": f"NIFTY 50 日足・取得可能な約10年、重複局面を5営業日間隔で間引き（最終 {dates[-1]}）",
+        "method_version": ANALYTICS_METHOD_VERSION,
+        "window_years": ANALYTICS_WINDOW_YEARS,
+        "window_start": dates[start_i],
+        "window_end": dates[-1],
+        "basis": f"NIFTY 50 日足・直近{ANALYTICS_WINDOW_YEARS}年、重複局面を5営業日間隔で間引き（最終 {dates[-1]}）",
         "baseline": baseline,
         "buy": [collect("buy", x) for x in (35, 55, 70)],
         "sell": [collect("sell", x) for x in (35, 55, 70)],
-        "warning": "これはテクニカル中核スコアの過去検証です。USD/INR、Brent、VIX、騰落銘柄数、FII/DIIを含む現在の総合スコアそのものの的中率ではありません。",
+        "warning": "テクニカル中核スコアのみの過去検証です。サンプル30未満は『不足』として扱い、現在の総合スコアの的中率とは解釈しません。",
     }
 
-
-def nearest_analog_outlook(dates, vals, arrays, k=35):
+def nearest_analog_outlook(dates, vals, arrays, k=30):
     last = len(vals) - 1
     if last < 120:
         return {"available": False, "message": "履歴不足"}
@@ -2051,12 +2120,13 @@ def nearest_analog_outlook(dates, vals, arrays, k=35):
     if cur is None:
         return {"available": False, "message": "現在の特徴量不足"}
     scales = (15.0, 3.0, 2.5, 0.5, 4.0, 8.0)
+    start_i = max(90, analysis_window_start_index(dates))
     candidates = []
-    for i in range(90, len(vals) - 20):
+    for i in range(start_i, len(vals) - 20):
         f = feat(i)
         if f is None:
             continue
-        dist = math.sqrt(sum(((a - b) / s) ** 2 for a, b, s in zip(f, cur, scales)))
+        dist = math.sqrt(sum(((a - b) / scale) ** 2 for a, b, scale in zip(f, cur, scales)))
         candidates.append((dist, i))
     candidates.sort()
 
@@ -2066,8 +2136,8 @@ def nearest_analog_outlook(dates, vals, arrays, k=35):
             selected.append((dist, i))
         if len(selected) >= k:
             break
-    if len(selected) < 10:
-        return {"available": False, "message": "類似局面のサンプル不足"}
+    if len(selected) < 12:
+        return {"available": False, "message": "直近10年の類似局面サンプル不足"}
 
     fwd, drawdowns, examples, dists = [], [], [], []
     for dist, i in selected:
@@ -2105,17 +2175,22 @@ def nearest_analog_outlook(dates, vals, arrays, k=35):
     else:
         label = "中立"
 
-    if len(fwd) >= 30 and iqr <= 7 and median_dist <= 2.0:
+    if len(fwd) >= 25 and iqr <= 7 and median_dist <= 2.0:
         ref = "中"
-    elif len(fwd) >= 20 and iqr <= 10:
+    elif len(fwd) >= 18 and iqr <= 10:
         ref = "低〜中"
     else:
         ref = "低"
 
     return {
         "available": True,
+        "method_version": ANALYTICS_METHOD_VERSION,
+        "window_years": ANALYTICS_WINDOW_YEARS,
+        "window_start": dates[start_i],
+        "window_end": dates[-1],
         "label": label,
         "statistical_reference": ref,
+        "sample_adequacy": sample_adequacy(len(fwd)),
         "basis_date": dates[last],
         "horizon": "20営業日（約1か月）",
         "analog_count": len(fwd),
@@ -2126,30 +2201,32 @@ def nearest_analog_outlook(dates, vals, arrays, k=35):
         "q75_return_pct": round(q75, 2),
         "median_max_drawdown_pct": round(statistics.median(drawdowns), 2) if drawdowns else None,
         "median_similarity_distance": round(median_dist, 2),
-        "method": "RSI、25日線乖離、25/75日線関係、MACDヒストグラム、5日騰落率、20日ボラティリティが近い過去局面を検索。",
-        "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。統計参考度が低い場合は方向判定を弱く扱ってください。",
+        "method": f"直近{ANALYTICS_WINDOW_YEARS}年から、RSI・25日線乖離・25/75日線関係・MACDヒストグラム・5日騰落率・20日ボラティリティが近い局面を検索。",
+        "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。平均より中央値・分布・最大下落を優先して確認してください。",
         "examples": examples[:10],
     }
-
 
 def anomaly_stats(dates, vals):
     if len(vals) < 300:
         return {"available": False}
 
-    daily_ret = [None] + [pct_change(vals[i], vals[i - 1]) for i in range(1, len(vals))]
+    start_i = max(1, analysis_window_start_index(dates))
+    sub_dates = dates[start_i:]
+    sub_vals = vals[start_i:]
+    if len(sub_vals) < 250:
+        return {"available": False, "message": "直近10年のアノマリー履歴不足"}
+
+    daily_ret = [None] + [pct_change(sub_vals[i], sub_vals[i - 1]) for i in range(1, len(sub_vals))]
     all_rets = [x for x in daily_ret if x is not None]
     baseline_avg = statistics.fmean(all_rets)
     baseline_up = sum(x > 0 for x in all_rets) / len(all_rets) * 100
 
     by_weekday = defaultdict(list)
-    by_month = defaultdict(list)
-    for i in range(1, len(vals)):
-        dt = datetime.fromisoformat(dates[i]).date()
+    for i in range(1, len(sub_vals)):
+        dt = datetime.fromisoformat(sub_dates[i]).date()
         r = daily_ret[i]
-        if r is None:
-            continue
-        by_weekday[dt.weekday()].append(r)
-        by_month[dt.month].append(r)
+        if r is not None:
+            by_weekday[dt.weekday()].append(r)
 
     jp_weekdays = ["月", "火", "水", "木", "金"]
     weekday_rows = []
@@ -2159,25 +2236,50 @@ def anomaly_stats(dates, vals):
         weekday_rows.append({
             "weekday": jp_weekdays[wd],
             "sample_count": len(xs),
+            "sample_adequacy": sample_adequacy(len(xs)),
             "avg_return_pct": round_or_none(avg, 2),
             "up_rate_pct": round_or_none(sum(x > 0 for x in xs) / len(xs) * 100, 1) if xs else None,
             "excess_vs_baseline_pct": round_or_none(avg - baseline_avg, 2) if avg is not None else None,
         })
 
+    # True monthly seasonality: month-end to month-end return, not average daily return.
+    month_last = []
+    grouped = defaultdict(list)
+    for i, d in enumerate(dates):
+        dt = datetime.fromisoformat(d).date()
+        grouped[(dt.year, dt.month)].append(i)
+    for key in sorted(grouped):
+        i = grouped[key][-1]
+        month_last.append((datetime.fromisoformat(dates[i]).date(), vals[i]))
+    monthly_by_month = defaultdict(list)
+    all_monthly = []
+    cutoff_date = datetime.fromisoformat(sub_dates[0]).date()
+    for (prev_d, prev_v), (cur_d, cur_v) in zip(month_last, month_last[1:]):
+        if cur_d < cutoff_date:
+            continue
+        r = pct_change(cur_v, prev_v)
+        if r is None:
+            continue
+        monthly_by_month[cur_d.month].append(r)
+        all_monthly.append(r)
+    monthly_baseline = statistics.fmean(all_monthly) if all_monthly else None
     month_rows = []
     for m in range(1, 13):
-        xs = by_month.get(m, [])
+        xs = monthly_by_month.get(m, [])
         avg = statistics.fmean(xs) if xs else None
+        med = statistics.median(xs) if xs else None
         month_rows.append({
             "month": m,
             "sample_count": len(xs),
+            "sample_adequacy": sample_adequacy(len(xs)),
             "avg_return_pct": round_or_none(avg, 2),
+            "median_return_pct": round_or_none(med, 2),
             "up_rate_pct": round_or_none(sum(x > 0 for x in xs) / len(xs) * 100, 1) if xs else None,
-            "excess_vs_baseline_pct": round_or_none(avg - baseline_avg, 2) if avg is not None else None,
+            "excess_vs_baseline_pct": round_or_none(avg - monthly_baseline, 2) if avg is not None and monthly_baseline is not None else None,
         })
 
     month_indices = defaultdict(list)
-    for i, d in enumerate(dates):
+    for i, d in enumerate(sub_dates):
         dt = datetime.fromisoformat(d).date()
         month_indices[(dt.year, dt.month)].append(i)
     turn_idx = set()
@@ -2185,28 +2287,29 @@ def anomaly_stats(dates, vals):
         turn_idx.update(ids[:3])
         turn_idx.update(ids[-3:])
     turn_rets = [daily_ret[i] for i in sorted(turn_idx) if i > 0 and daily_ret[i] is not None]
-    other_rets = [daily_ret[i] for i in range(1, len(vals)) if i not in turn_idx and daily_ret[i] is not None]
+    other_rets = [daily_ret[i] for i in range(1, len(sub_vals)) if i not in turn_idx and daily_ret[i] is not None]
 
     three_down_1, three_down_20 = [], []
     large_down_1, large_down_20 = [], []
-    for i in range(3, len(vals) - 20):
+    for i in range(3, len(sub_vals) - 20):
         if all(daily_ret[j] is not None and daily_ret[j] < 0 for j in (i - 2, i - 1, i)):
-            three_down_1.append(pct_change(vals[i + 1], vals[i]))
-            three_down_20.append(pct_change(vals[i + 20], vals[i]))
+            three_down_1.append(pct_change(sub_vals[i + 1], sub_vals[i]))
+            three_down_20.append(pct_change(sub_vals[i + 20], sub_vals[i]))
         if daily_ret[i] is not None and daily_ret[i] <= -1.5:
-            large_down_1.append(pct_change(vals[i + 1], vals[i]))
-            large_down_20.append(pct_change(vals[i + 20], vals[i]))
+            large_down_1.append(pct_change(sub_vals[i + 1], sub_vals[i]))
+            large_down_20.append(pct_change(sub_vals[i + 20], sub_vals[i]))
 
-    last_three_down = len(vals) >= 4 and all(daily_ret[j] is not None and daily_ret[j] < 0 for j in range(len(vals) - 3, len(vals)))
+    last_three_down = len(sub_vals) >= 4 and all(daily_ret[j] is not None and daily_ret[j] < 0 for j in range(len(sub_vals) - 3, len(sub_vals)))
     last_large_down = daily_ret[-1] is not None and daily_ret[-1] <= -1.5
-    last_dt = datetime.fromisoformat(dates[-1]).date()
+    last_dt = datetime.fromisoformat(sub_dates[-1]).date()
     ids = month_indices[(last_dt.year, last_dt.month)]
-    last_turn = (len(vals) - 1) in set(ids[:3] + ids[-3:])
+    last_turn = (len(sub_vals) - 1) in set(ids[:3] + ids[-3:])
 
     def stat(xs):
         avg = statistics.fmean(xs) if xs else None
         return {
             "sample_count": len(xs),
+            "sample_adequacy": sample_adequacy(len(xs)),
             "avg_return_pct": round_or_none(avg, 2),
             "up_rate_pct": round_or_none(sum(x > 0 for x in xs) / len(xs) * 100, 1) if xs else None,
             "excess_vs_baseline_pct": round_or_none(avg - baseline_avg, 2) if avg is not None else None,
@@ -2214,14 +2317,21 @@ def anomaly_stats(dates, vals):
 
     return {
         "available": True,
-        "basis": f"NIFTY 50 日足・取得可能な過去約10年（最終 {dates[-1]}）",
+        "method_version": ANALYTICS_METHOD_VERSION,
+        "window_years": ANALYTICS_WINDOW_YEARS,
+        "window_start": sub_dates[0],
+        "window_end": sub_dates[-1],
+        "basis": f"NIFTY 50 日足・直近{ANALYTICS_WINDOW_YEARS}年（最終 {sub_dates[-1]}）",
         "baseline": {
             "sample_count": len(all_rets),
             "avg_return_pct": round_or_none(baseline_avg, 2),
             "up_rate_pct": round_or_none(baseline_up, 1),
+            "monthly_sample_count": len(all_monthly),
+            "monthly_avg_return_pct": round_or_none(monthly_baseline, 2),
         },
         "weekday": weekday_rows,
         "month": month_rows,
+        "month_definition": "月末終値から翌月末終値までの月次騰落率。日次平均ではありません。",
         "turn_of_month": {
             "definition": "各月の最初3営業日と最後3営業日",
             "current_applicable": last_turn,
@@ -2240,9 +2350,8 @@ def anomaly_stats(dates, vals):
             "next_1d": stat(large_down_1),
             "next_20d": stat(large_down_20),
         },
-        "warning": "アノマリーは過去の統計的傾向です。全期間平均との差も併記しますが、偶然・制度変更・相場環境変化で再現しない可能性があります。",
+        "warning": "アノマリーは因果関係ではありません。直近10年に限定し、月別季節性は月次リターンで評価します。件数の少ない結果は参考度を下げてください。",
     }
-
 
 def build_data_quality(result, now_jst):
     reasons = []
@@ -2337,6 +2446,52 @@ def build_data_quality(result, now_jst):
         "official_holiday_calendar_loaded": now_jst.year == 2026,
         "policy": "前回値は表示継続しても、今回取得に失敗した主要データを使って最新の売買判断を確定しない。",
     }
+
+
+def build_data_lineage(result, now_jst):
+    """Normalized audit metadata for every market value shown to the user."""
+    state = result.get("market_state") or {}
+    core = result.get("core_fetch") or {}
+    out = {
+        "fetched_at_jst": result.get("generated_at_jst"),
+        "market_open": state.get("code") == "LIVE",
+        "market_state": state.get("code"),
+        "calendar_source": state.get("calendar_source"),
+        "analytics_method_version": ANALYTICS_METHOD_VERSION,
+        "analytics_window_years": ANALYTICS_WINDOW_YEARS,
+        "instruments": {},
+    }
+    for key in ("nifty", "usdinr", "brent"):
+        obj = result.get(key) or {}
+        meta = core.get(key) or {}
+        out["instruments"][key] = {
+            "source": meta.get("provider") or obj.get("provider"),
+            "provider_symbol": meta.get("provider_symbol") or obj.get("provider_symbol") or obj.get("symbol"),
+            "quote_time_jst": obj.get("as_of_jst"),
+            "fetched_at_jst": result.get("generated_at_jst"),
+            "data_age_minutes": round_or_none(iso_age_minutes(obj.get("as_of_jst"), now_jst), 1),
+            "status": meta.get("status"),
+            "fallback_used": meta.get("status") == "fallback",
+            "provisional": bool(key == "nifty" and (obj.get("provisional") or {}).get("available")),
+            "market_open": state.get("code") == "LIVE",
+        }
+    nmeta = core.get("nifty") or {}
+    out["nifty_technicals"] = {
+        "technical_date": (result.get("nifty") or {}).get("technical_date"),
+        "technical_status": nmeta.get("technical_status"),
+        "technical_basis": (result.get("nifty") or {}).get("technical_basis"),
+        "provisional_available": bool(((result.get("nifty") or {}).get("provisional") or {}).get("available")),
+    }
+    out["history"] = {
+        "source": nmeta.get("history_source"),
+        "rows": nmeta.get("history_cache_rows"),
+        "first_date": nmeta.get("history_cache_first_date"),
+        "last_date": nmeta.get("history_cache_last_date"),
+        "recent_contiguous": nmeta.get("history_recent_contiguous"),
+        "continuity": nmeta.get("history_continuity"),
+        "ready_for_current_technicals": bool(nmeta.get("history_recent_contiguous")),
+    }
+    return out
 
 
 def build_summary(nifty, signals, outlook, breadth, fii_dii, quality):
@@ -2629,10 +2784,10 @@ def main():
             "status": status,
             "core_fetch": core_fetch,
             "provider_symbols": provider_symbols,
-            "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=local persistent cache seeded from public GitHub CSV mirrors, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
+            "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=persistent local cache seeded from public GitHub mirrors + Tickjournal recent bridge, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
             "errors": errors,
             "optional_errors": optional_errors,
-            "note": "v4.6 free-only: NIFTY long history is bootstrapped from public GitHub mirrors, the current-year gap is bridged from Tickjournal's public daily table, and new closes are then maintained inside this repository from Google Finance previous/post-close values. A continuity gate prevents sparse history from being used for current technicals. Failed core fetches never qualify as a fresh trading decision.",
+            "note": "v4.7 free-only: NIFTY recent-history continuity is mandatory for current technicals; every displayed core value has normalized lineage metadata; 1-month analogs/anomalies/backtests use the most recent 10 years; monthly seasonality uses true month-to-month returns. Failed or stale data never qualifies as a fresh trading decision.",
         }
     )
 
@@ -2727,6 +2882,13 @@ def main():
             "basis": "前回14:00保存値",
             "message": "主要データに前回値が含まれるため、今回の前回比較は保留しています。",
         }
+
+    result["analysis_meta"] = {
+        "method_version": ANALYTICS_METHOD_VERSION,
+        "window_years": ANALYTICS_WINDOW_YEARS,
+        "principle": "14:00暫定値と前営業日確定日足を分離し、予測・アノマリーは直近10年に限定。",
+    }
+    result["data_lineage"] = build_data_lineage(result, now_jst)
 
     result["summary"] = build_summary(
         result.get("nifty", {}), result.get("signals", {}), result.get("outlook_1m", {}),

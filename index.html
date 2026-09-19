@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="India 14:00">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>India 14:00 Check v4.6</title>
+  <title>India 14:00 Check v4.7</title>
   <style>
     :root{
       color-scheme:dark;
@@ -112,7 +112,7 @@
 <body>
 <div class="app">
   <header>
-    <h1>India 14:00 Check <span style="font-size:.45em;color:#8ea3bd">v4.6</span></h1>
+    <h1>India 14:00 Check <span style="font-size:.45em;color:#8ea3bd">v4.7</span></h1>
     <div class="sub">無料データ源を優先し、現在・前回比較・前兆・1か月見通し・検証・アノマリーをデータ鮮度と根拠を確認しながら使う判断支援ツール</div>
   </header>
 
@@ -151,7 +151,10 @@
       <div class="source-row"><span>NIFTY公式クロスチェック</span><b id="crosscheck">--</b></div>
       <div class="source-row"><span>NIFTY50騰落銘柄</span><b id="breadthStatus">--</b></div>
       <div class="source-row"><span>FII/DII</span><b id="fiiStatus">--</b></div>
-      <div class="small" style="margin-top:8px">無料構成: NIFTYはGoogle Finance＋NSE Indices、USD/INRはTwelve Data無料FXを優先、BrentはGoogle Finance。通常取引時間外、コアデータ欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。</div>
+      <div class="source-row"><span>履歴監査</span><b id="historyAudit">--</b></div>
+      <div class="source-row"><span>分析期間</span><b id="analysisAudit">--</b></div>
+      <div class="source-row"><span>取得時刻監査</span><b id="lineageAudit">--</b></div>
+      <div class="small" style="margin-top:8px">無料構成: NIFTYはGoogle Finance＋Tickjournal/NSE補完、USD/INRはTwelve Data無料FXを優先、BrentはGoogle Finance。通常取引時間外、コアデータ欠損、履歴の大きな欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。</div>
     </div>
 
     <div class="card">
@@ -333,7 +336,8 @@
     <details><summary>売り場前兆スコア</summary><div class="detailbody">RSI高位、モメンタム悪化、25日線からの上方乖離、外部環境悪化などの条件一致度を0〜100で表します。<div class="definition">売却を自動決定する指標ではありません。過熱と内部悪化が同時に起きているかを見る補助指標です。</div></div></details>
     <details><summary>1か月見通し</summary><div class="detailbody">現在と似た過去局面を、RSI、移動平均位置、MACDヒストグラム、5日騰落率、20日ボラティリティから探し、その後20営業日の実績分布を表示します。<div class="definition">過去の類似は将来の同一結果を保証しません。平均だけでなく、中央値、25〜75%範囲、最大下落も確認します。</div></div></details>
     <details><summary>アノマリー</summary><div class="detailbody">曜日、月、月末・月初、連続下落後などに過去繰り返し観測された統計的傾向です。<div class="definition">因果関係ではなく、将来も続く保証はありません。平均騰落率、上昇率、サンプル数を必ずセットで見ます。</div></div></details>
-    <details><summary>前回14:00比較</summary><div class="detailbody">平日14:00前後に保存した過去スナップショットと、現在値を比較します。<div class="definition">GitHub Actionsの5回実行のうち、価格時刻が14:00 JSTに最も近い値を1日1件だけ保存します。</div></div></details>
+    <details><summary>前回14:00比較</summary><div class="detailbody">平日14:00前後に保存した過去スナップショットと、現在値を比較します。<div class="definition">GitHub Actionsの14:00前後の実行から、価格時刻が14:00 JSTに最も近い値を1日1件だけ保存します。</div></div></details>
+    <details><summary>SBIの投信データとの役割分離</summary><div class="detailbody">このアプリはNIFTY・為替・原油など「市場側」の14:00判断を担当します。SBI証券の投信基準価額、受付締切、約定日は市場データとは基準時刻が異なるため直接混在させません。<div class="definition">市場シグナルと投信の商品・基準価額データを分離することで、日付ずれや古い基準価額を現在の市場値として誤解することを防ぎます。</div></div></details>
   </section>
 
   <div class="footer">本アプリは市場状態の確認と判断支援を目的としています。前兆スコア、バックテスト、過去統計、類似局面は将来の値動きや利益を保証しません。データ品質・基準時刻・サンプル数を確認し、売買の最終判断は利用者が行います。</div>
@@ -520,6 +524,12 @@ function renderQuality(){
   setText("coreBrentStatus",coreText(cs.brent));
   setText("breadthStatus",br.available?`${fmt(br.advance_ratio_pct,1)}% 上昇 / ${br.sample_count}銘柄`:(br.skipped?"今回は省略（補助）":"取得不能（手動可）"));
   setText("fiiStatus",fd.available?`公表値あり ${fd.fii?.date||fd.dii?.date||""}`:(fd.skipped?"今回は省略（補助）":"取得不能（補助）"));
+  const nf=market?.core_fetch?.nifty||{}, cont=nf.history_continuity||{};
+  setText("historyAudit",`${nf.history_recent_contiguous?"連続性OK":"要確認"} / ${nf.history_cache_rows||0}件 / 最大gap ${cont.max_gap_days??"--"}日`);
+  const am=market?.analysis_meta||{};
+  setText("analysisAudit",`${am.window_years||"--"}年 / ${am.method_version||"--"}`);
+  const dl=market?.data_lineage||{}, ni=dl.instruments?.nifty||{};
+  setText("lineageAudit",`価格 ${ni.quote_time_jst||"--"} / 取得 ${dl.fetched_at_jst||"--"}`);
 }
 
 function renderTechCompare(){
@@ -655,7 +665,8 @@ function renderOutlook(){
 
 function backtestTable(rows,kind){
   if(!rows?.length)return "--";
-  return `<table class="table"><thead><tr><th>閾値</th><th>${kind==="buy"?"20日後上昇":"20日後下落"}</th><th>基準差</th><th>20日平均</th><th>件数</th></tr></thead><tbody>${rows.map(r=>`<tr><td>≥${r.threshold}</td><td>${fmt(r.success_rate_20d_pct,1)}%</td><td>${signed(r.success_rate_lift_vs_baseline_pctpt,1,"pt")}</td><td>${signed(r.avg_return_20d_pct,2,"%")}</td><td>${r.sample_count}</td></tr>`).join("")}</tbody></table>`;
+  const cal=x=>x==="SUPPORTIVE"?"支持":x==="INSUFFICIENT"?"不足":"弱い/矛盾";
+  return `<table class="table"><thead><tr><th>閾値</th><th>${kind==="buy"?"20日後上昇":"20日後下落"}</th><th>基準差</th><th>20日平均</th><th>件数</th><th>評価</th></tr></thead><tbody>${rows.map(r=>`<tr><td>≥${r.threshold}</td><td>${fmt(r.success_rate_20d_pct,1)}%</td><td>${signed(r.success_rate_lift_vs_baseline_pctpt,1,"pt")}</td><td>${signed(r.avg_return_20d_pct,2,"%")}</td><td>${r.sample_count}</td><td>${cal(r.calibration)} / ${r.sample_adequacy||"--"}</td></tr>`).join("")}</tbody></table>`;
 }
 function renderValidation(){
   const b=market?.score_backtest||{};
@@ -679,6 +690,10 @@ function renderValidation(){
 function simpleStatsTable(rows,keyLabel,keyName){
   return `<table class="table"><thead><tr><th>${keyLabel}</th><th>平均</th><th>全体差</th><th>上昇率</th><th>件数</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[keyName]}</td><td>${signed(r.avg_return_pct,2,"%")}</td><td>${signed(r.excess_vs_baseline_pct,2,"%")}</td><td>${fmt(r.up_rate_pct,1)}%</td><td>${r.sample_count}</td></tr>`).join("")}</tbody></table>`;
 }
+function monthStatsTable(rows){
+  return `<table class="table"><thead><tr><th>月</th><th>月平均</th><th>中央値</th><th>全月平均差</th><th>上昇月率</th><th>年数</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.month}月</td><td>${signed(r.avg_return_pct,2,"%")}</td><td>${signed(r.median_return_pct,2,"%")}</td><td>${signed(r.excess_vs_baseline_pct,2,"%")}</td><td>${fmt(r.up_rate_pct,1)}%</td><td>${r.sample_count}</td></tr>`).join("")}</tbody></table>`;
+}
+
 function specialCard(title,obj){
   const now=obj.current_applicable?`<span class="applicable">現在該当</span>`:"";
   const one=obj.next_1d,two=obj.next_20d;
@@ -699,10 +714,11 @@ function renderAnomalies(){
     ["平均日次騰落",signed(base.avg_return_pct,2,"%")],
     ["上昇日率",`${fmt(base.up_rate_pct,1)}%`],
     ["サンプル",`${base.sample_count||0}日`],
-    ["比較方法","平均との差"],
+    ["月次平均",signed(base.monthly_avg_return_pct,2,"%")],
+    ["比較方法","曜日=日次 / 月別=月次"],
   ].map(([l,v])=>`<div class="metric"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
   $("weekdayTable").innerHTML=simpleStatsTable(a.weekday||[],"曜日","weekday");
-  $("monthTable").innerHTML=simpleStatsTable((a.month||[]).map(x=>({...x,month:`${x.month}月` })),"月","month");
+  $("monthTable").innerHTML=monthStatsTable(a.month||[]);
   $("specialAnomalies").innerHTML=specialCard("月末・月初効果",a.turn_of_month||{})+specialCard("3日連続下落後",a.after_three_down||{})+specialCard("大幅下落後",a.after_large_down||{});
 }
 
