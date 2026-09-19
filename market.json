@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-09-19T21:47:37+00:00",
-  "generated_at_jst": "2026-09-20T06:47:37+09:00",
+  "generated_at_utc": "2026-09-19T22:26:20+00:00",
+  "generated_at_jst": "2026-09-20T07:26:20+09:00",
   "status": "ok",
-  "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=local persistent cache seeded from public GitHub CSV mirrors, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
+  "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=persistent local cache seeded from public GitHub mirrors + Tickjournal recent bridge, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
   "nifty": {
     "symbol": "^NSEI",
     "provider_symbol": "NIFTY_50:INDEXNSE",
@@ -54,9 +54,9 @@
     "symbol": "INR=X",
     "provider_symbol": "USD/INR",
     "provider": "Twelve Data",
-    "price": 95.994,
+    "price": 96.006,
     "as_of_jst": "2026-09-20T06:00+09:00",
-    "change_5d_pct": 0.01
+    "change_5d_pct": 0.02
   },
   "brent": {
     "symbol": "BZ=F",
@@ -67,7 +67,7 @@
     "change_5d_pct": null
   },
   "errors": [],
-  "note": "v4.6 free-only: NIFTY long history is bootstrapped from public GitHub mirrors, the current-year gap is bridged from Tickjournal's public daily table, and new closes are then maintained inside this repository from Google Finance previous/post-close values. A continuity gate prevents sparse history from being used for current technicals. Failed core fetches never qualify as a fresh trading decision.",
+  "note": "v4.7 free-only: NIFTY recent-history continuity is mandatory for current technicals; every displayed core value has normalized lineage metadata; 1-month analogs/anomalies/backtests use the most recent 10 years; monthly seasonality uses true month-to-month returns. Failed or stale data never qualifies as a fresh trading decision.",
   "india_vix": {
     "symbol": "^INDIAVIX",
     "provider": "Google Finance",
@@ -136,20 +136,25 @@
   },
   "outlook_1m": {
     "available": true,
+    "method_version": "4.7-stat-1",
+    "window_years": 10,
+    "window_start": "2016-09-19",
+    "window_end": "2026-09-18",
     "label": "中立",
     "statistical_reference": "中",
+    "sample_adequacy": "中",
     "basis_date": "2026-09-18",
     "horizon": "20営業日（約1か月）",
-    "analog_count": 35,
-    "up_rate_pct": 62.9,
-    "mean_return_pct": 1.13,
-    "median_return_pct": 0.72,
-    "q25_return_pct": -1.64,
-    "q75_return_pct": 3.74,
-    "median_max_drawdown_pct": -2.18,
-    "median_similarity_distance": 0.79,
-    "method": "RSI、25日線乖離、25/75日線関係、MACDヒストグラム、5日騰落率、20日ボラティリティが近い過去局面を検索。",
-    "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。統計参考度が低い場合は方向判定を弱く扱ってください。",
+    "analog_count": 30,
+    "up_rate_pct": 66.7,
+    "mean_return_pct": 1.02,
+    "median_return_pct": 0.68,
+    "q25_return_pct": -1.56,
+    "q75_return_pct": 2.79,
+    "median_max_drawdown_pct": -1.72,
+    "median_similarity_distance": 0.84,
+    "method": "直近10年から、RSI・25日線乖離・25/75日線関係・MACDヒストグラム・5日騰落率・20日ボラティリティが近い局面を検索。",
+    "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。平均より中央値・分布・最大下落を優先して確認してください。",
     "examples": [
       {
         "date": "2025-08-08",
@@ -188,12 +193,6 @@
         "max_drawdown_20d_pct": 1.99
       },
       {
-        "date": "2015-11-06",
-        "distance": 0.599,
-        "return_20d_pct": -3.18,
-        "max_drawdown_20d_pct": -3.18
-      },
-      {
         "date": "2023-02-02",
         "distance": 0.63,
         "return_20d_pct": -1.64,
@@ -210,213 +209,267 @@
         "distance": 0.655,
         "return_20d_pct": -2.91,
         "max_drawdown_20d_pct": -3.45
+      },
+      {
+        "date": "2019-07-26",
+        "distance": 0.661,
+        "return_20d_pct": -1.59,
+        "max_drawdown_20d_pct": -4.81
       }
     ],
     "_data_status": "fresh"
   },
   "anomalies": {
     "available": true,
-    "basis": "NIFTY 50 日足・取得可能な過去約10年（最終 2026-09-18）",
+    "method_version": "4.7-stat-1",
+    "window_years": 10,
+    "window_start": "2016-09-19",
+    "window_end": "2026-09-18",
+    "basis": "NIFTY 50 日足・直近10年（最終 2026-09-18）",
     "baseline": {
-      "sample_count": 6489,
-      "avg_return_pct": 0.05,
-      "up_rate_pct": 53.8
+      "sample_count": 2473,
+      "avg_return_pct": 0.04,
+      "up_rate_pct": 53.9,
+      "monthly_sample_count": 121,
+      "monthly_avg_return_pct": 0.92
     },
     "weekday": [
       {
         "weekday": "月",
-        "sample_count": 1291,
-        "avg_return_pct": -0.0,
-        "up_rate_pct": 55.1,
-        "excess_vs_baseline_pct": -0.05
+        "sample_count": 490,
+        "sample_adequacy": "高",
+        "avg_return_pct": -0.03,
+        "up_rate_pct": 57.6,
+        "excess_vs_baseline_pct": -0.08
       },
       {
         "weekday": "火",
-        "sample_count": 1303,
-        "avg_return_pct": 0.05,
-        "up_rate_pct": 53.2,
-        "excess_vs_baseline_pct": -0.0
+        "sample_count": 496,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.13,
+        "up_rate_pct": 55.0,
+        "excess_vs_baseline_pct": 0.09
       },
       {
         "weekday": "水",
-        "sample_count": 1299,
-        "avg_return_pct": 0.11,
-        "up_rate_pct": 54.3,
-        "excess_vs_baseline_pct": 0.06
+        "sample_count": 497,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.08,
+        "up_rate_pct": 53.1,
+        "excess_vs_baseline_pct": 0.04
       },
       {
         "weekday": "木",
-        "sample_count": 1296,
-        "avg_return_pct": 0.03,
-        "up_rate_pct": 53.4,
-        "excess_vs_baseline_pct": -0.02
+        "sample_count": 497,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.01,
+        "up_rate_pct": 52.3,
+        "excess_vs_baseline_pct": -0.03
       },
       {
         "weekday": "金",
-        "sample_count": 1276,
-        "avg_return_pct": 0.06,
-        "up_rate_pct": 52.7,
-        "excess_vs_baseline_pct": 0.01
+        "sample_count": 489,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.04,
+        "up_rate_pct": 51.5,
+        "excess_vs_baseline_pct": -0.01
       }
     ],
     "month": [
       {
         "month": 1,
-        "sample_count": 572,
-        "avg_return_pct": -0.03,
-        "up_rate_pct": 50.9,
-        "excess_vs_baseline_pct": -0.08
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": -0.14,
+        "median_return_pct": -0.43,
+        "up_rate_pct": 20.0,
+        "excess_vs_baseline_pct": -1.06
       },
       {
         "month": 2,
-        "sample_count": 536,
-        "avg_return_pct": -0.02,
-        "up_rate_pct": 50.4,
-        "excess_vs_baseline_pct": -0.07
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": -1.17,
+        "median_return_pct": -1.29,
+        "up_rate_pct": 30.0,
+        "excess_vs_baseline_pct": -2.09
       },
       {
         "month": 3,
-        "sample_count": 549,
-        "avg_return_pct": -0.02,
-        "up_rate_pct": 54.3,
-        "excess_vs_baseline_pct": -0.07
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": -1.39,
+        "median_return_pct": 1.34,
+        "up_rate_pct": 70.0,
+        "excess_vs_baseline_pct": -2.31
       },
       {
         "month": 4,
-        "sample_count": 502,
-        "avg_return_pct": 0.11,
-        "up_rate_pct": 55.4,
-        "excess_vs_baseline_pct": 0.06
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 3.71,
+        "median_return_pct": 2.44,
+        "up_rate_pct": 80.0,
+        "excess_vs_baseline_pct": 2.79
       },
       {
         "month": 5,
-        "sample_count": 554,
-        "avg_return_pct": 0.02,
-        "up_rate_pct": 50.9,
-        "excess_vs_baseline_pct": -0.03
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 0.76,
+        "median_return_pct": 0.73,
+        "up_rate_pct": 50.0,
+        "excess_vs_baseline_pct": -0.16
       },
       {
         "month": 6,
-        "sample_count": 575,
-        "avg_return_pct": 0.07,
-        "up_rate_pct": 54.6,
-        "excess_vs_baseline_pct": 0.02
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 1.58,
+        "median_return_pct": 1.12,
+        "up_rate_pct": 60.0,
+        "excess_vs_baseline_pct": 0.65
       },
       {
         "month": 7,
-        "sample_count": 589,
-        "avg_return_pct": 0.09,
-        "up_rate_pct": 54.2,
-        "excess_vs_baseline_pct": 0.04
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 2.87,
+        "median_return_pct": 3.43,
+        "up_rate_pct": 80.0,
+        "excess_vs_baseline_pct": 1.95
       },
       {
         "month": 8,
-        "sample_count": 546,
-        "avg_return_pct": 0.05,
-        "up_rate_pct": 56.8,
-        "excess_vs_baseline_pct": -0.0
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 1.14,
+        "median_return_pct": 0.14,
+        "up_rate_pct": 50.0,
+        "excess_vs_baseline_pct": 0.22
       },
       {
         "month": 9,
-        "sample_count": 522,
-        "avg_return_pct": 0.08,
-        "up_rate_pct": 54.8,
-        "excess_vs_baseline_pct": 0.03
+        "sample_count": 11,
+        "sample_adequacy": "不足",
+        "avg_return_pct": -0.53,
+        "median_return_pct": -1.23,
+        "up_rate_pct": 45.5,
+        "excess_vs_baseline_pct": -1.45
       },
       {
         "month": 10,
-        "sample_count": 489,
-        "avg_return_pct": 0.02,
-        "up_rate_pct": 51.5,
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 0.89,
+        "median_return_pct": 1.91,
+        "up_rate_pct": 70.0,
         "excess_vs_baseline_pct": -0.03
       },
       {
         "month": 11,
-        "sample_count": 506,
-        "avg_return_pct": 0.12,
-        "up_rate_pct": 57.5,
-        "excess_vs_baseline_pct": 0.07
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 1.92,
+        "median_return_pct": 1.69,
+        "up_rate_pct": 60.0,
+        "excess_vs_baseline_pct": 1.0
       },
       {
         "month": 12,
-        "sample_count": 549,
-        "avg_return_pct": 0.12,
-        "up_rate_pct": 54.5,
-        "excess_vs_baseline_pct": 0.07
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "avg_return_pct": 1.55,
+        "median_return_pct": 0.4,
+        "up_rate_pct": 50.0,
+        "excess_vs_baseline_pct": 0.62
       }
     ],
+    "month_definition": "月末終値から翌月末終値までの月次騰落率。日次平均ではありません。",
     "turn_of_month": {
       "definition": "各月の最初3営業日と最後3営業日",
       "current_applicable": true,
       "turn_days": {
-        "sample_count": 1902,
-        "avg_return_pct": 0.15,
-        "up_rate_pct": 56.3,
-        "excess_vs_baseline_pct": 0.1
+        "sample_count": 725,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.1,
+        "up_rate_pct": 53.9,
+        "excess_vs_baseline_pct": 0.05
       },
       "other_days": {
-        "sample_count": 4587,
-        "avg_return_pct": 0.01,
-        "up_rate_pct": 52.7,
-        "excess_vs_baseline_pct": -0.04
+        "sample_count": 1748,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.02,
+        "up_rate_pct": 53.8,
+        "excess_vs_baseline_pct": -0.02
       }
     },
     "after_three_down": {
       "definition": "3営業日連続下落後",
       "current_applicable": false,
       "next_1d": {
-        "sample_count": 746,
-        "avg_return_pct": 0.01,
-        "up_rate_pct": 48.5,
-        "excess_vs_baseline_pct": -0.04
+        "sample_count": 287,
+        "sample_adequacy": "高",
+        "avg_return_pct": -0.07,
+        "up_rate_pct": 46.7,
+        "excess_vs_baseline_pct": -0.11
       },
       "next_20d": {
-        "sample_count": 746,
-        "avg_return_pct": 1.08,
-        "up_rate_pct": 61.9,
-        "excess_vs_baseline_pct": 1.03
+        "sample_count": 287,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.68,
+        "up_rate_pct": 64.1,
+        "excess_vs_baseline_pct": 0.64
       }
     },
     "after_large_down": {
       "definition": "1日で-1.5%以下下落した後",
       "current_applicable": false,
       "next_1d": {
-        "sample_count": 557,
-        "avg_return_pct": 0.04,
-        "up_rate_pct": 54.4,
-        "excess_vs_baseline_pct": -0.01
+        "sample_count": 114,
+        "sample_adequacy": "高",
+        "avg_return_pct": 0.33,
+        "up_rate_pct": 63.2,
+        "excess_vs_baseline_pct": 0.28
       },
       "next_20d": {
-        "sample_count": 557,
-        "avg_return_pct": 1.32,
-        "up_rate_pct": 60.5,
-        "excess_vs_baseline_pct": 1.27
+        "sample_count": 114,
+        "sample_adequacy": "高",
+        "avg_return_pct": 2.09,
+        "up_rate_pct": 67.5,
+        "excess_vs_baseline_pct": 2.05
       }
     },
-    "warning": "アノマリーは過去の統計的傾向です。全期間平均との差も併記しますが、偶然・制度変更・相場環境変化で再現しない可能性があります。",
+    "warning": "アノマリーは因果関係ではありません。直近10年に限定し、月別季節性は月次リターンで評価します。件数の少ない結果は参考度を下げてください。",
     "_data_status": "fresh"
   },
   "score_backtest": {
     "available": true,
-    "basis": "NIFTY 50 日足・取得可能な約10年、重複局面を5営業日間隔で間引き（最終 2026-09-18）",
+    "method_version": "4.7-stat-1",
+    "window_years": 10,
+    "window_start": "2016-09-19",
+    "window_end": "2026-09-18",
+    "basis": "NIFTY 50 日足・直近10年、重複局面を5営業日間隔で間引き（最終 2026-09-18）",
     "baseline": {
-      "sample_count": 6370,
-      "up_rate_pct": 60.9,
-      "down_rate_pct": 39.1,
-      "avg_return_20d_pct": 1.08,
-      "median_return_20d_pct": 1.3
+      "sample_count": 2454,
+      "up_rate_pct": 63.2,
+      "down_rate_pct": 36.8,
+      "avg_return_20d_pct": 0.93,
+      "median_return_20d_pct": 1.09
     },
     "buy": [
       {
         "threshold": 35,
-        "sample_count": 158,
-        "success_rate_20d_pct": 67.1,
-        "success_rate_lift_vs_baseline_pctpt": 6.2,
-        "avg_return_5d_pct": 0.25,
-        "avg_return_20d_pct": 1.82,
-        "median_return_20d_pct": 2.56,
-        "median_max_drawdown_20d_pct": -2.43,
-        "median_max_upside_20d_pct": 4.63,
+        "sample_count": 45,
+        "sample_adequacy": "中",
+        "calibration": "WEAK_OR_CONTRADICTORY",
+        "success_rate_20d_pct": 62.2,
+        "success_rate_lift_vs_baseline_pctpt": -1.0,
+        "avg_return_5d_pct": 0.08,
+        "avg_return_20d_pct": 0.43,
+        "median_return_20d_pct": 0.87,
+        "median_max_drawdown_20d_pct": -2.25,
+        "median_max_upside_20d_pct": 2.84,
         "recent_examples": [
           {
             "date": "2026-02-03",
@@ -462,14 +515,16 @@
       },
       {
         "threshold": 55,
-        "sample_count": 15,
-        "success_rate_20d_pct": 66.7,
-        "success_rate_lift_vs_baseline_pctpt": 5.8,
-        "avg_return_5d_pct": -0.38,
-        "avg_return_20d_pct": -1.1,
-        "median_return_20d_pct": 3.22,
-        "median_max_drawdown_20d_pct": -4.11,
-        "median_max_upside_20d_pct": 4.45,
+        "sample_count": 6,
+        "sample_adequacy": "不足",
+        "calibration": "INSUFFICIENT",
+        "success_rate_20d_pct": 83.3,
+        "success_rate_lift_vs_baseline_pctpt": 20.1,
+        "avg_return_5d_pct": -1.2,
+        "avg_return_20d_pct": -0.59,
+        "median_return_20d_pct": 2.26,
+        "median_max_drawdown_20d_pct": -5.64,
+        "median_max_upside_20d_pct": 3.08,
         "recent_examples": [
           {
             "date": "2018-10-10",
@@ -516,6 +571,8 @@
       {
         "threshold": 70,
         "sample_count": 0,
+        "sample_adequacy": "不足",
+        "calibration": "INSUFFICIENT",
         "success_rate_20d_pct": null,
         "success_rate_lift_vs_baseline_pctpt": null,
         "avg_return_5d_pct": null,
@@ -529,14 +586,16 @@
     "sell": [
       {
         "threshold": 35,
-        "sample_count": 325,
-        "success_rate_20d_pct": 34.8,
-        "success_rate_lift_vs_baseline_pctpt": -4.3,
-        "avg_return_5d_pct": 0.25,
-        "avg_return_20d_pct": 1.37,
+        "sample_count": 120,
+        "sample_adequacy": "高",
+        "calibration": "WEAK_OR_CONTRADICTORY",
+        "success_rate_20d_pct": 30.0,
+        "success_rate_lift_vs_baseline_pctpt": -6.8,
+        "avg_return_5d_pct": 0.26,
+        "avg_return_20d_pct": 1.41,
         "median_return_20d_pct": 1.63,
-        "median_max_drawdown_20d_pct": -1.78,
-        "median_max_upside_20d_pct": 3.1,
+        "median_max_drawdown_20d_pct": -1.1,
+        "median_max_upside_20d_pct": 2.77,
         "recent_examples": [
           {
             "date": "2025-10-30",
@@ -582,14 +641,16 @@
       },
       {
         "threshold": 55,
-        "sample_count": 43,
-        "success_rate_20d_pct": 30.2,
-        "success_rate_lift_vs_baseline_pctpt": -8.9,
-        "avg_return_5d_pct": 0.09,
-        "avg_return_20d_pct": 3.55,
-        "median_return_20d_pct": 2.87,
-        "median_max_drawdown_20d_pct": -2.24,
-        "median_max_upside_20d_pct": 4.23,
+        "sample_count": 10,
+        "sample_adequacy": "不足",
+        "calibration": "INSUFFICIENT",
+        "success_rate_20d_pct": 10.0,
+        "success_rate_lift_vs_baseline_pctpt": -26.8,
+        "avg_return_5d_pct": 0.68,
+        "avg_return_20d_pct": 2.57,
+        "median_return_20d_pct": 2.45,
+        "median_max_drawdown_20d_pct": -0.81,
+        "median_max_upside_20d_pct": 3.24,
         "recent_examples": [
           {
             "date": "2022-08-04",
@@ -636,6 +697,8 @@
       {
         "threshold": 70,
         "sample_count": 0,
+        "sample_adequacy": "不足",
+        "calibration": "INSUFFICIENT",
         "success_rate_20d_pct": null,
         "success_rate_lift_vs_baseline_pctpt": null,
         "avg_return_5d_pct": null,
@@ -646,7 +709,7 @@
         "recent_examples": []
       }
     ],
-    "warning": "これはテクニカル中核スコアの過去検証です。USD/INR、Brent、VIX、騰落銘柄数、FII/DIIを含む現在の総合スコアそのものの的中率ではありません。",
+    "warning": "テクニカル中核スコアのみの過去検証です。サンプル30未満は『不足』として扱い、現在の総合スコアの的中率とは解釈しません。",
     "_data_status": "fresh"
   },
   "data_quality": {
@@ -667,7 +730,7 @@
         "provider": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
         "as_of_jst": "2026-09-18T19:01+09:00",
-        "age_minutes": 2146.6,
+        "age_minutes": 2185.3,
         "error": null
       },
       "usdinr": {
@@ -677,7 +740,7 @@
         "provider": "Twelve Data",
         "provider_symbol": "USD/INR",
         "as_of_jst": "2026-09-20T06:00+09:00",
-        "age_minutes": 47.6,
+        "age_minutes": 86.3,
         "error": null
       },
       "brent": {
@@ -687,7 +750,7 @@
         "provider": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
         "as_of_jst": "2026-09-19T06:50+09:00",
-        "age_minutes": 1437.6,
+        "age_minutes": 1476.3,
         "error": null
       }
     },
@@ -708,7 +771,7 @@
     "detail": "週末。NIFTY価格は 2026/09/18 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "4.6",
+  "app_version": "4.7",
   "core_fetch": {
     "nifty": {
       "status": "fresh",
@@ -732,7 +795,7 @@
       },
       "history_yahoo_html_report": {
         "status": "error",
-        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: HTTP Error 404: Not Found; ca.finance.yahoo.com: Yahoo history HTML too short (0 rows)"
+        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: HTTP Error 404: Not Found; ca.finance.yahoo.com: HTTP Error 404: Not Found"
       },
       "history_recent_contiguous": true,
       "history_continuity": {
@@ -773,6 +836,73 @@
   "provider_symbols": {
     "twelvedata": {
       "usdinr": "USD/INR"
+    }
+  },
+  "analysis_meta": {
+    "method_version": "4.7-stat-1",
+    "window_years": 10,
+    "principle": "14:00暫定値と前営業日確定日足を分離し、予測・アノマリーは直近10年に限定。"
+  },
+  "data_lineage": {
+    "fetched_at_jst": "2026-09-20T07:26:20+09:00",
+    "market_open": false,
+    "market_state": "CLOSED",
+    "calendar_source": "NSE 2026 holiday calendar",
+    "analytics_method_version": "4.7-stat-1",
+    "analytics_window_years": 10,
+    "instruments": {
+      "nifty": {
+        "source": "Google Finance + NSE Indices",
+        "provider_symbol": "NIFTY_50:INDEXNSE",
+        "quote_time_jst": "2026-09-18T19:01+09:00",
+        "fetched_at_jst": "2026-09-20T07:26:20+09:00",
+        "data_age_minutes": 2185.3,
+        "status": "fresh",
+        "fallback_used": false,
+        "provisional": true,
+        "market_open": false
+      },
+      "usdinr": {
+        "source": "Twelve Data",
+        "provider_symbol": "USD/INR",
+        "quote_time_jst": "2026-09-20T06:00+09:00",
+        "fetched_at_jst": "2026-09-20T07:26:20+09:00",
+        "data_age_minutes": 86.3,
+        "status": "fresh",
+        "fallback_used": false,
+        "provisional": false,
+        "market_open": false
+      },
+      "brent": {
+        "source": "Google Finance",
+        "provider_symbol": "BZW00:NYMEX",
+        "quote_time_jst": "2026-09-19T06:50+09:00",
+        "fetched_at_jst": "2026-09-20T07:26:20+09:00",
+        "data_age_minutes": 1476.3,
+        "status": "fresh",
+        "fallback_used": false,
+        "provisional": false,
+        "market_open": false
+      }
+    },
+    "nifty_technicals": {
+      "technical_date": "2026-09-18",
+      "technical_status": "fresh",
+      "technical_basis": "前営業日までの確定日足",
+      "provisional_available": true
+    },
+    "history": {
+      "source": "Tickjournal recent-history bridge + self-maintained Google close",
+      "rows": 6490,
+      "first_date": "2000-01-03",
+      "last_date": "2026-09-18",
+      "recent_contiguous": true,
+      "continuity": {
+        "latest": "2026-09-18",
+        "rows_120d": 84,
+        "max_gap_days": 4
+      },
+      "ready_for_current_technicals": true
     }
   }
 }
