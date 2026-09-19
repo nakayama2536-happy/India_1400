@@ -11,7 +11,7 @@ Goals
 - Backtest the NIFTY-only technical core of the buy/sell setup score.
 - Keep 1-month analog outlook and anomalies descriptive, not deterministic.
 
-Core market data still uses the Yahoo Finance chart endpoint as a reference source.
+Core market data uses Twelve Data when a GitHub Secret API key is configured, with Yahoo Finance as a fallback reference source.
 Optional official NSE/NSE Indices calls may fail from hosted runners; failures do not
 stop core processing and are surfaced explicitly in market.json.
 """
@@ -22,6 +22,7 @@ import http.cookiejar
 import io
 import json
 import math
+import os
 import statistics
 import time
 import urllib.parse
@@ -37,7 +38,9 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/
 JST = ZoneInfo("Asia/Tokyo")
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA_VERSION = 4
-APP_VERSION = "4.1"
+APP_VERSION = "4.2"
+TWELVEDATA_API_KEY = os.getenv("TWELVEDATA_API_KEY", "").strip()
+TWELVEDATA_BASE = "https://api.twelvedata.com"
 
 # NSE cash-market trading holidays for calendar year 2026.
 # Source: NSE circular "Trading holidays for the calendar year 2026".
@@ -198,6 +201,218 @@ def yahoo_daily_bundle(symbol: str, range_: str):
         if base not in (None, 0):
             change5 = pct_change(price, base)
     return chart, ts, price, ds, change5
+
+
+
+def twelve_json(endpoint: str, params: dict, tries: int = 2):
+    """Call Twelve Data using an API key kept in GitHub Secrets.
+
+    The key is never written to market.json or logs. A missing key simply disables
+    this provider and lets the Yahoo fallback path run.
+    """
+    if not TWELVEDATA_API_KEY:
+        raise RuntimeError("TWELVEDATA_API_KEY is not configured")
+    q = dict(params)
+    q["apikey"] = TWELVEDATA_API_KEY
+    url = f"{TWELVEDATA_BASE}/{endpoint.lstrip('/')}?{urllib.parse.urlencode(q)}"
+    data = http_json(url, tries=tries, timeout=25, headers={"Accept": "application/json"})
+    if isinstance(data, dict):
+        status = str(data.get("status") or "").lower()
+        if status == "error" or data.get("code") in (400, 401, 403, 404, 429):
+            msg = data.get("message") or data.get("error") or f"Twelve Data error {data.get('code')}"
+            raise RuntimeError(str(msg))
+    return data
+
+
+def _parse_provider_ts(obj, tz_hint=UTC if 'UTC' in globals() else timezone.utc):
+    ts = obj.get("timestamp") if isinstance(obj, dict) else None
+    if ts not in (None, ""):
+        try:
+            return int(float(ts))
+        except Exception:
+            pass
+    raw = (obj.get("datetime") if isinstance(obj, dict) else None) or (obj.get("date") if isinstance(obj, dict) else None)
+    if not raw:
+        return None
+    try:
+        dt = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=tz_hint)
+        return int(dt.astimezone(timezone.utc).timestamp())
+    except Exception:
+        try:
+            d = datetime.strptime(str(raw)[:10], "%Y-%m-%d").replace(tzinfo=tz_hint)
+            return int(d.astimezone(timezone.utc).timestamp())
+        except Exception:
+            return None
+
+
+def twelve_symbol_search(query: str, preferred_kind: str | None = None):
+    data = twelve_json("symbol_search", {"symbol": query}, tries=1)
+    rows = (data or {}).get("data") or (data or {}).get("result") or []
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError(f"symbol not found: {query}")
+
+    def score(row):
+        text = " ".join(str(row.get(k) or "") for k in (
+            "symbol", "instrument_name", "name", "exchange", "country", "instrument_type", "type"
+        )).lower()
+        sc = 0
+        if "nifty 50" in text:
+            sc += 20
+        if "india" in text:
+            sc += 8
+        if "nse" in text:
+            sc += 6
+        if preferred_kind and preferred_kind.lower() in text:
+            sc += 8
+        return sc
+
+    row = max(rows, key=score)
+    sym = row.get("symbol")
+    if not sym:
+        raise RuntimeError(f"symbol not found: {query}")
+    return str(sym), row
+
+
+def twelve_commodity_symbol(name_contains="Brent Spot"):
+    data = twelve_json("commodities", {}, tries=1)
+    rows = (data or {}).get("data") or []
+    target = name_contains.lower()
+    for row in rows:
+        name = str(row.get("name") or "").lower()
+        desc = str(row.get("description") or "").lower()
+        if target in name or ("brent" in name and "spot" in (name + " " + desc)):
+            if row.get("symbol"):
+                return str(row["symbol"]), row
+    for row in rows:
+        if "brent" in (str(row.get("name") or "") + " " + str(row.get("description") or "")).lower():
+            if row.get("symbol"):
+                return str(row["symbol"]), row
+    raise RuntimeError("Brent Spot symbol not found")
+
+
+def twelve_quote(symbol: str, tz_hint=timezone.utc):
+    data = twelve_json("quote", {"symbol": symbol}, tries=2)
+    price = None
+    for k in ("close", "price", "last", "value"):
+        if isinstance(data, dict) and data.get(k) not in (None, ""):
+            try:
+                price = float(data[k])
+                break
+            except Exception:
+                pass
+    if price is None:
+        raise RuntimeError(f"quote has no numeric price for {symbol}")
+    ts = _parse_provider_ts(data, tz_hint)
+    if ts is None:
+        ts = int(datetime.now(timezone.utc).timestamp())
+    return ts, price, data
+
+
+def twelve_daily_series(symbol: str, outputsize: int, tz_hint=timezone.utc):
+    data = twelve_json(
+        "time_series",
+        {
+            "symbol": symbol,
+            "interval": "1day",
+            "outputsize": int(outputsize),
+            "timezone": getattr(tz_hint, "key", "UTC"),
+            "format": "JSON",
+        },
+        tries=2,
+    )
+    rows = (data or {}).get("values") or []
+    out = []
+    for row in rows:
+        try:
+            close = float(row.get("close"))
+        except Exception:
+            continue
+        ts = _parse_provider_ts(row, tz_hint)
+        if ts is None:
+            continue
+        out.append((ts, close))
+    out.sort(key=lambda x: x[0])
+    if not out:
+        raise RuntimeError(f"no daily series for {symbol}")
+    return out, data
+
+
+def _completed_provider_daily(series, now_tz, market_close=dtime(16, 0)):
+    today = now_tz.date()
+    out = []
+    for ts, close in series:
+        dt = datetime.fromtimestamp(ts, timezone.utc).astimezone(now_tz.tzinfo)
+        if dt.date() == today and now_tz.time() < market_close:
+            continue
+        out.append((ts, close))
+    return out
+
+
+def twelve_nifty_bundle(old_result=None):
+    old_result = old_result or {}
+    cached = ((old_result.get("provider_symbols") or {}).get("twelvedata") or {}).get("nifty")
+    symbol = os.getenv("TWELVEDATA_NIFTY_SYMBOL", "").strip() or cached
+    meta = None
+    if not symbol:
+        symbol, meta = twelve_symbol_search("NIFTY 50", preferred_kind="index")
+    ts, price, quote = twelve_quote(symbol, IST)
+    series, _ = twelve_daily_series(symbol, 3000, IST)
+    ds = _completed_provider_daily(series, datetime.now(IST), dtime(16, 0))
+    if len(ds) < 120:
+        raise RuntimeError(f"Twelve Data NIFTY daily history too short ({len(ds)} rows); plan/history access may be limited")
+    return None, ts, price, ds, None, symbol, meta or quote
+
+
+def twelve_simple_bundle(kind: str, old_result=None):
+    old_result = old_result or {}
+    cached_map = (old_result.get("provider_symbols") or {}).get("twelvedata") or {}
+    if kind == "usdinr":
+        symbol = os.getenv("TWELVEDATA_USDINR_SYMBOL", "").strip() or cached_map.get("usdinr") or "USD/INR"
+        tz_hint = IST
+    elif kind == "brent":
+        symbol = os.getenv("TWELVEDATA_BRENT_SYMBOL", "").strip() or cached_map.get("brent")
+        if not symbol:
+            symbol, _ = twelve_commodity_symbol("Brent Spot")
+        tz_hint = timezone.utc
+    else:
+        raise ValueError(kind)
+    ts, price, _ = twelve_quote(symbol, tz_hint)
+    series, _ = twelve_daily_series(symbol, 15, tz_hint)
+    vals = [x[1] for x in series]
+    change5 = pct_change(price, vals[-6]) if len(vals) >= 6 and vals[-6] else None
+    return None, ts, price, series, change5, symbol
+
+
+def fetch_nifty_bundle(old_result=None):
+    errs = []
+    if TWELVEDATA_API_KEY:
+        try:
+            bundle = twelve_nifty_bundle(old_result)
+            return bundle[:5], "Twelve Data", bundle[5]
+        except Exception as e:
+            errs.append("Twelve Data: " + str(e))
+    try:
+        return yahoo_daily_bundle("^NSEI", "10y"), "Yahoo Finance", "^NSEI"
+    except Exception as e:
+        errs.append("Yahoo Finance: " + str(e))
+    raise RuntimeError("; ".join(errs))
+
+
+def fetch_simple_bundle(kind: str, yahoo_symbol: str, old_result=None):
+    errs = []
+    if TWELVEDATA_API_KEY:
+        try:
+            b = twelve_simple_bundle(kind, old_result)
+            return b[:5], "Twelve Data", b[5]
+        except Exception as e:
+            errs.append("Twelve Data: " + str(e))
+    try:
+        return yahoo_daily_bundle(yahoo_symbol, "1mo"), "Yahoo Finance", yahoo_symbol
+    except Exception as e:
+        errs.append("Yahoo Finance: " + str(e))
+    raise RuntimeError("; ".join(errs))
 
 
 def iso_age_minutes(value, now_jst):
@@ -1196,6 +1411,8 @@ def main():
     errors = []
     optional_errors = []
     core_fetch = {}
+    provider_symbols = dict((old.get("provider_symbols") or {}) if isinstance(old, dict) else {})
+    provider_symbols.setdefault("twelvedata", {})
 
     daily_dates = []
     daily_vals = []
@@ -1226,7 +1443,10 @@ def main():
     # NIFTY: one 10-year daily request supplies both current reference price (meta)
     # and the long history needed for analytics.
     try:
-        _, t_now, p_now, ds, _ = yahoo_daily_bundle("^NSEI", "10y")
+        bundle, provider_name, provider_symbol = fetch_nifty_bundle(old)
+        _, t_now, p_now, ds, _ = bundle
+        if provider_name == "Twelve Data":
+            provider_symbols["twelvedata"]["nifty"] = provider_symbol
         if len(ds) < 100:
             raise RuntimeError("insufficient daily history")
         daily_vals = [c for _, c in ds]
@@ -1239,6 +1459,8 @@ def main():
         provisional = build_provisional_technicals(daily_dates, daily_vals, p_now, t_now)
         result["nifty"] = {
             "symbol": "^NSEI",
+            "provider_symbol": provider_symbol,
+            "provider": provider_name,
             "price": round_or_none(p_now, 2),
             "as_of_jst": iso_jst(t_now),
             "previous_close": round_or_none(previous_close, 2),
@@ -1263,7 +1485,7 @@ def main():
             "technical_basis": "前営業日までの確定日足",
             "provisional": provisional,
         }
-        core_fetch["nifty"] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(t_now), "error": None}
+        core_fetch["nifty"] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(t_now), "provider": provider_name, "provider_symbol": provider_symbol, "error": None}
         result["market_state"] = market_state(t_now, now_jst)
     except Exception as e:
         record_core_failure("nifty", "NIFTY", e)
@@ -1273,14 +1495,19 @@ def main():
     # enough closes for the 5-session change. This halves Yahoo request volume.
     for key, label, symbol in (("usdinr", "USD/INR", "INR=X"), ("brent", "Brent", "BZ=F")):
         try:
-            _, ts, price, _, change5 = yahoo_daily_bundle(symbol, "1mo")
+            bundle, provider_name, provider_symbol = fetch_simple_bundle(key, symbol, old)
+            _, ts, price, _, change5 = bundle
+            if provider_name == "Twelve Data":
+                provider_symbols["twelvedata"][key] = provider_symbol
             result[key] = {
                 "symbol": symbol,
+                "provider_symbol": provider_symbol,
+                "provider": provider_name,
                 "price": round_or_none(price, 4 if key == "usdinr" else 2),
                 "as_of_jst": iso_jst(ts),
                 "change_5d_pct": round_or_none(change5, 2),
             }
-            core_fetch[key] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(ts), "error": None}
+            core_fetch[key] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(ts), "provider": provider_name, "provider_symbol": provider_symbol, "error": None}
         except Exception as e:
             record_core_failure(key, label, e)
         time.sleep(0.8)
@@ -1359,10 +1586,11 @@ def main():
             "generated_at_jst": now_jst.isoformat(timespec="seconds"),
             "status": status,
             "core_fetch": core_fetch,
-            "source": "Yahoo Finance chart endpoint for core reference data; official NSE/NSE Indices optional cross-check/context",
+            "provider_symbols": provider_symbols,
+            "source": "Core provider priority: Twelve Data (when TWELVEDATA_API_KEY is configured) -> Yahoo Finance fallback; official NSE/NSE Indices optional cross-check/context",
             "errors": errors,
             "optional_errors": optional_errors,
-            "note": "v4.1: failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
+            "note": "v4.2: Twelve Data can be enabled through a GitHub Secret. Failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
         }
     )
 
