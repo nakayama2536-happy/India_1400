@@ -1,0 +1,43 @@
+name: Update India 14:00 market data
+
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC. 04:50-05:10 UTC = 13:50-14:10 JST
+    - cron: '50,55 4 * * 1-5'
+    - cron: '0,5,10 5 * * 1-5'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: india-1400-market-update
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch market data and calculate indicators
+        run: python update_market.py
+
+      - name: Commit market.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add market.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Update India 14:00 market data"
+            git push
+          fi
