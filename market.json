@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-09-19T12:13:15+00:00",
-  "generated_at_jst": "2026-09-19T21:13:15+09:00",
+  "generated_at_utc": "2026-09-19T13:14:17+00:00",
+  "generated_at_jst": "2026-09-19T22:14:17+09:00",
   "status": "partial",
-  "source": "Core provider priority: Twelve Data (when TWELVEDATA_API_KEY is configured) -> Yahoo Finance fallback; official NSE/NSE Indices optional cross-check/context",
+  "source": "Zero-cost provider priority: NIFTY=Google Finance quote + official NSE Indices history; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance is last-resort fallback; optional NSE live context may be unavailable on hosted runners",
   "nifty": {
     "symbol": "^NSEI",
     "price": 23346.4,
@@ -22,25 +22,29 @@
     "symbol": "INR=X",
     "provider_symbol": "USD/INR",
     "provider": "Twelve Data",
-    "price": 95.9909,
+    "price": 96.0031,
     "as_of_jst": "2026-09-19T06:00+09:00",
-    "change_5d_pct": 0.1
+    "change_5d_pct": 0.11
   },
   "brent": {
     "symbol": "BZ=F",
-    "price": 98.77,
-    "as_of_jst": "2026-09-19T05:58+09:00"
+    "provider_symbol": "BZW00:NYMEX",
+    "provider": "Google Finance",
+    "price": 0.0,
+    "as_of_jst": "2026-09-19T06:50+09:00",
+    "change_5d_pct": null
   },
   "errors": [
-    "NIFTY: Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
-    "Brent: Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+    "NIFTY: NIFTY current quote fetched, but daily history unavailable and no saved technical cache exists"
   ],
-  "note": "v4.2: Twelve Data can be enabled through a GitHub Secret. Failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
+  "note": "v4.3 free-only: no paid market-data plan is required. Public web sources can change or throttle; failed core fetches retain the previous value only for continuity and never qualify as a fresh trading decision.",
   "india_vix": {
     "symbol": "^INDIAVIX",
-    "price": null,
+    "provider": "Google Finance",
+    "price": 11.38,
+    "as_of_jst": "2026-09-18T19:13+09:00",
     "change_5d_pct": null,
-    "data_status": "unavailable"
+    "data_status": "fresh"
   },
   "crosscheck": {
     "available": false,
@@ -61,9 +65,7 @@
     "reason": "休場日またはNIFTY最新取得失敗のため省略"
   },
   "schema_version": 4,
-  "optional_errors": [
-    "India VIX: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
-  ],
+  "optional_errors": [],
   "signals": {
     "available": false,
     "decision_eligible": false,
@@ -72,7 +74,7 @@
     "last_valid_score": {
       "buy_setup_score": null,
       "sell_setup_score": null,
-      "generated_at_jst": "2026-09-19T18:55:59+09:00"
+      "generated_at_jst": "2026-09-19T21:13:15+09:00"
     },
     "definition": "前回スコアは参考情報としてのみ保持し、最新判断には使用しません。"
   },
@@ -102,7 +104,6 @@
     },
     "reasons": [
       "NIFTYは今回取得できず、前回取得値を表示しています。",
-      "Brentは今回取得できず、前回取得値を表示しています。",
       "主要3データが今回すべて更新できていないため、前兆・購入ルールを最新判断として確定しません。",
       "通常取引時間中ではないため、第1弾購入ルールは自動確定しません。"
     ],
@@ -111,29 +112,35 @@
         "label": "NIFTY",
         "status": "fallback",
         "fetched_this_run": false,
+        "provider": null,
+        "provider_symbol": null,
         "as_of_jst": "2026-09-18T19:00+09:00",
-        "age_minutes": 1573.3,
-        "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+        "age_minutes": 1634.3,
+        "error": "NIFTY current quote fetched, but daily history unavailable and no saved technical cache exists"
       },
       "usdinr": {
         "label": "USD/INR",
         "status": "fresh",
         "fetched_this_run": true,
+        "provider": "Twelve Data",
+        "provider_symbol": "USD/INR",
         "as_of_jst": "2026-09-19T06:00+09:00",
-        "age_minutes": 913.3,
+        "age_minutes": 974.3,
         "error": null
       },
       "brent": {
         "label": "Brent",
-        "status": "fallback",
-        "fetched_this_run": false,
-        "as_of_jst": "2026-09-19T05:58+09:00",
-        "age_minutes": 915.3,
-        "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+        "status": "fresh",
+        "fetched_this_run": true,
+        "provider": "Google Finance",
+        "provider_symbol": "BZW00:NYMEX",
+        "as_of_jst": "2026-09-19T06:50+09:00",
+        "age_minutes": 924.3,
+        "error": null
       }
     },
     "all_core_fresh_this_run": false,
-    "optional_context_available_count": 0,
+    "optional_context_available_count": 1,
     "official_holiday_calendar_loaded": true,
     "policy": "前回値は表示継続しても、今回取得に失敗した主要データを使って最新の売買判断を確定しない。"
   },
@@ -149,14 +156,14 @@
     "detail": "週末。NIFTY価格は 2026/09/18 19:00 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "4.2",
+  "app_version": "4.3",
   "core_fetch": {
     "nifty": {
       "status": "fallback",
       "fetched_this_run": false,
       "reused_previous_value": true,
       "previous_as_of_jst": "2026-09-18T19:00+09:00",
-      "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "error": "NIFTY current quote fetched, but daily history unavailable and no saved technical cache exists"
     },
     "usdinr": {
       "status": "fresh",
@@ -167,11 +174,12 @@
       "error": null
     },
     "brent": {
-      "status": "fallback",
-      "fetched_this_run": false,
-      "reused_previous_value": true,
-      "previous_as_of_jst": "2026-09-19T05:58+09:00",
-      "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "status": "fresh",
+      "fetched_this_run": true,
+      "as_of_jst": "2026-09-19T06:50+09:00",
+      "provider": "Google Finance",
+      "provider_symbol": "BZW00:NYMEX",
+      "error": null
     }
   },
   "provider_symbols": {
