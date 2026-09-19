@@ -3,216 +3,690 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="theme-color" content="#08111f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="India 14:00">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>India 14:00 Check</title>
+  <title>India 14:00 Check v4</title>
   <style>
     :root{
       color-scheme:dark;
-      --bg:#07111f;--card:#101b2d;--line:#24334c;--text:#f3f6fb;
-      --muted:#9db0c8;--ok:#25c26e;--ng:#ff6b6b;--warn:#f5bf42;--accent:#6ea8ff;
+      --bg:#07111f;--card:#0f1b2e;--card2:#0a1525;--line:#263854;
+      --text:#f4f7fb;--muted:#9eb0c8;--ok:#29c777;--ng:#ff7272;--warn:#f4c14b;
+      --accent:#70a9ff;--accent2:#a7c7ff;--shadow:0 8px 24px rgba(0,0,0,.18);
     }
     *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#07111f 0%,#0b1628 100%);
-      color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    main{max-width:760px;margin:auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 32px)}
-    h1{font-size:26px;margin:8px 0 4px}
-    h2{font-size:18px;margin:0 0 12px}
-    .sub,.note,.small{color:var(--muted)}
-    .sub{font-size:13px;margin-bottom:14px}
-    .card{background:rgba(16,27,45,.96);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+    html{background:var(--bg)}
+    body{margin:0;background:linear-gradient(180deg,#07111f 0%,#0a1629 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:760px;margin:auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(92px + env(safe-area-inset-bottom))}
+    header{padding:4px 2px 8px}
+    h1{font-size:27px;margin:4px 0 3px;letter-spacing:-.3px}
+    h2{font-size:19px;margin:0 0 12px}
+    h3{font-size:16px;margin:0 0 8px}
+    .sub,.small,.note{color:var(--muted)}
+    .sub{font-size:13px;line-height:1.55}
+    .small{font-size:12px;line-height:1.55}
+    .card{background:rgba(15,27,46,.97);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+    .card.flat{box-shadow:none}
     .hero{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
-    .price{font-size:38px;font-weight:760;letter-spacing:-1px}
-    .delta{font-size:16px;font-weight:700}
-    .ok{color:var(--ok)} .ng{color:var(--ng)} .warn{color:var(--warn)}
+    .price{font-size:40px;font-weight:800;letter-spacing:-1.2px;line-height:1.08}
+    .delta{font-size:17px;font-weight:800}
+    .ok{color:var(--ok)} .ng{color:var(--ng)} .warn{color:var(--warn)} .muted{color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:750;background:#0a1525}
+    .pill.ok{background:rgba(41,199,119,.10)} .pill.warn{background:rgba(244,193,75,.10)}
+    .statusline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+    button.primary,button.secondary,button.ghost{width:100%;border-radius:14px;padding:13px 12px;font-size:15px;font-weight:800}
+    button.primary{border:0;background:var(--accent);color:#06101e}
+    button.secondary{background:#192943;color:var(--text);border:1px solid #35517a}
+    button.ghost{background:#0a1525;color:var(--text);border:1px solid var(--line)}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .metric{padding:12px;background:#0b1525;border:1px solid var(--line);border-radius:14px}
-    .label{font-size:12px;color:var(--muted);margin-bottom:5px}
-    .value{font-size:18px;font-weight:700;word-break:break-word}
-    button{width:100%;border:0;border-radius:14px;padding:14px 16px;font-size:16px;font-weight:750;background:var(--accent);color:#06101e;margin-top:8px}
-    button.secondary{background:#1b2940;color:var(--text);border:1px solid var(--line)}
-    .rule{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+    .metric{padding:12px;background:var(--card2);border:1px solid var(--line);border-radius:14px;min-width:0}
+    .metric .label{font-size:12px;color:var(--muted);margin-bottom:5px}
+    .metric .value{font-size:18px;font-weight:780;overflow-wrap:anywhere}
+    .metric .detail{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+    .section-note{padding:10px 12px;background:#0a1525;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px;line-height:1.6}
+    .summary{font-size:14px;line-height:1.7}
+    .table{width:100%;border-collapse:collapse;font-size:13px}
+    .table th,.table td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+    .table th:first-child,.table td:first-child{text-align:left}
+    .table th{color:var(--muted);font-weight:650;font-size:11px}
+    .table tr:last-child td{border-bottom:0}
+    .trendup{color:var(--ok);font-weight:750}.trenddown{color:var(--ng);font-weight:750}
+    .scorebox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .scorecard{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:14px}
+    .scorebig{font-size:38px;font-weight:850;letter-spacing:-1px}
+    .bar{height:9px;background:#16243a;border-radius:999px;overflow:hidden;margin:8px 0 6px}
+    .bar > span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#6ea8ff,#29c777)}
+    .bar.sell > span{background:linear-gradient(90deg,#f4c14b,#ff7272)}
+    .factor{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+    .factor:last-child{border-bottom:0}
+    .pts{min-width:45px;font-weight:800;color:var(--accent2)}
+    .factor b{font-size:14px}.factor .small{margin-top:2px}
+    .outlook-label{font-size:30px;font-weight:850;margin:2px 0 8px}
+    .range{font-size:13px;color:var(--muted);line-height:1.7}
+    .highlight{border-left:3px solid var(--accent);padding-left:12px}
+    .anomaly-card{background:var(--card2);border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0}
+    .anomaly-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .applicable{font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:rgba(41,199,119,.12);color:var(--ok);white-space:nowrap}
+    details{background:var(--card2);border:1px solid var(--line);border-radius:14px;margin:9px 0;overflow:hidden}
+    summary{list-style:none;padding:14px;font-weight:780;cursor:pointer}
+    summary::-webkit-details-marker{display:none}
+    details .detailbody{padding:0 14px 14px;color:#dce5f1;font-size:13px;line-height:1.75}
+    .definition{padding:10px 0;border-top:1px solid var(--line);margin-top:8px;color:var(--muted)}
+    .rule{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
     .rule:last-child{border-bottom:0}
-    .badge{min-width:48px;text-align:center;border-radius:999px;padding:4px 7px;font-size:12px;font-weight:800}
-    .badge.ok{background:rgba(37,194,110,.14)}
-    .badge.ng{background:rgba(255,107,107,.14)}
-    .badge.warn{background:rgba(245,191,66,.14)}
-    input[type="number"]{width:100%;font-size:17px;padding:11px;background:#091321;color:var(--text);border:1px solid var(--line);border-radius:12px}
-    input[type="checkbox"]{width:22px;height:22px}
+    .badge{min-width:48px;text-align:center;border-radius:999px;padding:4px 7px;font-size:11px;font-weight:850}
+    .badge.ok{background:rgba(41,199,119,.14)}.badge.ng{background:rgba(255,114,114,.14)}.badge.warn{background:rgba(244,193,75,.14)}
     .settings{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .decision{font-size:25px;font-weight:800;line-height:1.25;margin:4px 0}
-    .score{font-size:14px;color:var(--muted)}
-    .footer{font-size:12px;line-height:1.55;color:var(--muted);padding:6px 3px}
-    @media (max-width:430px){.grid,.settings{grid-template-columns:1fr 1fr}.price{font-size:34px}}
+    label .label{font-size:11px;color:var(--muted);margin-bottom:5px}
+    input[type="number"]{width:100%;font-size:16px;padding:10px;background:#091321;color:var(--text);border:1px solid var(--line);border-radius:12px}
+    input[type="checkbox"]{width:22px;height:22px;margin-top:2px}
+    .decision{font-size:22px;font-weight:850;margin-top:10px}
+    .spark-wrap{height:84px;margin-top:8px}
+    .spark-wrap svg{width:100%;height:100%;overflow:visible}
+    .history-list{display:flex;gap:8px;overflow:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
+    .history-chip{min-width:120px;scroll-snap-align:start;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px}
+    .tabs{position:fixed;z-index:10;left:0;right:0;bottom:0;background:rgba(7,17,31,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));display:flex;justify-content:center}
+    .tabbar{width:min(760px,100%);display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+    .tab{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:780;padding:9px 3px;border-radius:11px}
+    .tab.active{background:#182842;color:var(--text)}
+    .page{display:none}.page.active{display:block}
+    .footer{font-size:11px;line-height:1.6;color:var(--muted);padding:7px 2px}
+    .toast{position:fixed;z-index:30;left:50%;transform:translateX(-50%);bottom:calc(82px + env(safe-area-inset-bottom));max-width:90%;background:#182842;border:1px solid #36557f;color:var(--text);padding:10px 14px;border-radius:12px;font-size:13px;box-shadow:var(--shadow);display:none}
+    .toast.show{display:block}
+    .quality-list{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.65}
+    .quality-list:empty{display:none}
+    .source-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+    .source-row:last-child{border-bottom:0}
+    .source-row b{text-align:right}
+    .tech-table td,.tech-table th{font-size:12px}
+    .gate-ok{border-left:3px solid var(--ok)}.gate-warn{border-left:3px solid var(--warn)}.gate-hold{border-left:3px solid var(--ng)}
+    @media(max-width:430px){.price{font-size:36px}.btnrow{grid-template-columns:1fr}.scorebig{font-size:34px}.grid,.settings{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
-<main>
-  <h1>India 14:00 Check</h1>
-  <div class="sub">NIFTY 50・USD/INR・Brentを自動取得。テクニカルは前営業日終値ベース。</div>
+<div class="app">
+  <header>
+    <h1>India 14:00 Check</h1>
+    <div class="sub">現在・前回比較・前兆・1か月見通し・検証・アノマリーを、データ鮮度と根拠を確認しながら使う判断支援ツール</div>
+  </header>
 
-  <section class="card">
-    <div class="hero">
-      <div>
-        <div class="label">NIFTY 50</div>
-        <div id="niftyPrice" class="price">--</div>
+  <section id="page-check" class="page active">
+    <div class="card">
+      <div class="hero">
+        <div>
+          <div class="small">NIFTY 50</div>
+          <div id="niftyPrice" class="price">--</div>
+        </div>
+        <div id="niftyChange" class="delta">--</div>
       </div>
-      <div id="niftyChange" class="delta">--</div>
+      <div class="statusline">
+        <span id="marketState" class="pill">状態 --</span>
+        <span id="dataStatus" class="pill">データ --</span>
+      </div>
+      <div id="marketStateDetail" class="small" style="margin-top:8px">--</div>
+      <div id="times" class="small" style="margin-top:3px">--</div>
+      <div class="btnrow">
+        <button id="refreshBtn" class="primary">最新データを読み込む</button>
+        <button id="updateBtn" class="secondary">最新データに更新</button>
+      </div>
+      <div class="small" style="margin-top:8px">「更新」はGitHub Actionsを開きます。Run workflow実行後、この画面へ戻ると再読込します。</div>
     </div>
-    <div id="asOf" class="small" style="margin-top:8px">更新時刻: --</div>
-    <button id="refreshBtn">最新データを読み込む</button>
+
+    <div id="qualityCard" class="card">
+      <h2>データ品質・判断ゲート</h2>
+      <div class="statusline">
+        <span id="decisionGate" class="pill">判定 --</span>
+        <span id="freshness" class="pill">鮮度 --</span>
+      </div>
+      <ul id="qualityReasons" class="quality-list"></ul>
+      <div class="source-row"><span>NIFTY公式クロスチェック</span><b id="crosscheck">--</b></div>
+      <div class="source-row"><span>NIFTY50騰落銘柄</span><b id="breadthStatus">--</b></div>
+      <div class="source-row"><span>FII/DII</span><b id="fiiStatus">--</b></div>
+      <div class="small" style="margin-top:8px">通常取引時間外、コアデータ欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。</div>
+    </div>
+
+    <div class="card">
+      <h2>現在の市場データ</h2>
+      <div class="grid">
+        <div class="metric"><div class="label">前日終値</div><div id="prevClose" class="value">--</div></div>
+        <div class="metric"><div class="label">USD/INR</div><div id="usdinr" class="value">--</div><div id="usdinr5" class="detail">5日 --</div></div>
+        <div class="metric"><div class="label">Brent</div><div id="brent" class="value">--</div><div id="brent5" class="detail">5日 --</div></div>
+        <div class="metric"><div class="label">India VIX</div><div id="vix" class="value">--</div><div id="vix5" class="detail">5日 --</div></div>
+        <div class="metric"><div class="label">上昇銘柄比率</div><div id="breadthRatio" class="value">--</div><div id="breadthCounts" class="detail">NIFTY50 --</div></div>
+        <div class="metric"><div class="label">FII/FPI（日次公表値）</div><div id="fiiNet" class="value">--</div><div id="fiiDate" class="detail">基準 --</div></div>
+        <div class="metric"><div class="label">DII（日次公表値）</div><div id="diiNet" class="value">--</div><div id="diiDate" class="detail">基準 --</div></div>
+        <div class="metric"><div class="label">5日線</div><div id="ma5" class="value">--</div><div id="ma5gap" class="detail">乖離 --</div></div>
+        <div class="metric"><div class="label">25日線</div><div id="ma25" class="value">--</div><div id="ma25gap" class="detail">乖離 --</div></div>
+        <div class="metric"><div class="label">75日線</div><div id="ma75" class="value">--</div><div id="ma75gap" class="detail">乖離 --</div></div>
+        <div class="metric"><div class="label">RSI(14)</div><div id="rsi14" class="value">--</div><div id="rsiPrev" class="detail">前回 --</div></div>
+        <div class="metric"><div class="label">MACD</div><div id="macd" class="value">--</div></div>
+        <div class="metric"><div class="label">MACD Signal</div><div id="signal" class="value">--</div></div>
+        <div class="metric"><div class="label">MACD Hist</div><div id="hist" class="value">--</div><div id="histPrev" class="detail">前回 --</div></div>
+        <div class="metric"><div class="label">20日ボラティリティ</div><div id="vol20" class="value">--</div><div class="detail">年率換算</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>確定テクニカル vs 14:00暫定テクニカル</h2>
+      <div id="techBasisNote" class="section-note">--</div>
+      <div id="techCompare">--</div>
+      <div class="small" style="margin-top:8px">暫定値は、現在のNIFTY価格を「今日の仮の終値」として再計算したものです。市場終了後の確定値とは一致しないことがあります。</div>
+    </div>
+
+    <div class="card">
+      <h2>前回14:00との比較</h2>
+      <div id="comparisonArea" class="section-note">履歴を確認中...</div>
+    </div>
+
+    <div class="card">
+      <h2>14:00履歴</h2>
+      <div id="historySpark" class="spark-wrap"></div>
+      <div id="historyList" class="history-list"></div>
+      <div class="small" style="margin-top:8px">平日13:45〜14:20に取得したデータのうち、14:00に最も近い値を1日1件保存します。</div>
+    </div>
+
+    <div class="card">
+      <h2>第1弾購入ルール</h2>
+      <div class="settings">
+        <label><div class="label">NIFTY 下限</div><input id="thNifty" type="number" step="1"></label>
+        <label><div class="label">Brent 上限</div><input id="thBrent" type="number" step="0.1"></label>
+        <label><div class="label">USD/INR 上限</div><input id="thUsd" type="number" step="0.01"></label>
+        <label><div class="label">第1弾金額（円）</div><input id="amount" type="number" step="10000"></label>
+      </div>
+      <label class="rule" style="margin-top:8px">
+        <input id="breadth" type="checkbox">
+        <div><b>広範な上昇（手動フォールバック）</b><div class="small">NSEの騰落銘柄数が取得できない場合だけ使用します。自動取得できた場合は上昇銘柄比率60%以上を条件成立とします。</div></div>
+      </label>
+      <div id="ruleList"></div>
+      <div id="ruleDecision" class="decision">データ待ち</div>
+      <div id="ruleScore" class="small">成立条件 -- / 4</div>
+      <button id="saveSettingsBtn" class="ghost" style="margin-top:10px">設定を保存</button>
+    </div>
+
+    <div class="card">
+      <h2>今日の状態整理</h2>
+      <div id="summary" class="summary">--</div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>自動取得データ</h2>
-    <div class="grid">
-      <div class="metric"><div class="label">前日終値</div><div id="prevClose" class="value">--</div></div>
-      <div class="metric"><div class="label">USD/INR</div><div id="usdinr" class="value">--</div></div>
-      <div class="metric"><div class="label">Brent</div><div id="brent" class="value">--</div></div>
-      <div class="metric"><div class="label">データ状態</div><div id="dataStatus" class="value">--</div></div>
-      <div class="metric"><div class="label">5日線</div><div id="ma5" class="value">--</div></div>
-      <div class="metric"><div class="label">25日線</div><div id="ma25" class="value">--</div></div>
-      <div class="metric"><div class="label">75日線</div><div id="ma75" class="value">--</div></div>
-      <div class="metric"><div class="label">RSI(14)</div><div id="rsi14" class="value">--</div></div>
-      <div class="metric"><div class="label">MACD</div><div id="macd" class="value">--</div></div>
-      <div class="metric"><div class="label">Signal</div><div id="signal" class="value">--</div></div>
+  <section id="page-signal" class="page">
+    <div class="card">
+      <h2>買い場・売り場の前兆</h2>
+      <div class="section-note">スコアは「条件の一致度」です。上昇確率・下落確率ではありません。取引中は14:00暫定テクニカルを優先し、取引時間外は確定日足を使います。</div>
+      <div id="signalBasis" class="small" style="margin-top:8px">--</div>
+      <div class="scorebox" style="margin-top:12px">
+        <div class="scorecard">
+          <div class="small">買い場前兆</div>
+          <div id="buyScore" class="scorebig">--</div>
+          <div class="bar"><span id="buyBar" style="width:0%"></span></div>
+          <div id="buyLabel" class="small">--</div>
+          <div id="buyCore" class="small" style="margin-top:5px">テクニカル中核 --</div>
+        </div>
+        <div class="scorecard">
+          <div class="small">売り場前兆</div>
+          <div id="sellScore" class="scorebig">--</div>
+          <div class="bar sell"><span id="sellBar" style="width:0%"></span></div>
+          <div id="sellLabel" class="small">--</div>
+          <div id="sellCore" class="small" style="margin-top:5px">テクニカル中核 --</div>
+        </div>
+      </div>
     </div>
-    <div class="note small" style="margin-top:10px">自動値は参考データです。取得元の仕様変更・遅延・休場日により更新されない場合があります。</div>
-  </section>
-
-  <section class="card">
-    <h2>第1弾購入ルール</h2>
-    <div class="settings">
-      <label><div class="label">NIFTY 下限</div><input id="thNifty" type="number" step="1"></label>
-      <label><div class="label">Brent 上限</div><input id="thBrent" type="number" step="0.1"></label>
-      <label><div class="label">USD/INR 上限</div><input id="thUsd" type="number" step="0.01"></label>
-      <label><div class="label">第1弾金額（円）</div><input id="amount" type="number" step="10000"></label>
-    </div>
-
-    <label class="rule" style="margin-top:8px">
-      <input id="breadth" type="checkbox">
-      <div><b>広範な上昇を確認</b><div class="small">市場全体の上昇は手動確認。チェックすると1条件成立。</div></div>
-    </label>
-
-    <div id="ruleList"></div>
-    <div style="margin-top:12px">
-      <div id="decision" class="decision">データ待ち</div>
-      <div id="score" class="score">成立条件 -- / 4</div>
-    </div>
-    <button id="saveBtn" class="secondary">設定を保存</button>
-  </section>
-
-  <section class="card">
-    <h2>使い方</h2>
-    <div class="small" style="line-height:1.7">
-      1. 14:00頃にアプリを開き、「最新データを読み込む」を押します。<br>
-      2. NIFTY、Brent、USD/INRの自動判定を確認します。<br>
-      3. 市場全体の上昇を別途確認し、「広範な上昇を確認」にチェックします。<br>
-      4. 4条件中3条件以上で、設定した第1弾金額の条件成立と表示します。
+    <div class="card"><h2>買い場前兆の要因</h2><div id="buyFactors">--</div></div>
+    <div class="card"><h2>売り場前兆の要因</h2><div id="sellFactors">--</div></div>
+    <div class="card">
+      <h2>見方</h2>
+      <div class="summary">買い場前兆は「売られ過ぎ＋改善開始」、売り場前兆は「過熱＋内部悪化」を重視します。RSIの絶対値だけで判定せず、MACDヒストグラム、5日線、25日線乖離、USD/INR、Brent、India VIXの変化を組み合わせます。</div>
     </div>
   </section>
 
-  <div class="footer">
-    判定はユーザー設定ルールを機械的に表示する補助機能で、将来の値動きや利益を保証するものではありません。
-    GitHub Actionsの更新が遅れた場合は、画面の更新時刻とデータ状態を確認してください。
+  <section id="page-outlook" class="page">
+    <div class="card">
+      <h2>短期1か月見通し</h2>
+      <div id="outlookLabel" class="outlook-label">--</div>
+      <div id="outlookBasis" class="small">--</div>
+      <div id="outlookSimilarity" class="small" style="margin-top:4px">--</div>
+      <div id="outlookStats" class="grid" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h2>過去類似局面の分布</h2>
+      <div id="outlookRange" class="range">--</div>
+    </div>
+    <div class="card">
+      <h2>予測方法</h2>
+      <div id="outlookMethod" class="summary">--</div>
+      <div class="section-note" style="margin-top:10px">「20営業日後に上昇していた割合」は過去類似局面の実績割合であり、今後1か月の上昇確率そのものではありません。</div>
+    </div>
+  </section>
+
+  <section id="page-validation" class="page">
+    <div class="card">
+      <h2>前兆スコアの過去検証</h2>
+      <div id="backtestBasis" class="section-note">--</div>
+    </div>
+    <div class="card">
+      <h2>通常時の基準</h2>
+      <div id="baselineStats" class="grid">--</div>
+    </div>
+    <div class="card">
+      <h2>買い場テクニカル中核</h2>
+      <div id="buyBacktest">--</div>
+    </div>
+    <div class="card">
+      <h2>売り場テクニカル中核</h2>
+      <div id="sellBacktest">--</div>
+    </div>
+    <div class="card">
+      <h2>検証の限界</h2>
+      <div id="backtestWarning" class="summary">--</div>
+      <div class="section-note" style="margin-top:10px">同じ期間でルールを作り、同じ期間で評価すると過大評価になりやすいため、ここでは「参考検証」として扱います。今後は実運用データを蓄積し、別期間での検証を優先します。</div>
+    </div>
+  </section>
+
+  <section id="page-anomaly" class="page">
+    <div class="card">
+      <h2>アノマリー</h2>
+      <div id="anomalyBasis" class="section-note">--</div>
+    </div>
+    <div class="card">
+      <h2>全期間の基準</h2>
+      <div id="anomalyBaseline" class="grid">--</div>
+    </div>
+    <div class="card">
+      <h2>曜日効果</h2>
+      <div id="weekdayTable">--</div>
+    </div>
+    <div class="card">
+      <h2>月別季節性</h2>
+      <div id="monthTable">--</div>
+    </div>
+    <div id="specialAnomalies"></div>
+  </section>
+
+  <section id="page-help" class="page">
+    <div class="card">
+      <h2>指標・判定の意味</h2>
+      <div class="small">「何を表すか」「このアプリでどう見るか」「注意点」の順で確認できます。</div>
+    </div>
+
+    <details><summary>確定テクニカルと14:00暫定テクニカル</summary><div class="detailbody">確定テクニカルは前営業日までの確定終値で計算します。暫定テクニカルは14:00頃の現在値を当日の仮終値として再計算します。<div class="definition">前兆検出には暫定値が有効ですが、市場終了まで変化します。最終的な日足評価は確定値を優先します。</div></div></details>
+    <details><summary>データ品質・判断ゲート</summary><div class="detailbody">取引時間、価格時刻、コアデータの欠損、NIFTY公式クロスチェックを確認します。<div class="definition">休場・時間外・取引中の古い価格では、第1弾購入ルールを自動確定せず「保留」にします。</div></div></details>
+    <details><summary>NIFTY50騰落銘柄数</summary><div class="detailbody">NIFTY50構成銘柄のうち、何銘柄が上昇しているかを見る市場内部指標です。<div class="definition">指数上昇でも上昇銘柄が少ない場合は、一部大型株だけの上昇の可能性があります。60%以上を「広範な上昇」の目安にします。</div></div></details>
+    <details><summary>FII/FPI・DII</summary><div class="detailbody">外国機関投資家と国内機関投資家の日次売買動向です。NSEの公表値を取得します。<div class="definition">14:00時点では当日分がまだ確定していないため、通常は前営業日以前の公表値です。補助情報として使い、単独で判断しません。</div></div></details>
+    <details><summary>前兆スコアの過去検証</summary><div class="detailbody">NIFTY日足だけで再現できるテクニカル中核スコアについて、過去に閾値以上になった後の5日・20営業日の実績を集計します。<div class="definition">現在の総合スコアには為替・原油・VIX・騰落銘柄数・FII等も含むため、検証値をそのまま総合スコアの的中率とは解釈しません。</div></div></details>
+    <details open><summary>NIFTY 50</summary><div class="detailbody">インドの主要50社で構成される代表的な株価指数です。このアプリの中心となる市場価格です。<div class="definition">現在値だけでなく、前日終値、5・25・75日線との位置、前回14:00値との比較を合わせて見ます。</div></div></details>
+    <details><summary>5日・25日・75日移動平均</summary><div class="detailbody">一定期間の終値平均です。5日線は約1週間、25日線は約1か月、75日線は約3か月の方向感を見る目安です。<div class="definition">価格が線の上か下かに加え、乖離率を見ます。線を超えただけで売買を決めません。</div></div></details>
+    <details><summary>RSI(14)</summary><div class="detailbody">直近14期間の上昇・下落の強さから、過熱・売られ過ぎを測る指標です。一般に30付近以下は低位、70付近以上は高位とされます。<div class="definition">30以下だから即買い、70以上だから即売りではありません。低位から上向くか、高位から下向くかという変化を重視します。</div></div></details>
+    <details><summary>MACD / Signal / Histogram</summary><div class="detailbody">短期・長期EMA（指数移動平均）の差からトレンド変化を見る指標です。HistogramはMACDとSignalの差です。<div class="definition">Histogramがマイナスでも、前日より改善していれば下落モメンタムが弱まっている可能性があります。</div></div></details>
+    <details><summary>USD/INR</summary><div class="detailbody">1米ドルが何インドルピーかを示します。数値上昇はルピー安です。<div class="definition">ルピー安が急速に進む局面は、海外資金や輸入物価の面でインド株の逆風になり得るため、5日変化も確認します。</div></div></details>
+    <details><summary>Brent</summary><div class="detailbody">国際的な原油価格の代表指標です。インドは原油輸入国のため、急上昇は貿易収支や物価の逆風になり得ます。<div class="definition">価格水準だけでなく、5日間で急騰しているかを前兆スコアに使います。</div></div></details>
+    <details><summary>India VIX</summary><div class="detailbody">インド株市場の予想変動率を表す指標です。一般に上昇は市場の不安定化を示します。<div class="definition">絶対値だけでなく5日変化を確認します。取得できない場合は前兆スコアから除外します。</div></div></details>
+    <details><summary>買い場前兆スコア</summary><div class="detailbody">RSI低位、RSI改善、MACDヒストグラム改善、5日線回復、外部環境の落ち着きなどの条件一致度を0〜100で表します。<div class="definition">100%の上昇確率を意味しません。「買い場形成の条件がどの程度そろっているか」の補助指標です。</div></div></details>
+    <details><summary>売り場前兆スコア</summary><div class="detailbody">RSI高位、モメンタム悪化、25日線からの上方乖離、外部環境悪化などの条件一致度を0〜100で表します。<div class="definition">売却を自動決定する指標ではありません。過熱と内部悪化が同時に起きているかを見る補助指標です。</div></div></details>
+    <details><summary>1か月見通し</summary><div class="detailbody">現在と似た過去局面を、RSI、移動平均位置、MACDヒストグラム、5日騰落率、20日ボラティリティから探し、その後20営業日の実績分布を表示します。<div class="definition">過去の類似は将来の同一結果を保証しません。平均だけでなく、中央値、25〜75%範囲、最大下落も確認します。</div></div></details>
+    <details><summary>アノマリー</summary><div class="detailbody">曜日、月、月末・月初、連続下落後などに過去繰り返し観測された統計的傾向です。<div class="definition">因果関係ではなく、将来も続く保証はありません。平均騰落率、上昇率、サンプル数を必ずセットで見ます。</div></div></details>
+    <details><summary>前回14:00比較</summary><div class="detailbody">平日14:00前後に保存した過去スナップショットと、現在値を比較します。<div class="definition">GitHub Actionsの5回実行のうち、価格時刻が14:00 JSTに最も近い値を1日1件だけ保存します。</div></div></details>
+  </section>
+
+  <div class="footer">本アプリは市場状態の確認と判断支援を目的としています。前兆スコア、バックテスト、過去統計、類似局面は将来の値動きや利益を保証しません。データ品質・基準時刻・サンプル数を確認し、売買の最終判断は利用者が行います。</div>
+</div>
+
+<nav class="tabs" aria-label="画面切替">
+  <div class="tabbar">
+    <button class="tab active" data-page="check">確認</button>
+    <button class="tab" data-page="signal">前兆</button>
+    <button class="tab" data-page="outlook">1か月</button>
+    <button class="tab" data-page="validation">検証</button>
+    <button class="tab" data-page="anomaly">傾向</button>
+    <button class="tab" data-page="help">解説</button>
   </div>
-</main>
+</nav>
+<div id="toast" class="toast"></div>
 
 <script>
+const REPO_WORKFLOW_URL = "https://github.com/nakayama2536-happy/India_1400/actions/workflows/update-market.yml";
 const defaults = {thNifty:23300, thBrent:104, thUsd:96, amount:400000, breadth:false};
 let market = null;
+let history = {records:[]};
+let lastGenerated = null;
+let pollTimer = null;
 
+const $ = id => document.getElementById(id);
 function fmt(x,d=2){
   if(x===null || x===undefined || Number.isNaN(Number(x))) return "--";
   return Number(x).toLocaleString("ja-JP",{minimumFractionDigits:d,maximumFractionDigits:d});
 }
+function signed(x,d=2,suffix=""){
+  if(x===null || x===undefined || Number.isNaN(Number(x))) return "--";
+  const n=Number(x); return `${n>0?"+":""}${fmt(n,d)}${suffix}`;
+}
+function clsDelta(x){return Number(x)>0?"trendup":Number(x)<0?"trenddown":""}
+function setText(id,v){const e=$(id); if(e)e.textContent=v}
+function showToast(msg,ms=2800){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),ms)}
+
 function loadSettings(){
   let s={...defaults};
   try{s={...s,...JSON.parse(localStorage.getItem("india1400.settings")||"{}")}}catch(e){}
-  for(const k of ["thNifty","thBrent","thUsd","amount"]) document.getElementById(k).value=s[k];
-  document.getElementById("breadth").checked=!!s.breadth;
+  for(const k of ["thNifty","thBrent","thUsd","amount"]) $(k).value=s[k];
+  $("breadth").checked=!!s.breadth;
 }
-function getSettings(){
-  return {
-    thNifty:Number(document.getElementById("thNifty").value),
-    thBrent:Number(document.getElementById("thBrent").value),
-    thUsd:Number(document.getElementById("thUsd").value),
-    amount:Number(document.getElementById("amount").value),
-    breadth:document.getElementById("breadth").checked
-  };
-}
-function saveSettings(){
-  localStorage.setItem("india1400.settings",JSON.stringify(getSettings()));
-  evaluate();
-}
-function setText(id,v){document.getElementById(id).textContent=v}
+function getSettings(){return {thNifty:Number($("thNifty").value),thBrent:Number($("thBrent").value),thUsd:Number($("thUsd").value),amount:Number($("amount").value),breadth:$("breadth").checked}}
+function saveSettings(){localStorage.setItem("india1400.settings",JSON.stringify(getSettings()));evaluateRule();showToast("設定を保存しました")}
 
-async function refresh(){
-  setText("dataStatus","読込中");
+async function fetchJson(path){
+  const r=await fetch(`${path}?v=${Date.now()}`,{cache:"no-store"});
+  if(!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
+  return r.json();
+}
+async function refreshData(silent=false){
   try{
-    const r=await fetch("market.json?t="+Date.now(),{cache:"no-store"});
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    market=await r.json();
-    render();
+    const [m,h]=await Promise.all([fetchJson("market.json"),fetchJson("history.json").catch(()=>({records:[]}))]);
+    const old=lastGenerated;
+    market=m; history=h||{records:[]}; lastGenerated=market.generated_at_jst||null;
+    renderAll();
+    if(!silent) showToast(old && lastGenerated!==old ? "新しいデータを読み込みました" : "最新保存データを読み込みました");
+    return old && lastGenerated!==old;
   }catch(e){
     setText("dataStatus","取得失敗");
-    setText("asOf","更新失敗: "+e.message);
-    evaluate();
+    showToast(`読込失敗: ${e.message}`,4500);
+    return false;
   }
 }
-function render(){
-  const n=market?.nifty||{}, u=market?.usdinr||{}, b=market?.brent||{};
-  setText("niftyPrice",fmt(n.price,2));
-  const c=Number(n.change_pct);
-  const ce=document.getElementById("niftyChange");
-  ce.textContent=Number.isFinite(c)?((c>=0?"+":"")+fmt(c,2)+"%"):"--";
-  ce.className="delta "+(Number.isFinite(c)?(c>=0?"ok":"ng"):"");
-  setText("prevClose",fmt(n.previous_close,2));
-  setText("usdinr",fmt(u.price,2));
-  setText("brent",fmt(b.price,2));
-  setText("ma5",fmt(n.ma5,2)); setText("ma25",fmt(n.ma25,2)); setText("ma75",fmt(n.ma75,2));
-  setText("rsi14",fmt(n.rsi14,1)); setText("macd",fmt(n.macd,2)); setText("signal",fmt(n.macd_signal,2));
-  setText("dataStatus",market.status||"--");
-  setText("asOf","更新時刻: "+(market.generated_at_jst||n.as_of_jst||"--"));
-  evaluate();
+function startUpdatePolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  let tries=0;
+  pollTimer=setInterval(async()=>{
+    tries++;
+    const changed=await refreshData(true);
+    if(changed){clearInterval(pollTimer);pollTimer=null;showToast("更新完了を検知しました",4000)}
+    if(tries>=12){clearInterval(pollTimer);pollTimer=null}
+  },5000);
 }
+function openUpdate(){
+  localStorage.setItem("india1400.awaitUpdate","1");
+  window.open(REPO_WORKFLOW_URL,"_blank","noopener");
+  showToast("GitHubで Run workflow を実行してください",5000);
+  startUpdatePolling();
+}
+window.addEventListener("focus",()=>{
+  if(localStorage.getItem("india1400.awaitUpdate")==="1"){
+    localStorage.removeItem("india1400.awaitUpdate");
+    refreshData(true).then(changed=>showToast(changed?"更新後データを読み込みました":"更新を確認中です"));
+    startUpdatePolling();
+  }
+});
+
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
+  const p=btn.dataset.page;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===btn));
+  document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===`page-${p}`));
+  window.scrollTo({top:0,behavior:"smooth"});
+}));
+
+function renderAll(){
+  renderCheck();
+  renderQuality();
+  renderTechCompare();
+  renderComparison();
+  renderHistory();
+  renderRule();
+  renderSignals();
+  renderOutlook();
+  renderValidation();
+  renderAnomalies();
+}
+
+function renderCheck(){
+  const n=market?.nifty||{},u=market?.usdinr||{},b=market?.brent||{},v=market?.india_vix||{};
+  const br=market?.breadth||{},fd=market?.fii_dii||{};
+  setText("niftyPrice",fmt(n.price,2));
+  const ch=Number(n.change_pct); const ce=$("niftyChange");
+  ce.textContent=Number.isFinite(ch)?`${ch>=0?"+":""}${fmt(ch,2)}%`:"--";
+  ce.className=`delta ${Number.isFinite(ch)?(ch>=0?"ok":"ng"):""}`;
+  const ms=market?.market_state||{};
+  setText("marketState",ms.label||"状態 --");
+  $("marketState").className=`pill ${ms.code==="LIVE"?"ok":ms.code?"warn":""}`;
+  setText("marketStateDetail",ms.detail||"--");
+  setText("dataStatus",`データ ${market?.status||"--"}`);
+  $("dataStatus").className=`pill ${market?.status==="ok"?"ok":"warn"}`;
+  setText("times",`データ生成: ${market?.generated_at_jst||"--"} / NIFTY価格: ${n.as_of_jst||"--"} / 確定テクニカル: ${n.technical_date||"--"}`);
+
+  setText("prevClose",fmt(n.previous_close,2));
+  setText("usdinr",fmt(u.price,2)); setText("usdinr5",`5日 ${signed(u.change_5d_pct,2,"%")}`);
+  setText("brent",fmt(b.price,2)); setText("brent5",`5日 ${signed(b.change_5d_pct,2,"%")}`);
+  setText("vix",fmt(v.price,2)); setText("vix5",`5日 ${signed(v.change_5d_pct,2,"%")}`);
+
+  if(br.available){
+    setText("breadthRatio",`${fmt(br.advance_ratio_pct,1)}%`);
+    setText("breadthCounts",`上昇 ${br.advances} / 下落 ${br.declines} / ${br.sample_count}銘柄`);
+  }else{
+    setText("breadthRatio","取得不能"); setText("breadthCounts","手動確認へフォールバック");
+  }
+
+  const fii=fd.fii||{},dii=fd.dii||{};
+  setText("fiiNet",fii.net_value_crore==null?"--":`${signed(fii.net_value_crore,0)} Cr`);
+  setText("fiiDate",`基準 ${fii.date||"--"}`);
+  setText("diiNet",dii.net_value_crore==null?"--":`${signed(dii.net_value_crore,0)} Cr`);
+  setText("diiDate",`基準 ${dii.date||"--"}`);
+
+  setText("ma5",fmt(n.ma5,2)); setText("ma5gap",`現在値との乖離 ${signed(n.price_vs_ma5_pct,2,"%")}`);
+  setText("ma25",fmt(n.ma25,2)); setText("ma25gap",`現在値との乖離 ${signed(n.price_vs_ma25_pct,2,"%")}`);
+  setText("ma75",fmt(n.ma75,2)); setText("ma75gap",`現在値との乖離 ${signed(n.price_vs_ma75_pct,2,"%")}`);
+  setText("rsi14",fmt(n.rsi14,1)); setText("rsiPrev",`前日 ${fmt(n.rsi14_prev,1)}`);
+  setText("macd",fmt(n.macd,2)); setText("signal",fmt(n.macd_signal,2));
+  setText("hist",fmt(n.macd_hist,2)); setText("histPrev",`前日 ${fmt(n.macd_hist_prev,2)}`);
+  setText("vol20",n.vol20_annualized_pct==null?"--":`${fmt(n.vol20_annualized_pct,1)}%`);
+  setText("summary",market?.summary||"--");
+}
+
+function renderQuality(){
+  const q=market?.data_quality||{},g=q.decision_gate||{},cc=market?.crosscheck||{},br=market?.breadth||{},fd=market?.fii_dii||{};
+  setText("decisionGate",g.label||"判定 --");
+  const dg=$("decisionGate");
+  dg.className=`pill ${g.code==="OK"?"ok":g.code?"warn":""}`;
+  setText("freshness",q.freshness?`鮮度 ${q.freshness}`:"鮮度 --");
+  $("freshness").className=`pill ${q.freshness==="FRESH"?"ok":"warn"}`;
+  const card=$("qualityCard");
+  card.classList.remove("gate-ok","gate-warn","gate-hold");
+  card.classList.add(g.code==="OK"?"gate-ok":g.code==="HOLD"?"gate-hold":"gate-warn");
+  $("qualityReasons").innerHTML=(q.reasons||[]).map(x=>`<li>${x}</li>`).join("");
+
+  if(cc.available){
+    setText("crosscheck",`${cc.status==="match"?"一致":"要確認"} / 差 ${signed(cc.diff_pct,2,"%")}`);
+  }else setText("crosscheck","取得不能（補助）");
+
+  setText("breadthStatus",br.available?`${fmt(br.advance_ratio_pct,1)}% 上昇 / ${br.sample_count}銘柄`:"取得不能（手動可）");
+  setText("fiiStatus",fd.available?`公表値あり ${fd.fii?.date||fd.dii?.date||""}`:"取得不能（補助）");
+}
+
+function renderTechCompare(){
+  const n=market?.nifty||{},p=n.provisional||{};
+  setText("techBasisNote",p.available?`確定値は ${n.technical_date||"--"} 終値まで。暫定値は ${p.date||"--"} の現在価格 ${fmt(p.price,2)} を仮終値として計算。`:"暫定テクニカルは現在利用できません。");
+  const rows=[
+    ["5日線",n.ma5,p.ma5,2],
+    ["25日線",n.ma25,p.ma25,2],
+    ["75日線",n.ma75,p.ma75,2],
+    ["RSI(14)",n.rsi14,p.rsi14,1],
+    ["MACD",n.macd,p.macd,2],
+    ["Signal",n.macd_signal,p.macd_signal,2],
+    ["MACD Hist",n.macd_hist,p.macd_hist,2],
+    ["20日Vol",n.vol20_annualized_pct,p.vol20_annualized_pct,1],
+  ];
+  $("techCompare").innerHTML=`<table class="table tech-table"><thead><tr><th>指標</th><th>確定</th><th>14:00暫定</th><th>差</th></tr></thead><tbody>${rows.map(([name,a,b,d])=>{
+    const delta=(a!=null&&b!=null)?Number(b)-Number(a):null;
+    const suffix=name==="20日Vol"?"%":"";
+    return `<tr><td>${name}</td><td>${fmt(a,d)}${suffix}</td><td>${fmt(b,d)}${suffix}</td><td class="${clsDelta(delta)}">${signed(delta,d,suffix)}</td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+function renderComparison(){
+  const c=market?.comparison; const area=$("comparisonArea");
+  if(!c?.available){area.innerHTML=`${c?.message||"14:00履歴を蓄積中です。"}`;return}
+  const useProv=market?.nifty?.provisional?.available;
+  const rows=[
+    ["NIFTY",c.values?.nifty_price,2,true],
+    ["USD/INR",c.values?.usdinr,2,true],
+    ["Brent",c.values?.brent,2,true],
+    [useProv?"RSI暫定":"RSI確定",useProv?c.values?.rsi14_provisional:c.values?.rsi14_confirmed,1,false],
+    [useProv?"MACD Hist暫定":"MACD Hist確定",useProv?c.values?.macd_hist_provisional:c.values?.macd_hist_confirmed,2,false],
+  ];
+  area.innerHTML=`<div class="small" style="margin-bottom:7px">基準: ${c.previous_date_jst||"--"} 14:00保存値</div><table class="table"><thead><tr><th>指標</th><th>前回</th><th>現在</th><th>差</th></tr></thead><tbody>${rows.map(([name,x,d,pct])=>{
+    if(!x)return ""; const del=x.delta; return `<tr><td>${name}</td><td>${fmt(x.previous,d)}</td><td>${fmt(x.current,d)}</td><td class="${clsDelta(del)}">${signed(del,d)}${pct&&x.delta_pct!=null?`<br><span class="small">(${signed(x.delta_pct,2,"%")})</span>`:""}</td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+function renderHistory(){
+  const recs=(history?.records||[]).slice(-12); const list=$("historyList"), spark=$("historySpark");
+  if(!recs.length){list.innerHTML=`<div class="section-note">14:00履歴はまだありません。</div>`;spark.innerHTML="";return}
+  list.innerHTML=recs.slice().reverse().map(r=>`<div class="history-chip"><div class="small">${r.date_jst}</div><b>${fmt(r.nifty?.price,2)}</b><div class="small">${r.price_as_of_jst?.slice(11,16)||"--"} JST</div></div>`).join("");
+  const vals=recs.map(r=>Number(r.nifty?.price)).filter(Number.isFinite);
+  if(vals.length<2){spark.innerHTML="";return}
+  const w=600,h=80,p=5,min=Math.min(...vals),max=Math.max(...vals),span=max-min||1;
+  const pts=vals.map((v,i)=>`${p+i*(w-2*p)/(vals.length-1)},${h-p-(v-min)*(h-2*p)/span}`).join(" ");
+  spark.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-label="14時NIFTY履歴"><polyline points="${pts}" fill="none" stroke="#70a9ff" stroke-width="3" vector-effect="non-scaling-stroke"/><line x1="0" y1="${h-1}" x2="${w}" y2="${h-1}" stroke="#263854"/></svg>`;
+}
+
 function ruleRow(ok,title,detail){
-  const state=ok===null?"保留":(ok?"OK":"NG");
-  const cls=ok===null?"warn":(ok?"ok":"ng");
+  const state=ok===null?"保留":ok?"OK":"NG";
+  const cls=ok===null?"warn":ok?"ok":"ng";
   return `<div class="rule"><span class="badge ${cls}">${state}</span><div><b>${title}</b><div class="small">${detail}</div></div></div>`;
 }
-function evaluate(){
-  const s=getSettings(), n=market?.nifty||{}, u=market?.usdinr||{}, b=market?.brent||{};
-  const np=Number(n.price), up=Number(u.price), bp=Number(b.price);
+function evaluateRule(){renderRule()}
+function renderRule(){
+  const s=getSettings(),n=market?.nifty||{},u=market?.usdinr||{},b=market?.brent||{},br=market?.breadth||{};
+  const np=Number(n.price),up=Number(u.price),bp=Number(b.price);
   const r1=Number.isFinite(np)?np>=s.thNifty:null;
   const r2=Number.isFinite(bp)?bp<=s.thBrent:null;
   const r3=Number.isFinite(up)?up<s.thUsd:null;
-  const r4=!!s.breadth;
-  document.getElementById("ruleList").innerHTML=
-    ruleRow(r1,"NIFTY ≥ "+fmt(s.thNifty,0),Number.isFinite(np)?"現在 "+fmt(np,2):"データ待ち")+
-    ruleRow(r2,"Brent ≤ "+fmt(s.thBrent,1),Number.isFinite(bp)?"現在 "+fmt(bp,2):"データ待ち")+
-    ruleRow(r3,"USD/INR < "+fmt(s.thUsd,2),Number.isFinite(up)?"現在 "+fmt(up,2):"データ待ち")+
-    ruleRow(r4,"広範な上昇","手動確認");
-  const valid=[r1,r2,r3,r4].filter(x=>x===true).length;
-  const pending=[r1,r2,r3].some(x=>x===null);
-  setText("score","成立条件 "+valid+" / 4");
-  const d=document.getElementById("decision");
-  if(pending){d.textContent="自動データ待ち";d.className="decision warn"}
-  else if(valid>=3){d.textContent="第1弾 "+Math.round(s.amount).toLocaleString("ja-JP")+"円：条件成立";d.className="decision ok"}
-  else{d.textContent="今回は待機";d.className="decision"}
+  const r4=br.available?(Number(br.advance_ratio_pct)>=60):!!s.breadth;
+  const breadthDetail=br.available?`自動: 上昇銘柄比率 ${fmt(br.advance_ratio_pct,1)}%`:`自動取得不能: 手動 ${s.breadth?"確認済み":"未確認"}`;
+  $("ruleList").innerHTML=
+    ruleRow(r1,`NIFTY ≥ ${fmt(s.thNifty,0)}`,Number.isFinite(np)?`現在 ${fmt(np,2)}`:"データ待ち")+
+    ruleRow(r2,`Brent ≤ ${fmt(s.thBrent,1)}`,Number.isFinite(bp)?`現在 ${fmt(bp,2)}`:"データ待ち")+
+    ruleRow(r3,`USD/INR < ${fmt(s.thUsd,2)}`,Number.isFinite(up)?`現在 ${fmt(up,2)}`:"データ待ち")+
+    ruleRow(r4,"広範な上昇",breadthDetail);
+  const valid=[r1,r2,r3,r4].filter(x=>x===true).length,pending=[r1,r2,r3].some(x=>x===null);
+  setText("ruleScore",`成立条件 ${valid} / 4`); const d=$("ruleDecision");
+  const gate=market?.data_quality?.decision_gate||{};
+  if(gate.allow_rule===false){
+    d.textContent=`判定保留：${gate.label||"データ条件未達"}`;d.className="decision warn";
+  }else if(pending){
+    d.textContent="自動データ待ち";d.className="decision warn";
+  }else if(valid>=3){
+    d.textContent=`第1弾 ${Math.round(s.amount).toLocaleString("ja-JP")}円：条件成立`;d.className="decision ok";
+  }else{
+    d.textContent="今回は待機";d.className="decision";
+  }
 }
-document.getElementById("refreshBtn").addEventListener("click",refresh);
-document.getElementById("saveBtn").addEventListener("click",saveSettings);
-document.getElementById("breadth").addEventListener("change",saveSettings);
-["thNifty","thBrent","thUsd","amount"].forEach(id=>document.getElementById(id).addEventListener("change",saveSettings));
-loadSettings(); evaluate(); refresh();
+
+function factorHtml(xs){
+  if(!xs?.length)return `<div class="section-note">該当要因なし</div>`;
+  return xs.map(x=>`<div class="factor"><div class="pts">+${x.points}</div><div><b>${x.label}</b><div class="small">${x.detail||""}</div></div></div>`).join("");
+}
+function renderSignals(){
+  const s=market?.signals||{}; const b=Number(s.buy_setup_score),q=Number(s.sell_setup_score);
+  setText("buyScore",Number.isFinite(b)?`${b}/100`:"--");setText("sellScore",Number.isFinite(q)?`${q}/100`:"--");
+  $("buyBar").style.width=`${Number.isFinite(b)?Math.max(0,Math.min(100,b)):0}%`;
+  $("sellBar").style.width=`${Number.isFinite(q)?Math.max(0,Math.min(100,q)):0}%`;
+  setText("buyLabel",s.buy_setup_label||"--");setText("sellLabel",s.sell_setup_label||"--");
+  setText("buyCore",`テクニカル中核 ${s.technical_buy_score??"--"}/100`);
+  setText("sellCore",`テクニカル中核 ${s.technical_sell_score??"--"}/100`);
+  setText("signalBasis",`使用テクニカル: ${s.technical_basis_used||"--"}。総合スコアには取得できた外部環境も加点します。`);
+  $("buyFactors").innerHTML=factorHtml(s.buy_factors);$("sellFactors").innerHTML=factorHtml(s.sell_factors);
+}
+
+function renderOutlook(){
+  const o=market?.outlook_1m||{};
+  if(!o.available){
+    setText("outlookLabel","算出待ち");setText("outlookBasis",o.message||"データ不足");
+    setText("outlookSimilarity","--");$("outlookStats").innerHTML="";setText("outlookRange","--");setText("outlookMethod","--");return;
+  }
+  setText("outlookLabel",o.label||"--");
+  setText("outlookBasis",`${o.horizon} / 基準 ${o.basis_date} / 類似局面 ${o.analog_count}例 / 統計参考度 ${o.statistical_reference}`);
+  setText("outlookSimilarity",`類似度距離の中央値 ${fmt(o.median_similarity_distance,2)}（小さいほど現在に近い）`);
+  const stats=[
+    ["過去類似局面の上昇割合",`${fmt(o.up_rate_pct,1)}%`],
+    ["平均騰落率",signed(o.mean_return_pct,2,"%")],
+    ["中央値",signed(o.median_return_pct,2,"%")],
+    ["最大下落率中央値",signed(o.median_max_drawdown_pct,2,"%")]
+  ];
+  $("outlookStats").innerHTML=stats.map(([l,v])=>`<div class="metric"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
+  $("outlookRange").innerHTML=`類似局面の中央50%範囲：<b>${signed(o.q25_return_pct,2,"%")} 〜 ${signed(o.q75_return_pct,2,"%")}</b><br>中央値：<b>${signed(o.median_return_pct,2,"%")}</b><br>20営業日中の最大下落率中央値：<b>${signed(o.median_max_drawdown_pct,2,"%")}</b>`;
+  setText("outlookMethod",`${o.method||""} ${o.warning||""}`);
+}
+
+function backtestTable(rows,kind){
+  if(!rows?.length)return "--";
+  return `<table class="table"><thead><tr><th>閾値</th><th>${kind==="buy"?"20日後上昇":"20日後下落"}</th><th>基準差</th><th>20日平均</th><th>件数</th></tr></thead><tbody>${rows.map(r=>`<tr><td>≥${r.threshold}</td><td>${fmt(r.success_rate_20d_pct,1)}%</td><td>${signed(r.success_rate_lift_vs_baseline_pctpt,1,"pt")}</td><td>${signed(r.avg_return_20d_pct,2,"%")}</td><td>${r.sample_count}</td></tr>`).join("")}</tbody></table>`;
+}
+function renderValidation(){
+  const b=market?.score_backtest||{};
+  if(!b.available){
+    setText("backtestBasis",b.message||"検証データ不足");
+    $("baselineStats").innerHTML="--";$("buyBacktest").innerHTML="--";$("sellBacktest").innerHTML="--";setText("backtestWarning","--");return;
+  }
+  setText("backtestBasis",b.basis||"--");
+  const base=b.baseline||{};
+  $("baselineStats").innerHTML=[
+    ["20日後上昇",`${fmt(base.up_rate_pct,1)}%`],
+    ["20日後下落",`${fmt(base.down_rate_pct,1)}%`],
+    ["20日平均",signed(base.avg_return_20d_pct,2,"%")],
+    ["サンプル",`${base.sample_count||0}件`],
+  ].map(([l,v])=>`<div class="metric"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
+  $("buyBacktest").innerHTML=backtestTable(b.buy,"buy");
+  $("sellBacktest").innerHTML=backtestTable(b.sell,"sell");
+  setText("backtestWarning",b.warning||"--");
+}
+
+function simpleStatsTable(rows,keyLabel,keyName){
+  return `<table class="table"><thead><tr><th>${keyLabel}</th><th>平均</th><th>全体差</th><th>上昇率</th><th>件数</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[keyName]}</td><td>${signed(r.avg_return_pct,2,"%")}</td><td>${signed(r.excess_vs_baseline_pct,2,"%")}</td><td>${fmt(r.up_rate_pct,1)}%</td><td>${r.sample_count}</td></tr>`).join("")}</tbody></table>`;
+}
+function specialCard(title,obj){
+  const now=obj.current_applicable?`<span class="applicable">現在該当</span>`:"";
+  const one=obj.next_1d,two=obj.next_20d;
+  const lines=[];
+  if(one)lines.push(`<div class="metric"><div class="label">翌営業日</div><div class="value">平均 ${signed(one.avg_return_pct,2,"%")}</div><div class="detail">全体差 ${signed(one.excess_vs_baseline_pct,2,"%")} / 上昇率 ${fmt(one.up_rate_pct,1)}% / ${one.sample_count}例</div></div>`);
+  if(two)lines.push(`<div class="metric"><div class="label">20営業日後</div><div class="value">平均 ${signed(two.avg_return_pct,2,"%")}</div><div class="detail">上昇率 ${fmt(two.up_rate_pct,1)}% / ${two.sample_count}例</div></div>`);
+  if(obj.turn_days)lines.push(`<div class="metric"><div class="label">月末月初</div><div class="value">平均 ${signed(obj.turn_days.avg_return_pct,2,"%")}</div><div class="detail">全体差 ${signed(obj.turn_days.excess_vs_baseline_pct,2,"%")} / ${obj.turn_days.sample_count}日</div></div><div class="metric"><div class="label">その他の日</div><div class="value">平均 ${signed(obj.other_days.avg_return_pct,2,"%")}</div><div class="detail">${obj.other_days.sample_count}日</div></div>`);
+  return `<div class="card"><div class="anomaly-head"><div><h2>${title}</h2><div class="small">${obj.definition||""}</div></div>${now}</div><div class="grid" style="margin-top:10px">${lines.join("")}</div></div>`;
+}
+function renderAnomalies(){
+  const a=market?.anomalies||{};
+  if(!a.available){
+    setText("anomalyBasis","アノマリーデータを算出できませんでした。");$("anomalyBaseline").innerHTML="--";$("weekdayTable").innerHTML="--";$("monthTable").innerHTML="--";$("specialAnomalies").innerHTML="";return;
+  }
+  setText("anomalyBasis",`${a.basis}。${a.warning||""}`);
+  const base=a.baseline||{};
+  $("anomalyBaseline").innerHTML=[
+    ["平均日次騰落",signed(base.avg_return_pct,2,"%")],
+    ["上昇日率",`${fmt(base.up_rate_pct,1)}%`],
+    ["サンプル",`${base.sample_count||0}日`],
+    ["比較方法","平均との差"],
+  ].map(([l,v])=>`<div class="metric"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
+  $("weekdayTable").innerHTML=simpleStatsTable(a.weekday||[],"曜日","weekday");
+  $("monthTable").innerHTML=simpleStatsTable((a.month||[]).map(x=>({...x,month:`${x.month}月` })),"月","month");
+  $("specialAnomalies").innerHTML=specialCard("月末・月初効果",a.turn_of_month||{})+specialCard("3日連続下落後",a.after_three_down||{})+specialCard("大幅下落後",a.after_large_down||{});
+}
+
+$("refreshBtn").addEventListener("click",()=>refreshData(false));
+$("updateBtn").addEventListener("click",openUpdate);
+$("saveSettingsBtn").addEventListener("click",saveSettings);
+$("breadth").addEventListener("change",saveSettings);
+["thNifty","thBrent","thUsd","amount"].forEach(id=>$(id).addEventListener("change",saveSettings));
+loadSettings();renderRule();refreshData(true);
 
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(!sessionStorage.getItem("india1400.swReloaded")){
+      sessionStorage.setItem("india1400.swReloaded","1");location.reload();
+    }
+  });
 }
 </script>
 </body>

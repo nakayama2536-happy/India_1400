@@ -1,39 +1,121 @@
 #!/usr/bin/env python3
-import json, math, time, urllib.request, urllib.parse
+"""India 14:00 Check v4 market updater.
+
+Goals
+- Keep the v3 workflow and history model.
+- Separate confirmed EOD technicals from 14:00 intraday provisional technicals.
+- Add data-freshness/decision-gate checks.
+- Use the official 2026 NSE holiday calendar for regular-session closure checks.
+- Add optional official NSE breadth and FII/DII context.
+- Add optional NIFTY official-source cross-check (NSE Indices live blob).
+- Backtest the NIFTY-only technical core of the buy/sell setup score.
+- Keep 1-month analog outlook and anomalies descriptive, not deterministic.
+
+Core market data still uses the Yahoo Finance chart endpoint as a reference source.
+Optional official NSE/NSE Indices calls may fail from hosted runners; failures do not
+stop core processing and are surfaced explicitly in market.json.
+"""
+from __future__ import annotations
+
+import csv
+import http.cookiejar
+import io
+import json
+import math
+import statistics
+import time
+import urllib.parse
+import urllib.request
+from collections import defaultdict
+from datetime import datetime, time as dtime, timezone
 from pathlib import Path
-from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-OUT = Path("market.json")
-UA = "Mozilla/5.0 (compatible; India1400PWA/2.0)"
+MARKET_OUT = Path("market.json")
+HISTORY_OUT = Path("history.json")
+UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/126 Safari/537.36"
+JST = ZoneInfo("Asia/Tokyo")
+IST = ZoneInfo("Asia/Kolkata")
+SCHEMA_VERSION = 4
 
-def http_json(url, tries=3, timeout=20):
+# NSE cash-market trading holidays for calendar year 2026.
+# Source: NSE circular "Trading holidays for the calendar year 2026".
+NSE_HOLIDAYS_2026 = {
+    "2026-01-26": "Republic Day",
+    "2026-03-03": "Holi",
+    "2026-03-26": "Shri Ram Navami",
+    "2026-03-31": "Shri Mahavir Jayanti",
+    "2026-04-03": "Good Friday",
+    "2026-04-14": "Dr. Baba Saheb Ambedkar Jayanti",
+    "2026-05-01": "Maharashtra Day",
+    "2026-05-28": "Bakri Id",
+    "2026-06-26": "Muharram",
+    "2026-09-14": "Ganesh Chaturthi",
+    "2026-10-02": "Mahatma Gandhi Jayanti",
+    "2026-10-20": "Dussehra",
+    "2026-11-08": "Diwali Laxmi Pujan / Muhurat Trading special session",
+    "2026-11-10": "Diwali-Balipratipada",
+    "2026-11-24": "Prakash Gurpurb Sri Guru Nanak Dev",
+    "2026-12-25": "Christmas",
+}
+
+
+def http_json(url: str, tries: int = 3, timeout: int = 25, headers=None, opener=None):
     last = None
+    hdr = {"User-Agent": UA, "Accept": "application/json,text/plain,*/*"}
+    if headers:
+        hdr.update(headers)
     for i in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
-            with urllib.request.urlopen(req, timeout=timeout) as r:
+            req = urllib.request.Request(url, headers=hdr)
+            client = opener.open if opener is not None else urllib.request.urlopen
+            with client(req, timeout=timeout) as r:
                 return json.loads(r.read().decode("utf-8"))
         except Exception as e:
             last = e
-            time.sleep(2 * (i + 1))
-    raise last
+            time.sleep(1.5 * (i + 1))
+    raise RuntimeError(str(last))
 
-def yahoo_chart(symbol, range_="10d", interval="5m"):
+
+def http_text(url: str, tries: int = 3, timeout: int = 25, headers=None, opener=None):
+    last = None
+    hdr = {"User-Agent": UA, "Accept": "*/*"}
+    if headers:
+        hdr.update(headers)
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers=hdr)
+            client = opener.open if opener is not None else urllib.request.urlopen
+            with client(req, timeout=timeout) as r:
+                return r.read().decode("utf-8-sig", errors="replace")
+        except Exception as e:
+            last = e
+            time.sleep(1.5 * (i + 1))
+    raise RuntimeError(str(last))
+
+
+def yahoo_chart(symbol: str, range_: str = "10d", interval: str = "5m"):
     enc = urllib.parse.quote(symbol, safe="")
-    qs = urllib.parse.urlencode({"range": range_, "interval": interval, "includePrePost": "false", "events": "div,splits"})
+    qs = urllib.parse.urlencode(
+        {
+            "range": range_,
+            "interval": interval,
+            "includePrePost": "false",
+            "events": "div,splits",
+        }
+    )
     errors = []
     for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
-        url = f"https://{host}/v8/finance/chart/{enc}?{qs}"
         try:
-            data = http_json(url)
-            result = data.get("chart",{}).get("result")
+            data = http_json(f"https://{host}/v8/finance/chart/{enc}?{qs}")
+            result = (data.get("chart") or {}).get("result")
             if not result:
-                raise RuntimeError(str(data.get("chart",{}).get("error") or "empty result"))
+                raise RuntimeError(str((data.get("chart") or {}).get("error") or "empty result"))
             return result[0]
         except Exception as e:
             errors.append(f"{host}: {e}")
     raise RuntimeError("; ".join(errors))
+
 
 def series_from_chart(chart):
     ts = chart.get("timestamp") or []
@@ -45,124 +127,1169 @@ def series_from_chart(chart):
             out.append((int(t), float(c)))
     return out
 
+
 def last_value(chart):
     s = series_from_chart(chart)
     if not s:
         raise RuntimeError("no price data")
     return s[-1]
 
-def completed_daily_closes(chart):
+
+def completed_daily_series(chart, now_ist=None):
+    """Return completed daily closes only. Exclude today's partial candle during market hours."""
     s = series_from_chart(chart)
-    india_now = datetime.now(ZoneInfo("Asia/Kolkata"))
-    today = india_now.date()
+    now_ist = now_ist or datetime.now(IST)
+    today = now_ist.date()
     out = []
-    for t, c in s:
-        d = datetime.fromtimestamp(t, ZoneInfo("Asia/Kolkata")).date()
-        # 14:00 JST is before India market close; exclude today's partial daily bar.
-        if d == today and india_now.hour < 16:
+    for ts, close in s:
+        dt = datetime.fromtimestamp(ts, timezone.utc).astimezone(IST)
+        if dt.date() == today and now_ist.time() < dtime(16, 0):
             continue
-        out.append((t, c))
+        out.append((ts, close))
     return out
 
-def sma(vals, n):
-    return sum(vals[-n:]) / n if len(vals) >= n else None
+
+def round_or_none(x, n=4):
+    if x is None:
+        return None
+    try:
+        x = float(x)
+    except Exception:
+        return None
+    return None if not math.isfinite(x) else round(x, n)
+
+
+def iso_jst(ts: int):
+    return datetime.fromtimestamp(ts, timezone.utc).astimezone(JST).isoformat(timespec="minutes")
+
+
+def pct_change(new, old):
+    if new is None or old in (None, 0):
+        return None
+    return (float(new) / float(old) - 1.0) * 100.0
+
+
+def sma_series(vals, n):
+    out = [None] * len(vals)
+    if n <= 0:
+        return out
+    total = 0.0
+    for i, x in enumerate(vals):
+        total += x
+        if i >= n:
+            total -= vals[i - n]
+        if i >= n - 1:
+            out[i] = total / n
+    return out
+
 
 def ema_series(vals, n):
     if not vals:
         return []
-    a = 2.0 / (n + 1.0)
+    alpha = 2.0 / (n + 1.0)
     out = [vals[0]]
     for x in vals[1:]:
-        out.append(a*x + (1-a)*out[-1])
+        out.append(alpha * x + (1 - alpha) * out[-1])
     return out
 
-def rsi_wilder(vals, n=14):
-    if len(vals) < n+1:
-        return None
-    gains, losses = [], []
-    for a,b in zip(vals[:-1], vals[1:]):
-        d=b-a
-        gains.append(max(d,0.0)); losses.append(max(-d,0.0))
-    ag=sum(gains[:n])/n; al=sum(losses[:n])/n
-    for g,l in zip(gains[n:],losses[n:]):
-        ag=(ag*(n-1)+g)/n; al=(al*(n-1)+l)/n
-    if al==0: return 100.0
-    rs=ag/al
-    return 100.0 - 100.0/(1.0+rs)
 
-def macd(vals):
-    if len(vals) < 35:
-        return None, None
-    e12=ema_series(vals,12); e26=ema_series(vals,26)
-    line=[a-b for a,b in zip(e12,e26)]
-    sig=ema_series(line,9)
-    return line[-1], sig[-1]
+def rsi_series(vals, n=14):
+    out = [None] * len(vals)
+    if len(vals) < n + 1:
+        return out
+    gains = []
+    losses = []
+    for a, b in zip(vals[:-1], vals[1:]):
+        d = b - a
+        gains.append(max(d, 0.0))
+        losses.append(max(-d, 0.0))
+    avg_gain = sum(gains[:n]) / n
+    avg_loss = sum(losses[:n]) / n
+    out[n] = 100.0 if avg_loss == 0 else 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
+    for i in range(n + 1, len(vals)):
+        g = gains[i - 1]
+        l = losses[i - 1]
+        avg_gain = (avg_gain * (n - 1) + g) / n
+        avg_loss = (avg_loss * (n - 1) + l) / n
+        out[i] = 100.0 if avg_loss == 0 else 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
+    return out
 
-def dt_jst(ts):
-    return datetime.fromtimestamp(ts, timezone.utc).astimezone(ZoneInfo("Asia/Tokyo")).isoformat(timespec="minutes")
 
-def round_or_none(x, n=4):
-    return None if x is None or not math.isfinite(x) else round(x,n)
+def rolling_vol_series(vals, n=20):
+    out = [None] * len(vals)
+    rets = [None]
+    for i in range(1, len(vals)):
+        rets.append(vals[i] / vals[i - 1] - 1.0)
+    for i in range(n, len(vals)):
+        window = [x for x in rets[i - n + 1 : i + 1] if x is not None]
+        if len(window) >= n - 1:
+            out[i] = statistics.pstdev(window) * math.sqrt(252) * 100.0
+    return out
 
-def load_old():
-    try:
-        return json.loads(OUT.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
 
-old = load_old()
-result = dict(old) if isinstance(old,dict) else {}
-errors = []
-updated = 0
-
-# NIFTY current + technicals
-try:
-    intr = yahoo_chart("^NSEI","5d","5m")
-    t_now, p_now = last_value(intr)
-    daily = yahoo_chart("^NSEI","1y","1d")
-    ds = completed_daily_closes(daily)
-    vals = [c for _,c in ds]
-    if not vals:
-        raise RuntimeError("no completed daily closes")
-    prev = vals[-1]
-    m, sig = macd(vals)
-    result["nifty"] = {
-        "symbol":"^NSEI",
-        "price":round_or_none(p_now,2),
-        "as_of_jst":dt_jst(t_now),
-        "previous_close":round_or_none(prev,2),
-        "change_pct":round_or_none((p_now/prev-1)*100,3) if prev else None,
-        "ma5":round_or_none(sma(vals,5),2),
-        "ma25":round_or_none(sma(vals,25),2),
-        "ma75":round_or_none(sma(vals,75),2),
-        "rsi14":round_or_none(rsi_wilder(vals,14),2),
-        "macd":round_or_none(m,3),
-        "macd_signal":round_or_none(sig,3),
-        "technical_as_of_jst":dt_jst(ds[-1][0]),
-        "technical_basis":"completed daily closes"
+def build_indicator_arrays(vals):
+    ma5 = sma_series(vals, 5)
+    ma25 = sma_series(vals, 25)
+    ma75 = sma_series(vals, 75)
+    rsi = rsi_series(vals, 14)
+    e12 = ema_series(vals, 12)
+    e26 = ema_series(vals, 26)
+    macd = [a - b for a, b in zip(e12, e26)]
+    signal = ema_series(macd, 9)
+    hist = [m - s for m, s in zip(macd, signal)]
+    vol20 = rolling_vol_series(vals, 20)
+    ret5 = [None] * len(vals)
+    ret20 = [None] * len(vals)
+    for i in range(len(vals)):
+        if i >= 5:
+            ret5[i] = pct_change(vals[i], vals[i - 5])
+        if i >= 20:
+            ret20[i] = pct_change(vals[i], vals[i - 20])
+    return {
+        "ma5": ma5,
+        "ma25": ma25,
+        "ma75": ma75,
+        "rsi": rsi,
+        "macd": macd,
+        "signal": signal,
+        "hist": hist,
+        "vol20": vol20,
+        "ret5": ret5,
+        "ret20": ret20,
     }
-    updated += 1
-except Exception as e:
-    errors.append("NIFTY: "+str(e))
 
-for key, symbol in [("usdinr","INR=X"),("brent","BZ=F")]:
+
+def recent_change_5d(symbol):
     try:
-        ch = yahoo_chart(symbol,"5d","5m")
-        t,p = last_value(ch)
-        result[key]={"symbol":symbol,"price":round_or_none(p,4),"as_of_jst":dt_jst(t)}
-        updated += 1
-    except Exception as e:
-        errors.append(f"{key}: {e}")
+        daily = yahoo_chart(symbol, "1mo", "1d")
+        ds = completed_daily_series(daily)
+        vals = [c for _, c in ds]
+        if len(vals) >= 6:
+            return pct_change(vals[-1], vals[-6])
+    except Exception:
+        return None
+    return None
 
-now_utc = datetime.now(timezone.utc)
-now_jst = now_utc.astimezone(ZoneInfo("Asia/Tokyo"))
-result.update({
-    "generated_at_utc": now_utc.isoformat(timespec="seconds"),
-    "generated_at_jst": now_jst.isoformat(timespec="seconds"),
-    "status": "ok" if updated == 3 and not errors else ("partial" if updated else "error"),
-    "source": "Yahoo Finance chart endpoint (reference data; no API key)",
-    "errors": errors,
-    "note": "Technicals use completed daily closes. Current quotes may be delayed."
-})
-OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-print(json.dumps({"status":result["status"],"updated":updated,"errors":errors}, ensure_ascii=False))
+
+def is_regular_nse_trading_day(dt_jst: datetime):
+    d = dt_jst.date()
+    key = d.isoformat()
+    if d.weekday() >= 5:
+        return False, "週末"
+    if d.year == 2026 and key in NSE_HOLIDAYS_2026:
+        return False, NSE_HOLIDAYS_2026[key]
+    return True, None
+
+
+def market_state(price_ts: int, now_jst: datetime):
+    price_dt = datetime.fromtimestamp(price_ts, timezone.utc).astimezone(JST)
+    regular, reason = is_regular_nse_trading_day(now_jst)
+    if not regular:
+        return {
+            "code": "CLOSED",
+            "label": "休場",
+            "detail": f"{reason}。NIFTY価格は {price_dt.strftime('%Y/%m/%d %H:%M')} JST 時点です。",
+            "calendar_source": "NSE 2026 holiday calendar" if now_jst.year == 2026 else "weekend check",
+        }
+    if price_dt.date() < now_jst.date():
+        return {
+            "code": "PREVIOUS_SESSION",
+            "label": "前営業日データ",
+            "detail": f"NIFTY価格は {price_dt.strftime('%Y/%m/%d %H:%M')} JST 時点です。",
+            "calendar_source": "NSE 2026 holiday calendar" if now_jst.year == 2026 else "weekday check",
+        }
+    if dtime(12, 45) <= now_jst.time() <= dtime(19, 0):
+        return {
+            "code": "LIVE",
+            "label": "取引中",
+            "detail": f"NIFTY最新取得値は {price_dt.strftime('%H:%M')} JST 時点です。",
+            "calendar_source": "NSE 2026 holiday calendar" if now_jst.year == 2026 else "weekday check",
+        }
+    return {
+        "code": "OUT_OF_HOURS",
+        "label": "取引時間外",
+        "detail": f"NIFTY価格は {price_dt.strftime('%Y/%m/%d %H:%M')} JST 時点です。",
+        "calendar_source": "NSE 2026 holiday calendar" if now_jst.year == 2026 else "weekday check",
+    }
+
+
+def build_provisional_technicals(daily_dates, daily_vals, current_price, current_price_ts):
+    """Treat the current intraday price as today's temporary close and recalculate indicators."""
+    if not daily_vals or current_price is None or current_price_ts is None:
+        return {"available": False, "message": "データ不足"}
+    current_date = datetime.fromtimestamp(current_price_ts, timezone.utc).astimezone(IST).date().isoformat()
+    vals = list(daily_vals)
+    dates = list(daily_dates)
+    if dates and dates[-1] == current_date:
+        vals[-1] = float(current_price)
+    else:
+        dates.append(current_date)
+        vals.append(float(current_price))
+    if len(vals) < 80:
+        return {"available": False, "message": "履歴不足"}
+    arr = build_indicator_arrays(vals)
+    i = len(vals) - 1
+    return {
+        "available": True,
+        "basis": "14:00時点価格を当日終値と仮定した暫定計算",
+        "date": dates[i],
+        "price": round_or_none(vals[i], 2),
+        "ma5": round_or_none(arr["ma5"][i], 2),
+        "ma25": round_or_none(arr["ma25"][i], 2),
+        "ma75": round_or_none(arr["ma75"][i], 2),
+        "rsi14": round_or_none(arr["rsi"][i], 2),
+        "rsi14_prev": round_or_none(arr["rsi"][i - 1], 2),
+        "macd": round_or_none(arr["macd"][i], 3),
+        "macd_signal": round_or_none(arr["signal"][i], 3),
+        "macd_hist": round_or_none(arr["hist"][i], 3),
+        "macd_hist_prev": round_or_none(arr["hist"][i - 1], 3),
+        "ret5_pct": round_or_none(arr["ret5"][i], 2),
+        "vol20_annualized_pct": round_or_none(arr["vol20"][i], 2),
+        "price_vs_ma5_pct": round_or_none(pct_change(vals[i], arr["ma5"][i]), 2),
+        "price_vs_ma25_pct": round_or_none(pct_change(vals[i], arr["ma25"][i]), 2),
+        "price_vs_ma75_pct": round_or_none(pct_change(vals[i], arr["ma75"][i]), 2),
+    }
+
+
+def nse_opener():
+    jar = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    home_headers = {
+        "User-Agent": UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    req = urllib.request.Request("https://www.nseindia.com/", headers=home_headers)
+    with opener.open(req, timeout=20) as r:
+        r.read(1024)
+    return opener
+
+
+def fetch_nse_breadth(opener):
+    url = "https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%2050"
+    data = http_json(
+        url,
+        tries=2,
+        timeout=20,
+        opener=opener,
+        headers={
+            "Referer": "https://www.nseindia.com/market-data/live-equity-market",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+    )
+    rows = data.get("data") or []
+    changes = []
+    for row in rows:
+        sym = str(row.get("symbol") or "").strip()
+        if sym.upper() in ("NIFTY 50", "NIFTY50", ""):
+            continue
+        try:
+            ch = float(row.get("pChange"))
+        except Exception:
+            continue
+        changes.append(ch)
+    if len(changes) < 30:
+        raise RuntimeError(f"breadth sample too small: {len(changes)}")
+    adv = sum(x > 0 for x in changes)
+    dec = sum(x < 0 for x in changes)
+    unch = len(changes) - adv - dec
+    return {
+        "available": True,
+        "source": "NSE India NIFTY 50 constituent live data",
+        "sample_count": len(changes),
+        "advances": adv,
+        "declines": dec,
+        "unchanged": unch,
+        "advance_ratio_pct": round(adv / len(changes) * 100, 1),
+        "average_change_pct": round(statistics.fmean(changes), 2),
+    }
+
+
+def fetch_nse_fiidii(opener):
+    url = "https://www.nseindia.com/api/fiidiiTradeReact"
+    rows = http_json(
+        url,
+        tries=2,
+        timeout=20,
+        opener=opener,
+        headers={
+            "Referer": "https://www.nseindia.com/reports/fii-dii",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+    )
+    if not isinstance(rows, list):
+        raise RuntimeError("unexpected FII/DII response")
+    out = {"available": False, "source": "NSE India FII/FPI & DII activity"}
+    for row in rows:
+        cat = str(row.get("category") or "").upper()
+        try:
+            net = float(str(row.get("netValue") or row.get("net") or "nan").replace(",", ""))
+        except Exception:
+            continue
+        item = {
+            "date": row.get("date"),
+            "buy_value_crore": round_or_none(str(row.get("buyValue") or "").replace(",", ""), 2),
+            "sell_value_crore": round_or_none(str(row.get("sellValue") or "").replace(",", ""), 2),
+            "net_value_crore": round_or_none(net, 2),
+        }
+        if "FII" in cat or "FPI" in cat:
+            out["fii"] = item
+        elif "DII" in cat:
+            out["dii"] = item
+    out["available"] = bool(out.get("fii") or out.get("dii"))
+    out["basis"] = "公表済みの日次データ（14:00時点では通常、前営業日以前）"
+    return out
+
+
+def fetch_nifty_official_crosscheck():
+    url = "https://iislliveblob.niftyindices.com/jsonfiles/LiveIndicesWatch.json"
+    data = http_json(url, tries=2, timeout=20, headers={"Referer": "https://www.niftyindices.com/"})
+    rows = data.get("data") if isinstance(data, dict) else None
+    if not isinstance(rows, list):
+        raise RuntimeError("unexpected official NIFTY response")
+    for row in rows:
+        name = str(row.get("indexName") or row.get("index") or row.get("name") or "").upper().replace(" ", "")
+        if name == "NIFTY50":
+            for key in ("last", "lastPrice", "ltp", "close", "currentValue"):
+                try:
+                    price = float(row.get(key))
+                    if price > 0:
+                        return {"available": True, "price": round(price, 2), "source": "NSE Indices Live Indices Watch"}
+                except Exception:
+                    pass
+    raise RuntimeError("NIFTY 50 row/price not found")
+
+
+def load_json(path: Path, default):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def update_history(history, snapshot, now_jst):
+    history = history if isinstance(history, dict) else {}
+    records = history.get("records") if isinstance(history.get("records"), list) else []
+    history = {
+        "schema_version": 2,
+        "basis": "One representative snapshot closest to 14:00 JST on regular NSE trading days",
+        "records": records,
+    }
+
+    regular, _ = is_regular_nse_trading_day(now_jst)
+    if not regular or not (dtime(13, 45) <= now_jst.time() <= dtime(14, 20)):
+        return history
+    price_iso = snapshot.get("nifty", {}).get("as_of_jst")
+    if not price_iso:
+        return history
+    try:
+        price_dt = datetime.fromisoformat(price_iso)
+    except Exception:
+        return history
+    if price_dt.date() != now_jst.date():
+        return history
+
+    target = datetime.combine(now_jst.date(), dtime(14, 0), tzinfo=JST)
+    snap_distance = abs((price_dt - target).total_seconds())
+    rec = {
+        "date_jst": now_jst.date().isoformat(),
+        "generated_at_jst": snapshot.get("generated_at_jst"),
+        "price_as_of_jst": price_iso,
+        "distance_from_1400_seconds": int(snap_distance),
+        "nifty": snapshot.get("nifty"),
+        "usdinr": snapshot.get("usdinr"),
+        "brent": snapshot.get("brent"),
+        "india_vix": snapshot.get("india_vix"),
+        "breadth": snapshot.get("breadth"),
+        "fii_dii": snapshot.get("fii_dii"),
+        "signals": {
+            "buy_setup_score": (snapshot.get("signals") or {}).get("buy_setup_score"),
+            "sell_setup_score": (snapshot.get("signals") or {}).get("sell_setup_score"),
+            "technical_buy_score": (snapshot.get("signals") or {}).get("technical_buy_score"),
+            "technical_sell_score": (snapshot.get("signals") or {}).get("technical_sell_score"),
+        },
+    }
+    same_idx = next((i for i, r in enumerate(records) if r.get("date_jst") == rec["date_jst"]), None)
+    if same_idx is None:
+        records.append(rec)
+    else:
+        old_dist = records[same_idx].get("distance_from_1400_seconds", 10**9)
+        if snap_distance <= old_dist:
+            records[same_idx] = rec
+    records.sort(key=lambda r: r.get("date_jst", ""))
+    history["records"] = records[-520:]
+    return history
+
+
+def comparison_from_history(current, history):
+    records = (history or {}).get("records") or []
+    current_date = None
+    try:
+        current_date = datetime.fromisoformat(current["nifty"]["as_of_jst"]).date().isoformat()
+    except Exception:
+        pass
+    candidates = [r for r in records if r.get("date_jst") and r.get("date_jst") != current_date]
+    if not candidates:
+        return {
+            "available": False,
+            "basis": "前回14:00保存値",
+            "message": "14:00履歴を蓄積中です。異なる営業日の保存値が2回分以上あると比較できます。",
+        }
+    prev = candidates[-1]
+
+    def val(obj, path):
+        cur = obj
+        for key in path:
+            if not isinstance(cur, dict):
+                return None
+            cur = cur.get(key)
+        return cur
+
+    fields = {
+        "nifty_price": (("nifty", "price"), 2),
+        "usdinr": (("usdinr", "price"), 4),
+        "brent": (("brent", "price"), 2),
+        "rsi14_confirmed": (("nifty", "rsi14"), 2),
+        "rsi14_provisional": (("nifty", "provisional", "rsi14"), 2),
+        "macd_hist_confirmed": (("nifty", "macd_hist"), 3),
+        "macd_hist_provisional": (("nifty", "provisional", "macd_hist"), 3),
+    }
+    values = {}
+    for name, (path, digits) in fields.items():
+        a, b = val(current, path), val(prev, path)
+        # v3 history has no provisional technicals. Fall back to the confirmed value
+        # until two v4 14:00 snapshots have accumulated.
+        if b is None and name == "rsi14_provisional":
+            b = val(prev, ("nifty", "rsi14"))
+        if b is None and name == "macd_hist_provisional":
+            b = val(prev, ("nifty", "macd_hist"))
+        delta = None if a is None or b is None else float(a) - float(b)
+        values[name] = {
+            "current": round_or_none(a, digits),
+            "previous": round_or_none(b, digits),
+            "delta": round_or_none(delta, digits),
+            "delta_pct": round_or_none(pct_change(a, b), 3) if name in ("nifty_price", "usdinr", "brent") else None,
+        }
+    return {
+        "available": True,
+        "basis": "前回14:00保存値",
+        "previous_date_jst": prev.get("date_jst"),
+        "previous_price_as_of_jst": prev.get("price_as_of_jst"),
+        "values": values,
+    }
+
+
+def add_factor(target, factors, pts, label, detail):
+    target[0] += pts
+    factors.append({"points": pts, "label": label, "detail": detail})
+
+
+def technical_core_score(nifty):
+    bf, sf = [], []
+    b, s = [0], [0]
+    rsi = nifty.get("rsi14")
+    rsi_prev = nifty.get("rsi14_prev")
+    hist = nifty.get("macd_hist")
+    hist_prev = nifty.get("macd_hist_prev")
+    price = nifty.get("price")
+    ma5 = nifty.get("ma5")
+    pma25 = nifty.get("price_vs_ma25_pct")
+    ret5 = nifty.get("ret5_pct")
+
+    if rsi is not None:
+        if rsi <= 30:
+            add_factor(b, bf, 22, "RSI売られ過ぎ圏", f"RSI {rsi:.1f}")
+        elif rsi <= 35:
+            add_factor(b, bf, 16, "RSI低位", f"RSI {rsi:.1f}")
+        elif rsi <= 40:
+            add_factor(b, bf, 8, "RSIやや低位", f"RSI {rsi:.1f}")
+        if rsi >= 70:
+            add_factor(s, sf, 22, "RSI過熱圏", f"RSI {rsi:.1f}")
+        elif rsi >= 65:
+            add_factor(s, sf, 16, "RSI高位", f"RSI {rsi:.1f}")
+        elif rsi >= 60:
+            add_factor(s, sf, 8, "RSIやや高位", f"RSI {rsi:.1f}")
+    if rsi is not None and rsi_prev is not None:
+        if rsi > rsi_prev and rsi_prev < 45:
+            add_factor(b, bf, 10, "RSI改善", f"{rsi_prev:.1f} → {rsi:.1f}")
+        if rsi < rsi_prev and rsi_prev > 55:
+            add_factor(s, sf, 10, "RSI失速", f"{rsi_prev:.1f} → {rsi:.1f}")
+
+    if hist is not None and hist_prev is not None:
+        if hist > hist_prev:
+            add_factor(b, bf, 14, "MACDヒストグラム改善", f"{hist_prev:.2f} → {hist:.2f}")
+        elif hist < hist_prev:
+            add_factor(s, sf, 14, "MACDヒストグラム悪化", f"{hist_prev:.2f} → {hist:.2f}")
+        if hist > 0 >= hist_prev:
+            add_factor(b, bf, 8, "MACDヒストグラムがプラス転換", "モメンタム改善")
+        if hist < 0 <= hist_prev:
+            add_factor(s, sf, 8, "MACDヒストグラムがマイナス転換", "モメンタム悪化")
+
+    if price is not None and ma5 is not None:
+        if price >= ma5:
+            add_factor(b, bf, 10, "5日線を上回る", f"価格 {price:.0f} / 5日線 {ma5:.0f}")
+        else:
+            add_factor(s, sf, 8, "5日線を下回る", f"価格 {price:.0f} / 5日線 {ma5:.0f}")
+    if pma25 is not None:
+        if pma25 <= -3:
+            add_factor(b, bf, 8, "25日線から下方乖離", f"乖離 {pma25:.1f}%")
+        if pma25 >= 5:
+            add_factor(s, sf, 12, "25日線から上方乖離", f"乖離 +{pma25:.1f}%")
+    if ret5 is not None and ret5 >= 5:
+        add_factor(s, sf, 6, "5日間で急上昇", f"5日騰落率 +{ret5:.1f}%")
+    return min(100, b[0]), min(100, s[0]), bf, sf
+
+
+def score_setups(nifty, usdinr, brent, vix, breadth=None, fii_dii=None, basis_label="確定日足"):
+    technical_buy, technical_sell, bf, sf = technical_core_score(nifty)
+    b, s = [technical_buy], [technical_sell]
+
+    for obj, label, buy_limit, sell_limit in (
+        (usdinr, "USD/INR", 0.0, 1.0),
+        (brent, "Brent", 0.0, 3.0),
+        (vix, "India VIX", 0.0, 10.0),
+    ):
+        ch = (obj or {}).get("change_5d_pct")
+        if ch is None:
+            continue
+        if ch <= buy_limit:
+            add_factor(b, bf, 6, f"{label} 5日変化が落ち着く", f"{ch:+.1f}%")
+        if ch >= sell_limit:
+            add_factor(s, sf, 6, f"{label} 5日上昇", f"{ch:+.1f}%")
+
+    if (breadth or {}).get("available"):
+        ratio = breadth.get("advance_ratio_pct")
+        if ratio is not None and ratio >= 60:
+            add_factor(b, bf, 12, "市場の広がりが良好", f"NIFTY50上昇銘柄比率 {ratio:.1f}%")
+        elif ratio is not None and ratio <= 40:
+            add_factor(s, sf, 12, "市場の広がりが弱い", f"NIFTY50上昇銘柄比率 {ratio:.1f}%")
+
+    if (fii_dii or {}).get("available"):
+        net = ((fii_dii.get("fii") or {}).get("net_value_crore"))
+        if net is not None and net >= 500:
+            add_factor(b, bf, 5, "FII/FPI買い越し", f"公表済み日次 +{net:.0f} Cr")
+        elif net is not None and net <= -500:
+            add_factor(s, sf, 5, "FII/FPI売り越し", f"公表済み日次 {net:.0f} Crore")
+
+    buy = min(100, b[0])
+    sell = min(100, s[0])
+
+    def label(score):
+        if score >= 75:
+            return "強い前兆"
+        if score >= 55:
+            return "前兆あり"
+        if score >= 35:
+            return "中立〜前兆"
+        return "弱い"
+
+    return {
+        "buy_setup_score": buy,
+        "sell_setup_score": sell,
+        "technical_buy_score": technical_buy,
+        "technical_sell_score": technical_sell,
+        "buy_setup_label": label(buy),
+        "sell_setup_label": label(sell),
+        "buy_factors": sorted(bf, key=lambda x: -x["points"]),
+        "sell_factors": sorted(sf, key=lambda x: -x["points"]),
+        "technical_basis_used": basis_label,
+        "definition": "0〜100は条件一致度であり、将来の上昇・下落確率ではありません。",
+        "backtest_scope": "検証タブはNIFTY日足だけで再現できるテクニカル中核スコアを検証します。",
+    }
+
+
+def historical_technical_score(vals, arrays, i):
+    if i < 1:
+        return None, None
+    d = {
+        "price": vals[i],
+        "rsi14": arrays["rsi"][i],
+        "rsi14_prev": arrays["rsi"][i - 1],
+        "macd_hist": arrays["hist"][i],
+        "macd_hist_prev": arrays["hist"][i - 1],
+        "ma5": arrays["ma5"][i],
+        "price_vs_ma25_pct": pct_change(vals[i], arrays["ma25"][i]) if arrays["ma25"][i] else None,
+        "ret5_pct": arrays["ret5"][i],
+    }
+    b, s, _, _ = technical_core_score(d)
+    return b, s
+
+
+def setup_backtest(dates, vals, arrays):
+    if len(vals) < 300:
+        return {"available": False, "message": "バックテスト用履歴不足"}
+
+    returns20 = []
+    for i in range(100, len(vals) - 20):
+        r = pct_change(vals[i + 20], vals[i])
+        if r is not None:
+            returns20.append(r)
+    baseline = {
+        "sample_count": len(returns20),
+        "up_rate_pct": round_or_none(sum(x > 0 for x in returns20) / len(returns20) * 100, 1) if returns20 else None,
+        "down_rate_pct": round_or_none(sum(x < 0 for x in returns20) / len(returns20) * 100, 1) if returns20 else None,
+        "avg_return_20d_pct": round_or_none(statistics.fmean(returns20), 2) if returns20 else None,
+        "median_return_20d_pct": round_or_none(statistics.median(returns20), 2) if returns20 else None,
+    }
+
+    def collect(kind, threshold):
+        rows = []
+        last_selected = -999
+        for i in range(100, len(vals) - 20):
+            b, s = historical_technical_score(vals, arrays, i)
+            score = b if kind == "buy" else s
+            if score is None or score < threshold:
+                continue
+            if i - last_selected < 5:
+                continue
+            last_selected = i
+            r5 = pct_change(vals[i + 5], vals[i])
+            r20 = pct_change(vals[i + 20], vals[i])
+            path = [pct_change(vals[j], vals[i]) for j in range(i + 1, i + 21)]
+            rows.append({
+                "date": dates[i],
+                "score": score,
+                "return_5d_pct": r5,
+                "return_20d_pct": r20,
+                "max_drawdown_20d_pct": min(path) if path else None,
+                "max_upside_20d_pct": max(path) if path else None,
+            })
+        r20s = [r["return_20d_pct"] for r in rows if r["return_20d_pct"] is not None]
+        r5s = [r["return_5d_pct"] for r in rows if r["return_5d_pct"] is not None]
+        dds = [r["max_drawdown_20d_pct"] for r in rows if r["max_drawdown_20d_pct"] is not None]
+        ups = [r["max_upside_20d_pct"] for r in rows if r["max_upside_20d_pct"] is not None]
+        success = sum(x > 0 for x in r20s) / len(r20s) * 100 if kind == "buy" and r20s else \
+                  sum(x < 0 for x in r20s) / len(r20s) * 100 if kind == "sell" and r20s else None
+        base_rate = baseline.get("up_rate_pct") if kind == "buy" else baseline.get("down_rate_pct")
+        return {
+            "threshold": threshold,
+            "sample_count": len(r20s),
+            "success_rate_20d_pct": round_or_none(success, 1),
+            "success_rate_lift_vs_baseline_pctpt": round_or_none(success - base_rate, 1) if success is not None and base_rate is not None else None,
+            "avg_return_5d_pct": round_or_none(statistics.fmean(r5s), 2) if r5s else None,
+            "avg_return_20d_pct": round_or_none(statistics.fmean(r20s), 2) if r20s else None,
+            "median_return_20d_pct": round_or_none(statistics.median(r20s), 2) if r20s else None,
+            "median_max_drawdown_20d_pct": round_or_none(statistics.median(dds), 2) if dds else None,
+            "median_max_upside_20d_pct": round_or_none(statistics.median(ups), 2) if ups else None,
+            "recent_examples": rows[-5:],
+        }
+
+    return {
+        "available": True,
+        "basis": f"NIFTY 50 日足・取得可能な約10年、重複局面を5営業日間隔で間引き（最終 {dates[-1]}）",
+        "baseline": baseline,
+        "buy": [collect("buy", x) for x in (35, 55, 70)],
+        "sell": [collect("sell", x) for x in (35, 55, 70)],
+        "warning": "これはテクニカル中核スコアの過去検証です。USD/INR、Brent、VIX、騰落銘柄数、FII/DIIを含む現在の総合スコアそのものの的中率ではありません。",
+    }
+
+
+def nearest_analog_outlook(dates, vals, arrays, k=35):
+    last = len(vals) - 1
+    if last < 120:
+        return {"available": False, "message": "履歴不足"}
+
+    def feat(i):
+        ma25 = arrays["ma25"][i]
+        ma75 = arrays["ma75"][i]
+        rsi = arrays["rsi"][i]
+        hist = arrays["hist"][i]
+        ret5 = arrays["ret5"][i]
+        vol = arrays["vol20"][i]
+        if None in (ma25, ma75, rsi, hist, ret5, vol) or not vals[i]:
+            return None
+        return (
+            rsi,
+            (vals[i] / ma25 - 1) * 100,
+            (ma25 / ma75 - 1) * 100,
+            hist / vals[i] * 100,
+            ret5,
+            vol,
+        )
+
+    cur = feat(last)
+    if cur is None:
+        return {"available": False, "message": "現在の特徴量不足"}
+    scales = (15.0, 3.0, 2.5, 0.5, 4.0, 8.0)
+    candidates = []
+    for i in range(90, len(vals) - 20):
+        f = feat(i)
+        if f is None:
+            continue
+        dist = math.sqrt(sum(((a - b) / s) ** 2 for a, b, s in zip(f, cur, scales)))
+        candidates.append((dist, i))
+    candidates.sort()
+
+    selected = []
+    for dist, i in candidates:
+        if all(abs(i - j) >= 8 for _, j in selected):
+            selected.append((dist, i))
+        if len(selected) >= k:
+            break
+    if len(selected) < 10:
+        return {"available": False, "message": "類似局面のサンプル不足"}
+
+    fwd, drawdowns, examples, dists = [], [], [], []
+    for dist, i in selected:
+        r20 = pct_change(vals[i + 20], vals[i])
+        path = [pct_change(vals[j], vals[i]) for j in range(i + 1, i + 21)]
+        dd = min(path) if path else None
+        fwd.append(r20)
+        dists.append(dist)
+        if dd is not None:
+            drawdowns.append(dd)
+        examples.append({
+            "date": dates[i],
+            "distance": round(dist, 3),
+            "return_20d_pct": round_or_none(r20, 2),
+            "max_drawdown_20d_pct": round_or_none(dd, 2),
+        })
+
+    fwd_sorted = sorted(fwd)
+    q25 = fwd_sorted[max(0, int((len(fwd_sorted) - 1) * 0.25))]
+    q75 = fwd_sorted[max(0, int((len(fwd_sorted) - 1) * 0.75))]
+    up_rate = sum(x > 0 for x in fwd) / len(fwd) * 100
+    median = statistics.median(fwd)
+    mean = statistics.fmean(fwd)
+    iqr = q75 - q25
+    median_dist = statistics.median(dists)
+
+    if median >= 2.0 and up_rate >= 60:
+        label = "上向き"
+    elif median >= 0.75 and up_rate >= 55:
+        label = "やや上向き"
+    elif median <= -2.0 and up_rate <= 40:
+        label = "下向き"
+    elif median <= -0.75 and up_rate <= 45:
+        label = "やや下向き"
+    else:
+        label = "中立"
+
+    if len(fwd) >= 30 and iqr <= 7 and median_dist <= 2.0:
+        ref = "中"
+    elif len(fwd) >= 20 and iqr <= 10:
+        ref = "低〜中"
+    else:
+        ref = "低"
+
+    return {
+        "available": True,
+        "label": label,
+        "statistical_reference": ref,
+        "basis_date": dates[last],
+        "horizon": "20営業日（約1か月）",
+        "analog_count": len(fwd),
+        "up_rate_pct": round(up_rate, 1),
+        "mean_return_pct": round(mean, 2),
+        "median_return_pct": round(median, 2),
+        "q25_return_pct": round(q25, 2),
+        "q75_return_pct": round(q75, 2),
+        "median_max_drawdown_pct": round(statistics.median(drawdowns), 2) if drawdowns else None,
+        "median_similarity_distance": round(median_dist, 2),
+        "method": "RSI、25日線乖離、25/75日線関係、MACDヒストグラム、5日騰落率、20日ボラティリティが近い過去局面を検索。",
+        "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。統計参考度が低い場合は方向判定を弱く扱ってください。",
+        "examples": examples[:10],
+    }
+
+
+def anomaly_stats(dates, vals):
+    if len(vals) < 300:
+        return {"available": False}
+
+    daily_ret = [None] + [pct_change(vals[i], vals[i - 1]) for i in range(1, len(vals))]
+    all_rets = [x for x in daily_ret if x is not None]
+    baseline_avg = statistics.fmean(all_rets)
+    baseline_up = sum(x > 0 for x in all_rets) / len(all_rets) * 100
+
+    by_weekday = defaultdict(list)
+    by_month = defaultdict(list)
+    for i in range(1, len(vals)):
+        dt = datetime.fromisoformat(dates[i]).date()
+        r = daily_ret[i]
+        if r is None:
+            continue
+        by_weekday[dt.weekday()].append(r)
+        by_month[dt.month].append(r)
+
+    jp_weekdays = ["月", "火", "水", "木", "金"]
+    weekday_rows = []
+    for wd in range(5):
+        xs = by_weekday.get(wd, [])
+        avg = statistics.fmean(xs) if xs else None
+        weekday_rows.append({
+            "weekday": jp_weekdays[wd],
+            "sample_count": len(xs),
+            "avg_return_pct": round_or_none(avg, 2),
+            "up_rate_pct": round_or_none(sum(x > 0 for x in xs) / len(xs) * 100, 1) if xs else None,
+            "excess_vs_baseline_pct": round_or_none(avg - baseline_avg, 2) if avg is not None else None,
+        })
+
+    month_rows = []
+    for m in range(1, 13):
+        xs = by_month.get(m, [])
+        avg = statistics.fmean(xs) if xs else None
+        month_rows.append({
+            "month": m,
+            "sample_count": len(xs),
+            "avg_return_pct": round_or_none(avg, 2),
+            "up_rate_pct": round_or_none(sum(x > 0 for x in xs) / len(xs) * 100, 1) if xs else None,
+            "excess_vs_baseline_pct": round_or_none(avg - baseline_avg, 2) if avg is not None else None,
+        })
+
+    month_indices = defaultdict(list)
+    for i, d in enumerate(dates):
+        dt = datetime.fromisoformat(d).date()
+        month_indices[(dt.year, dt.month)].append(i)
+    turn_idx = set()
+    for ids in month_indices.values():
+        turn_idx.update(ids[:3])
+        turn_idx.update(ids[-3:])
+    turn_rets = [daily_ret[i] for i in sorted(turn_idx) if i > 0 and daily_ret[i] is not None]
+    other_rets = [daily_ret[i] for i in range(1, len(vals)) if i not in turn_idx and daily_ret[i] is not None]
+
+    three_down_1, three_down_20 = [], []
+    large_down_1, large_down_20 = [], []
+    for i in range(3, len(vals) - 20):
+        if all(daily_ret[j] is not None and daily_ret[j] < 0 for j in (i - 2, i - 1, i)):
+            three_down_1.append(pct_change(vals[i + 1], vals[i]))
+            three_down_20.append(pct_change(vals[i + 20], vals[i]))
+        if daily_ret[i] is not None and daily_ret[i] <= -1.5:
+            large_down_1.append(pct_change(vals[i + 1], vals[i]))
+            large_down_20.append(pct_change(vals[i + 20], vals[i]))
+
+    last_three_down = len(vals) >= 4 and all(daily_ret[j] is not None and daily_ret[j] < 0 for j in range(len(vals) - 3, len(vals)))
+    last_large_down = daily_ret[-1] is not None and daily_ret[-1] <= -1.5
+    last_dt = datetime.fromisoformat(dates[-1]).date()
+    ids = month_indices[(last_dt.year, last_dt.month)]
+    last_turn = (len(vals) - 1) in set(ids[:3] + ids[-3:])
+
+    def stat(xs):
+        avg = statistics.fmean(xs) if xs else None
+        return {
+            "sample_count": len(xs),
+            "avg_return_pct": round_or_none(avg, 2),
+            "up_rate_pct": round_or_none(sum(x > 0 for x in xs) / len(xs) * 100, 1) if xs else None,
+            "excess_vs_baseline_pct": round_or_none(avg - baseline_avg, 2) if avg is not None else None,
+        }
+
+    return {
+        "available": True,
+        "basis": f"NIFTY 50 日足・取得可能な過去約10年（最終 {dates[-1]}）",
+        "baseline": {
+            "sample_count": len(all_rets),
+            "avg_return_pct": round_or_none(baseline_avg, 2),
+            "up_rate_pct": round_or_none(baseline_up, 1),
+        },
+        "weekday": weekday_rows,
+        "month": month_rows,
+        "turn_of_month": {
+            "definition": "各月の最初3営業日と最後3営業日",
+            "current_applicable": last_turn,
+            "turn_days": stat(turn_rets),
+            "other_days": stat(other_rets),
+        },
+        "after_three_down": {
+            "definition": "3営業日連続下落後",
+            "current_applicable": last_three_down,
+            "next_1d": stat(three_down_1),
+            "next_20d": stat(three_down_20),
+        },
+        "after_large_down": {
+            "definition": "1日で-1.5%以下下落した後",
+            "current_applicable": last_large_down,
+            "next_1d": stat(large_down_1),
+            "next_20d": stat(large_down_20),
+        },
+        "warning": "アノマリーは過去の統計的傾向です。全期間平均との差も併記しますが、偶然・制度変更・相場環境変化で再現しない可能性があります。",
+    }
+
+
+def build_data_quality(result, now_jst):
+    reasons = []
+    state = result.get("market_state") or {}
+    status = result.get("status")
+    n = result.get("nifty") or {}
+    age_minutes = None
+    try:
+        age_minutes = (now_jst - datetime.fromisoformat(n.get("as_of_jst"))).total_seconds() / 60.0
+    except Exception:
+        pass
+
+    if status != "ok":
+        reasons.append("NIFTY・USD/INR・Brentのコアデータが全てそろっていません。")
+
+    if state.get("code") == "LIVE":
+        if age_minutes is None:
+            freshness = "UNKNOWN"
+            reasons.append("NIFTY価格時刻を確認できません。")
+        elif age_minutes <= 20:
+            freshness = "FRESH"
+        else:
+            freshness = "STALE"
+            reasons.append(f"取引中ですがNIFTY価格が約{age_minutes:.0f}分古い状態です。")
+    elif state.get("code") in ("CLOSED", "PREVIOUS_SESSION", "OUT_OF_HOURS"):
+        freshness = "EXPECTED_NONLIVE"
+    else:
+        freshness = "UNKNOWN"
+
+    cc = result.get("crosscheck") or {}
+    if cc.get("available") and cc.get("diff_pct") is not None and abs(cc["diff_pct"]) > 0.5:
+        reasons.append(f"NIFTYの参考価格と公式クロスチェックの差が{cc['diff_pct']:+.2f}%あります。")
+
+    if state.get("code") == "LIVE" and status == "ok" and freshness == "FRESH" and not any("クロスチェック" in x for x in reasons):
+        gate = {"code": "OK", "label": "判断データ良好", "allow_rule": True}
+    elif state.get("code") == "LIVE" and status == "ok" and freshness != "STALE":
+        gate = {"code": "CAUTION", "label": "注意付きで確認", "allow_rule": True}
+    else:
+        gate = {"code": "HOLD", "label": "売買ルール判定保留", "allow_rule": False}
+        if state.get("code") != "LIVE":
+            reasons.append("通常取引時間中ではないため、第1弾購入ルールは自動確定しません。")
+
+    optional_available = sum(
+        bool((result.get(k) or {}).get("available"))
+        for k in ("breadth", "fii_dii")
+    ) + (1 if (result.get("india_vix") or {}).get("price") is not None else 0)
+
+    return {
+        "freshness": freshness,
+        "nifty_age_minutes": round_or_none(age_minutes, 1),
+        "decision_gate": gate,
+        "reasons": reasons,
+        "optional_context_available_count": optional_available,
+        "official_holiday_calendar_loaded": now_jst.year == 2026,
+    }
+
+
+def build_summary(nifty, signals, outlook, breadth, fii_dii, quality):
+    parts = []
+    tech = (nifty.get("provisional") or {}) if (nifty.get("provisional") or {}).get("available") else nifty
+    price, ma5, ma25, ma75 = (tech.get(k) for k in ("price", "ma5", "ma25", "ma75"))
+    if price is not None and ma5 is not None:
+        parts.append("短期は5日線を上回っています" if price >= ma5 else "短期は5日線を下回っています")
+    if price is not None and ma25 is not None and ma75 is not None:
+        if price >= ma25 and price >= ma75:
+            parts.append("25日線・75日線より上です")
+        elif price < ma25 and price < ma75:
+            parts.append("25日線・75日線より下です")
+        else:
+            parts.append("中期移動平均線の間に位置しています")
+    rsi = tech.get("rsi14")
+    if rsi is not None:
+        if rsi <= 35:
+            parts.append(f"RSIは{rsi:.1f}で低位です")
+        elif rsi >= 65:
+            parts.append(f"RSIは{rsi:.1f}で高位です")
+        else:
+            parts.append(f"RSIは{rsi:.1f}で中立圏です")
+    if (breadth or {}).get("available"):
+        parts.append(f"NIFTY50の上昇銘柄比率は{breadth.get('advance_ratio_pct'):.0f}%です")
+    if (fii_dii or {}).get("available") and (fii_dii.get("fii") or {}).get("net_value_crore") is not None:
+        net = fii_dii["fii"]["net_value_crore"]
+        parts.append(f"公表済みFII/FPIは{'買い越し' if net >= 0 else '売り越し'}です")
+    if outlook.get("available"):
+        parts.append(f"過去類似局面の20営業日見通しは「{outlook.get('label')}」です")
+    gate = (quality.get("decision_gate") or {}).get("label")
+    if gate:
+        parts.append(f"データ判定は「{gate}」です")
+    return "。".join(parts) + ("。" if parts else "")
+
+
+def main():
+    old = load_json(MARKET_OUT, {})
+    now_utc = datetime.now(timezone.utc)
+    now_jst = now_utc.astimezone(JST)
+    result = dict(old) if isinstance(old, dict) else {}
+    errors = []
+    optional_errors = []
+    core_updated = 0
+
+    daily_dates = []
+    daily_vals = []
+    arrays = None
+
+    # NIFTY current + 10-year daily analytics
+    try:
+        intr = yahoo_chart("^NSEI", "5d", "5m")
+        t_now, p_now = last_value(intr)
+        daily = yahoo_chart("^NSEI", "10y", "1d")
+        ds = completed_daily_series(daily)
+        if len(ds) < 100:
+            raise RuntimeError("insufficient daily history")
+        daily_vals = [c for _, c in ds]
+        daily_dates = [datetime.fromtimestamp(t, timezone.utc).astimezone(IST).date().isoformat() for t, _ in ds]
+        arrays = build_indicator_arrays(daily_vals)
+        i = len(daily_vals) - 1
+        prev = daily_vals[-1]
+        provisional = build_provisional_technicals(daily_dates, daily_vals, p_now, t_now)
+        result["nifty"] = {
+            "symbol": "^NSEI",
+            "price": round_or_none(p_now, 2),
+            "as_of_jst": iso_jst(t_now),
+            "previous_close": round_or_none(prev, 2),
+            "change_pct": round_or_none(pct_change(p_now, prev), 3),
+            "technical_close": round_or_none(daily_vals[i], 2),
+            "technical_date": daily_dates[i],
+            "ma5": round_or_none(arrays["ma5"][i], 2),
+            "ma25": round_or_none(arrays["ma25"][i], 2),
+            "ma75": round_or_none(arrays["ma75"][i], 2),
+            "rsi14": round_or_none(arrays["rsi"][i], 2),
+            "rsi14_prev": round_or_none(arrays["rsi"][i - 1], 2),
+            "macd": round_or_none(arrays["macd"][i], 3),
+            "macd_signal": round_or_none(arrays["signal"][i], 3),
+            "macd_hist": round_or_none(arrays["hist"][i], 3),
+            "macd_hist_prev": round_or_none(arrays["hist"][i - 1], 3),
+            "ret5_pct": round_or_none(arrays["ret5"][i], 2),
+            "ret20_pct": round_or_none(arrays["ret20"][i], 2),
+            "vol20_annualized_pct": round_or_none(arrays["vol20"][i], 2),
+            "price_vs_ma5_pct": round_or_none(pct_change(p_now, arrays["ma5"][i]), 2),
+            "price_vs_ma25_pct": round_or_none(pct_change(p_now, arrays["ma25"][i]), 2),
+            "price_vs_ma75_pct": round_or_none(pct_change(p_now, arrays["ma75"][i]), 2),
+            "technical_basis": "前営業日までの確定日足",
+            "provisional": provisional,
+        }
+        result["market_state"] = market_state(t_now, now_jst)
+        core_updated += 1
+    except Exception as e:
+        errors.append("NIFTY: " + str(e))
+
+    # Core external factors
+    for key, symbol in (("usdinr", "INR=X"), ("brent", "BZ=F")):
+        try:
+            ch = yahoo_chart(symbol, "5d", "5m")
+            ts, price = last_value(ch)
+            result[key] = {
+                "symbol": symbol,
+                "price": round_or_none(price, 4 if key == "usdinr" else 2),
+                "as_of_jst": iso_jst(ts),
+                "change_5d_pct": round_or_none(recent_change_5d(symbol), 2),
+            }
+            core_updated += 1
+        except Exception as e:
+            errors.append(f"{key}: {e}")
+
+    # Optional India VIX
+    try:
+        ch = yahoo_chart("^INDIAVIX", "5d", "5m")
+        ts, price = last_value(ch)
+        result["india_vix"] = {
+            "symbol": "^INDIAVIX",
+            "price": round_or_none(price, 2),
+            "as_of_jst": iso_jst(ts),
+            "change_5d_pct": round_or_none(recent_change_5d("^INDIAVIX"), 2),
+        }
+    except Exception as e:
+        result["india_vix"] = {"symbol": "^INDIAVIX", "price": None, "change_5d_pct": None}
+        optional_errors.append("India VIX: " + str(e))
+
+    # Official NIFTY cross-check
+    try:
+        official = fetch_nifty_official_crosscheck()
+        yprice = (result.get("nifty") or {}).get("price")
+        diff = pct_change(yprice, official.get("price")) if yprice and official.get("price") else None
+        result["crosscheck"] = {
+            **official,
+            "reference_price": yprice,
+            "diff_pct": round_or_none(diff, 3),
+            "status": "match" if diff is not None and abs(diff) <= 0.5 else "check",
+        }
+    except Exception as e:
+        result["crosscheck"] = {"available": False, "source": "NSE Indices Live Indices Watch"}
+        optional_errors.append("NIFTY official cross-check: " + str(e))
+
+    # Optional official NSE breadth + FII/DII. Reuse one session.
+    try:
+        opener = nse_opener()
+        try:
+            result["breadth"] = fetch_nse_breadth(opener)
+        except Exception as e:
+            result["breadth"] = {"available": False, "source": "NSE India NIFTY 50 constituent live data"}
+            optional_errors.append("NSE breadth: " + str(e))
+        try:
+            result["fii_dii"] = fetch_nse_fiidii(opener)
+        except Exception as e:
+            result["fii_dii"] = {"available": False, "source": "NSE India FII/FPI & DII activity"}
+            optional_errors.append("NSE FII/DII: " + str(e))
+    except Exception as e:
+        result["breadth"] = {"available": False, "source": "NSE India NIFTY 50 constituent live data"}
+        result["fii_dii"] = {"available": False, "source": "NSE India FII/FPI & DII activity"}
+        optional_errors.append("NSE session: " + str(e))
+
+    result.update(
+        {
+            "schema_version": SCHEMA_VERSION,
+            "generated_at_utc": now_utc.isoformat(timespec="seconds"),
+            "generated_at_jst": now_jst.isoformat(timespec="seconds"),
+            "status": "ok" if core_updated == 3 else ("partial" if core_updated else "error"),
+            "source": "Yahoo Finance chart endpoint for core reference data; official NSE/NSE Indices optional cross-check/context",
+            "errors": errors,
+            "optional_errors": optional_errors,
+            "note": "Current quotes may be delayed. Confirmed technicals use completed daily closes; provisional technicals treat the current intraday price as a temporary close.",
+        }
+    )
+
+    if result.get("nifty"):
+        # Choose provisional technicals only when same-day and regular live market.
+        n = result["nifty"]
+        p = n.get("provisional") or {}
+        if (result.get("market_state") or {}).get("code") == "LIVE" and p.get("available"):
+            score_nifty = {
+                **n,
+                **{k: p.get(k) for k in (
+                    "price","ma5","ma25","ma75","rsi14","rsi14_prev","macd","macd_signal",
+                    "macd_hist","macd_hist_prev","ret5_pct","vol20_annualized_pct",
+                    "price_vs_ma5_pct","price_vs_ma25_pct","price_vs_ma75_pct"
+                )}
+            }
+            score_basis = "14:00暫定テクニカル"
+        else:
+            score_nifty = n
+            score_basis = "確定日足テクニカル"
+
+        result["signals"] = score_setups(
+            score_nifty,
+            result.get("usdinr", {}),
+            result.get("brent", {}),
+            result.get("india_vix", {}),
+            result.get("breadth", {}),
+            result.get("fii_dii", {}),
+            basis_label=score_basis,
+        )
+
+        if arrays and daily_vals:
+            result["outlook_1m"] = nearest_analog_outlook(daily_dates, daily_vals, arrays)
+            result["anomalies"] = anomaly_stats(daily_dates, daily_vals)
+            result["score_backtest"] = setup_backtest(daily_dates, daily_vals, arrays)
+        else:
+            result["outlook_1m"] = {"available": False, "message": "日足データ不足"}
+            result["anomalies"] = {"available": False}
+            result["score_backtest"] = {"available": False, "message": "日足データ不足"}
+
+        result["data_quality"] = build_data_quality(result, now_jst)
+
+        history = load_json(HISTORY_OUT, {"schema_version": 2, "records": []})
+        # comparison before today's best snapshot can still use the prior day.
+        result["comparison"] = comparison_from_history(result, history)
+        result["summary"] = build_summary(
+            result.get("nifty", {}),
+            result.get("signals", {}),
+            result.get("outlook_1m", {}),
+            result.get("breadth", {}),
+            result.get("fii_dii", {}),
+            result.get("data_quality", {}),
+        )
+        history = update_history(history, result, now_jst)
+        HISTORY_OUT.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    MARKET_OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(json.dumps({
+        "status": result["status"],
+        "schema_version": SCHEMA_VERSION,
+        "core_updated": core_updated,
+        "errors": errors,
+        "optional_errors": optional_errors,
+        "decision_gate": ((result.get("data_quality") or {}).get("decision_gate") or {}).get("code"),
+    }, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,10 +1,12 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "start_url": "./",
+  "description": "インド株14:00定点確認・データ品質・前兆・1か月見通し・検証・アノマリー判断支援",
+  "start_url": "./?v=4",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
-  "theme_color": "#0b1220",
+  "theme_color": "#08111f",
   "icons": [
     {
       "src": "icon-192.png",
