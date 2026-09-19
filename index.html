@@ -112,7 +112,7 @@
 <body>
 <div class="app">
   <header>
-    <h1>India 14:00 Check</h1>
+    <h1>India 14:00 Check <span style="font-size:.45em;color:#8ea3bd">v4.1</span></h1>
     <div class="sub">現在・前回比較・前兆・1か月見通し・検証・アノマリーを、データ鮮度と根拠を確認しながら使う判断支援ツール</div>
   </header>
 
@@ -145,10 +145,13 @@
         <span id="freshness" class="pill">鮮度 --</span>
       </div>
       <ul id="qualityReasons" class="quality-list"></ul>
+      <div class="source-row"><span>NIFTY取得</span><b id="coreNiftyStatus">--</b></div>
+      <div class="source-row"><span>USD/INR取得</span><b id="coreUsdStatus">--</b></div>
+      <div class="source-row"><span>Brent取得</span><b id="coreBrentStatus">--</b></div>
       <div class="source-row"><span>NIFTY公式クロスチェック</span><b id="crosscheck">--</b></div>
       <div class="source-row"><span>NIFTY50騰落銘柄</span><b id="breadthStatus">--</b></div>
       <div class="source-row"><span>FII/DII</span><b id="fiiStatus">--</b></div>
-      <div class="small" style="margin-top:8px">通常取引時間外、コアデータ欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。</div>
+      <div class="small" style="margin-top:8px">通常取引時間外、コアデータ欠損、取引中の価格遅延がある場合は、第1弾購入ルールを自動確定しません。前回値は継続表示しても「最新値」とは扱いません。</div>
     </div>
 
     <div class="card">
@@ -389,7 +392,11 @@ async function refreshData(silent=false){
     const old=lastGenerated;
     market=m; history=h||{records:[]}; lastGenerated=market.generated_at_jst||null;
     renderAll();
-    if(!silent) showToast(old && lastGenerated!==old ? "新しいデータを読み込みました" : "最新保存データを読み込みました");
+    if(!silent){
+      if(old && lastGenerated!==old){
+        showToast(market?.status==="ok" ? "新しいデータを読み込みました" : "更新処理は完了しましたが、一部は前回値です", 4200);
+      }else showToast("最新保存データを読み込みました");
+    }
     return old && lastGenerated!==old;
   }catch(e){
     setText("dataStatus","取得失敗");
@@ -403,7 +410,7 @@ function startUpdatePolling(){
   pollTimer=setInterval(async()=>{
     tries++;
     const changed=await refreshData(true);
-    if(changed){clearInterval(pollTimer);pollTimer=null;showToast("更新完了を検知しました",4000)}
+    if(changed){clearInterval(pollTimer);pollTimer=null;showToast(market?.status==="ok"?"更新完了を検知しました":"更新完了。一部データは前回値のため判断保留です",5000)}
     if(tries>=12){clearInterval(pollTimer);pollTimer=null}
   },5000);
 }
@@ -500,8 +507,18 @@ function renderQuality(){
     setText("crosscheck",`${cc.status==="match"?"一致":"要確認"} / 差 ${signed(cc.diff_pct,2,"%")}`);
   }else setText("crosscheck","取得不能（補助）");
 
-  setText("breadthStatus",br.available?`${fmt(br.advance_ratio_pct,1)}% 上昇 / ${br.sample_count}銘柄`:"取得不能（手動可）");
-  setText("fiiStatus",fd.available?`公表値あり ${fd.fii?.date||fd.dii?.date||""}`:"取得不能（補助）");
+  const cs=q.core_sources||{};
+  const coreText=(x)=>{
+    if(!x)return "--";
+    if(x.status==="fresh")return `今回取得 / ${x.as_of_jst||"--"}`;
+    if(x.status==="fallback")return `前回値 / ${x.as_of_jst||"--"}`;
+    return "取得不能";
+  };
+  setText("coreNiftyStatus",coreText(cs.nifty));
+  setText("coreUsdStatus",coreText(cs.usdinr));
+  setText("coreBrentStatus",coreText(cs.brent));
+  setText("breadthStatus",br.available?`${fmt(br.advance_ratio_pct,1)}% 上昇 / ${br.sample_count}銘柄`:(br.skipped?"今回は省略（補助）":"取得不能（手動可）"));
+  setText("fiiStatus",fd.available?`公表値あり ${fd.fii?.date||fd.dii?.date||""}`:(fd.skipped?"今回は省略（補助）":"取得不能（補助）"));
 }
 
 function renderTechCompare(){
@@ -589,14 +606,29 @@ function factorHtml(xs){
   return xs.map(x=>`<div class="factor"><div class="pts">+${x.points}</div><div><b>${x.label}</b><div class="small">${x.detail||""}</div></div></div>`).join("");
 }
 function renderSignals(){
-  const s=market?.signals||{}; const b=Number(s.buy_setup_score),q=Number(s.sell_setup_score);
-  setText("buyScore",Number.isFinite(b)?`${b}/100`:"--");setText("sellScore",Number.isFinite(q)?`${q}/100`:"--");
+  const s=market?.signals||{};
+  if(s.available===false){
+    setText("buyScore","判定保留");setText("sellScore","判定保留");
+    $("buyBar").style.width="0%";$("sellBar").style.width="0%";
+    setText("buyLabel","最新スコア未更新");setText("sellLabel","最新スコア未更新");
+    const lv=s.last_valid_score||{};
+    setText("buyCore",lv.buy_setup_score==null?"前回値なし":`前回参考 ${lv.buy_setup_score}/100`);
+    setText("sellCore",lv.sell_setup_score==null?"前回値なし":`前回参考 ${lv.sell_setup_score}/100`);
+    setText("signalBasis",s.message||"データ品質条件未達のため最新前兆を算出していません。");
+    $("buyFactors").innerHTML=`<div class="section-note">${s.definition||"最新判断には使用しません。"}</div>`;
+    $("sellFactors").innerHTML=`<div class="section-note">${s.definition||"最新判断には使用しません。"}</div>`;
+    return;
+  }
+  const b=Number(s.buy_setup_score),q=Number(s.sell_setup_score);
+  const ref=s.decision_eligible===false?" 参考":"";
+  setText("buyScore",Number.isFinite(b)?`${b}/100${ref}`:"--");setText("sellScore",Number.isFinite(q)?`${q}/100${ref}`:"--");
   $("buyBar").style.width=`${Number.isFinite(b)?Math.max(0,Math.min(100,b)):0}%`;
   $("sellBar").style.width=`${Number.isFinite(q)?Math.max(0,Math.min(100,q)):0}%`;
-  setText("buyLabel",s.buy_setup_label||"--");setText("sellLabel",s.sell_setup_label||"--");
+  setText("buyLabel",`${s.buy_setup_label||"--"}${s.decision_eligible===false?"（判断保留）":""}`);
+  setText("sellLabel",`${s.sell_setup_label||"--"}${s.decision_eligible===false?"（判断保留）":""}`);
   setText("buyCore",`テクニカル中核 ${s.technical_buy_score??"--"}/100`);
   setText("sellCore",`テクニカル中核 ${s.technical_sell_score??"--"}/100`);
-  setText("signalBasis",`使用テクニカル: ${s.technical_basis_used||"--"}。総合スコアには取得できた外部環境も加点します。`);
+  setText("signalBasis",`${s.display_note||""} 使用テクニカル: ${s.technical_basis_used||"--"}。総合スコアには今回取得できた外部環境だけを加点します。`);
   $("buyFactors").innerHTML=factorHtml(s.buy_factors);$("sellFactors").innerHTML=factorHtml(s.sell_factors);
 }
 
@@ -607,7 +639,7 @@ function renderOutlook(){
     setText("outlookSimilarity","--");$("outlookStats").innerHTML="";setText("outlookRange","--");setText("outlookMethod","--");return;
   }
   setText("outlookLabel",o.label||"--");
-  setText("outlookBasis",`${o.horizon} / 基準 ${o.basis_date} / 類似局面 ${o.analog_count}例 / 統計参考度 ${o.statistical_reference}`);
+  setText("outlookBasis",`${o._data_status==="fallback"?"前回計算結果 / ":""}${o.horizon} / 基準 ${o.basis_date} / 類似局面 ${o.analog_count}例 / 統計参考度 ${o.statistical_reference}`);
   setText("outlookSimilarity",`類似度距離の中央値 ${fmt(o.median_similarity_distance,2)}（小さいほど現在に近い）`);
   const stats=[
     ["過去類似局面の上昇割合",`${fmt(o.up_rate_pct,1)}%`],

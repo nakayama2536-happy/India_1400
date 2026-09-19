@@ -37,6 +37,7 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/
 JST = ZoneInfo("Asia/Tokyo")
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA_VERSION = 4
+APP_VERSION = "4.1"
 
 # NSE cash-market trading holidays for calendar year 2026.
 # Source: NSE circular "Trading holidays for the calendar year 2026".
@@ -95,6 +96,11 @@ def http_text(url: str, tries: int = 3, timeout: int = 25, headers=None, opener=
 
 
 def yahoo_chart(symbol: str, range_: str = "10d", interval: str = "5m"):
+    """Lightweight Yahoo chart fetch with host fallback and modest backoff.
+
+    v4.1 deliberately avoids many small requests because shared GitHub Actions IPs
+    can be rate-limited even when this repository itself has low traffic.
+    """
     enc = urllib.parse.quote(symbol, safe="")
     qs = urllib.parse.urlencode(
         {
@@ -105,15 +111,26 @@ def yahoo_chart(symbol: str, range_: str = "10d", interval: str = "5m"):
         }
     )
     errors = []
-    for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
-        try:
-            data = http_json(f"https://{host}/v8/finance/chart/{enc}?{qs}")
-            result = (data.get("chart") or {}).get("result")
-            if not result:
-                raise RuntimeError(str((data.get("chart") or {}).get("error") or "empty result"))
-            return result[0]
-        except Exception as e:
-            errors.append(f"{host}: {e}")
+    headers = {
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://finance.yahoo.com/",
+        "Cache-Control": "no-cache",
+    }
+    for cycle in range(2):
+        for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
+            try:
+                data = http_json(
+                    f"https://{host}/v8/finance/chart/{enc}?{qs}",
+                    tries=1, timeout=20, headers=headers
+                )
+                result = (data.get("chart") or {}).get("result")
+                if not result:
+                    raise RuntimeError(str((data.get("chart") or {}).get("error") or "empty result"))
+                return result[0]
+            except Exception as e:
+                errors.append(f"{host}: {e}")
+        if cycle == 0:
+            time.sleep(4.0)
     raise RuntimeError("; ".join(errors))
 
 
@@ -147,6 +164,63 @@ def completed_daily_series(chart, now_ist=None):
             continue
         out.append((ts, close))
     return out
+
+
+def yahoo_daily_bundle(symbol: str, range_: str):
+    """One Yahoo request provides current reference quote + daily history.
+
+    This replaces the v4 pattern of separate intraday and daily requests, reducing
+    Yahoo calls from roughly eight per run to four.
+    """
+    chart = yahoo_chart(symbol, range_, "1d")
+    meta = chart.get("meta") or {}
+    series = series_from_chart(chart)
+    price = meta.get("regularMarketPrice")
+    ts = meta.get("regularMarketTime")
+    if price is None or ts is None:
+        if not series:
+            raise RuntimeError("no quote or series data")
+        ts, price = series[-1]
+    price = float(price)
+    ts = int(ts)
+    ds = completed_daily_series(chart)
+    vals = [c for _, c in ds]
+    change5 = None
+    if len(ds) >= 6:
+        quote_date = datetime.fromtimestamp(ts, timezone.utc).astimezone(IST).date()
+        last_daily_date = datetime.fromtimestamp(ds[-1][0], timezone.utc).astimezone(IST).date()
+        if quote_date == last_daily_date:
+            base = vals[-6]
+        elif len(vals) >= 5:
+            base = vals[-5]
+        else:
+            base = None
+        if base not in (None, 0):
+            change5 = pct_change(price, base)
+    return chart, ts, price, ds, change5
+
+
+def iso_age_minutes(value, now_jst):
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=JST)
+        return (now_jst - dt.astimezone(JST)).total_seconds() / 60.0
+    except Exception:
+        return None
+
+
+def market_state_from_saved(nifty, now_jst):
+    try:
+        dt = datetime.fromisoformat((nifty or {}).get("as_of_jst"))
+        return market_state(int(dt.timestamp()), now_jst)
+    except Exception:
+        return {
+            "code": "UNKNOWN",
+            "label": "状態不明",
+            "detail": "NIFTY価格時刻を確認できません。",
+            "calendar_source": "NSE 2026 holiday calendar" if now_jst.year == 2026 else "weekday check",
+        }
 
 
 def round_or_none(x, n=4):
@@ -1007,43 +1081,61 @@ def anomaly_stats(dates, vals):
 def build_data_quality(result, now_jst):
     reasons = []
     state = result.get("market_state") or {}
-    status = result.get("status")
-    n = result.get("nifty") or {}
-    age_minutes = None
-    try:
-        age_minutes = (now_jst - datetime.fromisoformat(n.get("as_of_jst"))).total_seconds() / 60.0
-    except Exception:
-        pass
+    core_fetch = result.get("core_fetch") or {}
+    core_defs = (("nifty", "NIFTY"), ("usdinr", "USD/INR"), ("brent", "Brent"))
+    core_sources = {}
+    all_fresh = True
+    any_fallback = False
+    live_stale = False
 
-    if status != "ok":
-        reasons.append("NIFTY・USD/INR・Brentのコアデータが全てそろっていません。")
+    for key, label in core_defs:
+        meta = core_fetch.get(key) or {}
+        status = meta.get("status", "unknown")
+        as_of = (result.get(key) or {}).get("as_of_jst")
+        age = iso_age_minutes(as_of, now_jst)
+        core_sources[key] = {
+            "label": label,
+            "status": status,
+            "fetched_this_run": bool(meta.get("fetched_this_run")),
+            "as_of_jst": as_of,
+            "age_minutes": round_or_none(age, 1),
+            "error": meta.get("error"),
+        }
+        if status != "fresh":
+            all_fresh = False
+            if status == "fallback":
+                any_fallback = True
+                reasons.append(f"{label}は今回取得できず、前回取得値を表示しています。")
+            else:
+                reasons.append(f"{label}の利用可能な値を確認できません。")
+        if state.get("code") == "LIVE" and age is not None and age > 30:
+            live_stale = True
+            reasons.append(f"取引中ですが{label}の価格時刻が約{age:.0f}分古い状態です。")
 
-    if state.get("code") == "LIVE":
-        if age_minutes is None:
-            freshness = "UNKNOWN"
-            reasons.append("NIFTY価格時刻を確認できません。")
-        elif age_minutes <= 20:
-            freshness = "FRESH"
-        else:
-            freshness = "STALE"
-            reasons.append(f"取引中ですがNIFTY価格が約{age_minutes:.0f}分古い状態です。")
+    cc = result.get("crosscheck") or {}
+    crosscheck_mismatch = bool(cc.get("available") and cc.get("diff_pct") is not None and abs(cc["diff_pct"]) > 0.5)
+    if crosscheck_mismatch:
+        reasons.append(f"NIFTYの参考価格と公式クロスチェックの差が{cc['diff_pct']:+.2f}%あります。")
+
+    if not all_fresh:
+        freshness = "FALLBACK" if any_fallback else "UNAVAILABLE"
+    elif state.get("code") == "LIVE":
+        freshness = "STALE" if live_stale else "FRESH"
     elif state.get("code") in ("CLOSED", "PREVIOUS_SESSION", "OUT_OF_HOURS"):
         freshness = "EXPECTED_NONLIVE"
     else:
         freshness = "UNKNOWN"
 
-    cc = result.get("crosscheck") or {}
-    if cc.get("available") and cc.get("diff_pct") is not None and abs(cc["diff_pct"]) > 0.5:
-        reasons.append(f"NIFTYの参考価格と公式クロスチェックの差が{cc['diff_pct']:+.2f}%あります。")
-
-    if state.get("code") == "LIVE" and status == "ok" and freshness == "FRESH" and not any("クロスチェック" in x for x in reasons):
+    if all_fresh and state.get("code") == "LIVE" and not live_stale and not crosscheck_mismatch:
         gate = {"code": "OK", "label": "判断データ良好", "allow_rule": True}
-    elif state.get("code") == "LIVE" and status == "ok" and freshness != "STALE":
-        gate = {"code": "CAUTION", "label": "注意付きで確認", "allow_rule": True}
     else:
         gate = {"code": "HOLD", "label": "売買ルール判定保留", "allow_rule": False}
+        if not all_fresh:
+            reasons.append("主要3データが今回すべて更新できていないため、前兆・購入ルールを最新判断として確定しません。")
         if state.get("code") != "LIVE":
             reasons.append("通常取引時間中ではないため、第1弾購入ルールは自動確定しません。")
+        elif live_stale:
+            reasons.append("取引中の主要価格に遅延があるため、最新判断を保留します。")
 
     optional_available = sum(
         bool((result.get(k) or {}).get("available"))
@@ -1052,11 +1144,13 @@ def build_data_quality(result, now_jst):
 
     return {
         "freshness": freshness,
-        "nifty_age_minutes": round_or_none(age_minutes, 1),
         "decision_gate": gate,
-        "reasons": reasons,
+        "reasons": list(dict.fromkeys(reasons)),
+        "core_sources": core_sources,
+        "all_core_fresh_this_run": all_fresh,
         "optional_context_available_count": optional_available,
         "official_holiday_calendar_loaded": now_jst.year == 2026,
+        "policy": "前回値は表示継続しても、今回取得に失敗した主要データを使って最新の売買判断を確定しない。",
     }
 
 
@@ -1101,32 +1195,54 @@ def main():
     result = dict(old) if isinstance(old, dict) else {}
     errors = []
     optional_errors = []
-    core_updated = 0
+    core_fetch = {}
 
     daily_dates = []
     daily_vals = []
     arrays = None
 
-    # NIFTY current + 10-year daily analytics
+    def record_core_failure(key, label, exc):
+        msg = str(exc)
+        errors.append(f"{label}: {msg}")
+        old_obj = (old.get(key) or {}) if isinstance(old, dict) else {}
+        if old_obj.get("price") is not None:
+            result[key] = old_obj
+            core_fetch[key] = {
+                "status": "fallback",
+                "fetched_this_run": False,
+                "reused_previous_value": True,
+                "previous_as_of_jst": old_obj.get("as_of_jst"),
+                "error": msg,
+            }
+        else:
+            result[key] = {"price": None}
+            core_fetch[key] = {
+                "status": "unavailable",
+                "fetched_this_run": False,
+                "reused_previous_value": False,
+                "error": msg,
+            }
+
+    # NIFTY: one 10-year daily request supplies both current reference price (meta)
+    # and the long history needed for analytics.
     try:
-        intr = yahoo_chart("^NSEI", "5d", "5m")
-        t_now, p_now = last_value(intr)
-        daily = yahoo_chart("^NSEI", "10y", "1d")
-        ds = completed_daily_series(daily)
+        _, t_now, p_now, ds, _ = yahoo_daily_bundle("^NSEI", "10y")
         if len(ds) < 100:
             raise RuntimeError("insufficient daily history")
         daily_vals = [c for _, c in ds]
         daily_dates = [datetime.fromtimestamp(t, timezone.utc).astimezone(IST).date().isoformat() for t, _ in ds]
         arrays = build_indicator_arrays(daily_vals)
         i = len(daily_vals) - 1
-        prev = daily_vals[-1]
+        quote_date = datetime.fromtimestamp(t_now, timezone.utc).astimezone(IST).date()
+        last_daily_date = datetime.fromtimestamp(ds[-1][0], timezone.utc).astimezone(IST).date()
+        previous_close = daily_vals[-2] if quote_date == last_daily_date and len(daily_vals) >= 2 else daily_vals[-1]
         provisional = build_provisional_technicals(daily_dates, daily_vals, p_now, t_now)
         result["nifty"] = {
             "symbol": "^NSEI",
             "price": round_or_none(p_now, 2),
             "as_of_jst": iso_jst(t_now),
-            "previous_close": round_or_none(prev, 2),
-            "change_pct": round_or_none(pct_change(p_now, prev), 3),
+            "previous_close": round_or_none(previous_close, 2),
+            "change_pct": round_or_none(pct_change(p_now, previous_close), 3),
             "technical_close": round_or_none(daily_vals[i], 2),
             "technical_date": daily_dates[i],
             "ma5": round_or_none(arrays["ma5"][i], 2),
@@ -1147,97 +1263,123 @@ def main():
             "technical_basis": "前営業日までの確定日足",
             "provisional": provisional,
         }
+        core_fetch["nifty"] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(t_now), "error": None}
         result["market_state"] = market_state(t_now, now_jst)
-        core_updated += 1
     except Exception as e:
-        errors.append("NIFTY: " + str(e))
+        record_core_failure("nifty", "NIFTY", e)
+        result["market_state"] = market_state_from_saved(result.get("nifty"), now_jst)
 
-    # Core external factors
-    for key, symbol in (("usdinr", "INR=X"), ("brent", "BZ=F")):
+    # USD/INR and Brent: one daily request each supplies regularMarketPrice plus
+    # enough closes for the 5-session change. This halves Yahoo request volume.
+    for key, label, symbol in (("usdinr", "USD/INR", "INR=X"), ("brent", "Brent", "BZ=F")):
         try:
-            ch = yahoo_chart(symbol, "5d", "5m")
-            ts, price = last_value(ch)
+            _, ts, price, _, change5 = yahoo_daily_bundle(symbol, "1mo")
             result[key] = {
                 "symbol": symbol,
                 "price": round_or_none(price, 4 if key == "usdinr" else 2),
                 "as_of_jst": iso_jst(ts),
-                "change_5d_pct": round_or_none(recent_change_5d(symbol), 2),
+                "change_5d_pct": round_or_none(change5, 2),
             }
-            core_updated += 1
+            core_fetch[key] = {"status": "fresh", "fetched_this_run": True, "as_of_jst": iso_jst(ts), "error": None}
         except Exception as e:
-            errors.append(f"{key}: {e}")
+            record_core_failure(key, label, e)
+        time.sleep(0.8)
 
-    # Optional India VIX
+    # Optional India VIX. Preserve a previous valid value if this run fails, but
+    # mark it as fallback so it cannot masquerade as a fresh optional factor.
+    vix_fetch_status = "unavailable"
     try:
-        ch = yahoo_chart("^INDIAVIX", "5d", "5m")
-        ts, price = last_value(ch)
+        _, ts, price, _, change5 = yahoo_daily_bundle("^INDIAVIX", "1mo")
         result["india_vix"] = {
             "symbol": "^INDIAVIX",
             "price": round_or_none(price, 2),
             "as_of_jst": iso_jst(ts),
-            "change_5d_pct": round_or_none(recent_change_5d("^INDIAVIX"), 2),
+            "change_5d_pct": round_or_none(change5, 2),
+            "data_status": "fresh",
         }
+        vix_fetch_status = "fresh"
     except Exception as e:
-        result["india_vix"] = {"symbol": "^INDIAVIX", "price": None, "change_5d_pct": None}
+        old_vix = old.get("india_vix") or {}
+        if old_vix.get("price") is not None:
+            result["india_vix"] = {**old_vix, "data_status": "fallback"}
+            vix_fetch_status = "fallback"
+        else:
+            result["india_vix"] = {"symbol": "^INDIAVIX", "price": None, "change_5d_pct": None, "data_status": "unavailable"}
         optional_errors.append("India VIX: " + str(e))
 
-    # Official NIFTY cross-check
-    try:
-        official = fetch_nifty_official_crosscheck()
-        yprice = (result.get("nifty") or {}).get("price")
-        diff = pct_change(yprice, official.get("price")) if yprice and official.get("price") else None
-        result["crosscheck"] = {
-            **official,
-            "reference_price": yprice,
-            "diff_pct": round_or_none(diff, 3),
-            "status": "match" if diff is not None and abs(diff) <= 0.5 else "check",
-        }
-    except Exception as e:
-        result["crosscheck"] = {"available": False, "source": "NSE Indices Live Indices Watch"}
-        optional_errors.append("NIFTY official cross-check: " + str(e))
-
-    # Optional official NSE breadth + FII/DII. Reuse one session.
-    try:
-        opener = nse_opener()
+    regular_today, _ = is_regular_nse_trading_day(now_jst)
+    # Optional official sources are attempted only on regular trading days and
+    # only when NIFTY itself was freshly obtained. Weekend/manual runs therefore
+    # avoid predictable 403s and unnecessary latency.
+    if regular_today and core_fetch.get("nifty", {}).get("status") == "fresh":
         try:
-            result["breadth"] = fetch_nse_breadth(opener)
+            official = fetch_nifty_official_crosscheck()
+            yprice = (result.get("nifty") or {}).get("price")
+            diff = pct_change(yprice, official.get("price")) if yprice and official.get("price") else None
+            result["crosscheck"] = {
+                **official,
+                "reference_price": yprice,
+                "diff_pct": round_or_none(diff, 3),
+                "status": "match" if diff is not None and abs(diff) <= 0.5 else "check",
+            }
+        except Exception as e:
+            result["crosscheck"] = {"available": False, "source": "NSE Indices Live Indices Watch"}
+            optional_errors.append("NIFTY official cross-check: " + str(e))
+
+        try:
+            opener = nse_opener()
+            try:
+                result["breadth"] = fetch_nse_breadth(opener)
+            except Exception as e:
+                result["breadth"] = {"available": False, "source": "NSE India NIFTY 50 constituent live data"}
+                optional_errors.append("NSE breadth: " + str(e))
+            try:
+                result["fii_dii"] = fetch_nse_fiidii(opener)
+            except Exception as e:
+                result["fii_dii"] = {"available": False, "source": "NSE India FII/FPI & DII activity"}
+                optional_errors.append("NSE FII/DII: " + str(e))
         except Exception as e:
             result["breadth"] = {"available": False, "source": "NSE India NIFTY 50 constituent live data"}
-            optional_errors.append("NSE breadth: " + str(e))
-        try:
-            result["fii_dii"] = fetch_nse_fiidii(opener)
-        except Exception as e:
             result["fii_dii"] = {"available": False, "source": "NSE India FII/FPI & DII activity"}
-            optional_errors.append("NSE FII/DII: " + str(e))
-    except Exception as e:
-        result["breadth"] = {"available": False, "source": "NSE India NIFTY 50 constituent live data"}
-        result["fii_dii"] = {"available": False, "source": "NSE India FII/FPI & DII activity"}
-        optional_errors.append("NSE session: " + str(e))
+            optional_errors.append("NSE session: " + str(e))
+    else:
+        result["crosscheck"] = {"available": False, "skipped": True, "source": "NSE Indices Live Indices Watch", "reason": "休場日またはNIFTY最新取得失敗のため省略"}
+        result["breadth"] = {"available": False, "skipped": True, "source": "NSE India NIFTY 50 constituent live data", "reason": "休場日またはNIFTY最新取得失敗のため省略"}
+        result["fii_dii"] = {"available": False, "skipped": True, "source": "NSE India FII/FPI & DII activity", "reason": "休場日またはNIFTY最新取得失敗のため省略"}
+
+    fresh_count = sum((core_fetch.get(k) or {}).get("status") == "fresh" for k in ("nifty", "usdinr", "brent"))
+    fallback_count = sum((core_fetch.get(k) or {}).get("status") == "fallback" for k in ("nifty", "usdinr", "brent"))
+    status = "ok" if fresh_count == 3 else ("partial" if fresh_count > 0 else ("fallback" if fallback_count > 0 else "error"))
 
     result.update(
         {
             "schema_version": SCHEMA_VERSION,
+            "app_version": APP_VERSION,
             "generated_at_utc": now_utc.isoformat(timespec="seconds"),
             "generated_at_jst": now_jst.isoformat(timespec="seconds"),
-            "status": "ok" if core_updated == 3 else ("partial" if core_updated else "error"),
+            "status": status,
+            "core_fetch": core_fetch,
             "source": "Yahoo Finance chart endpoint for core reference data; official NSE/NSE Indices optional cross-check/context",
             "errors": errors,
             "optional_errors": optional_errors,
-            "note": "Current quotes may be delayed. Confirmed technicals use completed daily closes; provisional technicals treat the current intraday price as a temporary close.",
+            "note": "v4.1: failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
         }
     )
 
-    if result.get("nifty"):
-        # Choose provisional technicals only when same-day and regular live market.
+    result["data_quality"] = build_data_quality(result, now_jst)
+    gate = (result.get("data_quality") or {}).get("decision_gate") or {}
+    all_core_fresh = bool((result.get("data_quality") or {}).get("all_core_fresh_this_run"))
+
+    if core_fetch.get("nifty", {}).get("status") == "fresh" and arrays and daily_vals:
         n = result["nifty"]
         p = n.get("provisional") or {}
         if (result.get("market_state") or {}).get("code") == "LIVE" and p.get("available"):
             score_nifty = {
                 **n,
                 **{k: p.get(k) for k in (
-                    "price","ma5","ma25","ma75","rsi14","rsi14_prev","macd","macd_signal",
-                    "macd_hist","macd_hist_prev","ret5_pct","vol20_annualized_pct",
-                    "price_vs_ma5_pct","price_vs_ma25_pct","price_vs_ma75_pct"
+                    "price", "ma5", "ma25", "ma75", "rsi14", "rsi14_prev", "macd", "macd_signal",
+                    "macd_hist", "macd_hist_prev", "ret5_pct", "vol20_annualized_pct",
+                    "price_vs_ma5_pct", "price_vs_ma25_pct", "price_vs_ma75_pct"
                 )}
             }
             score_basis = "14:00暫定テクニカル"
@@ -1245,46 +1387,78 @@ def main():
             score_nifty = n
             score_basis = "確定日足テクニカル"
 
+        # External factors are used only if freshly fetched in this run.
+        fresh_usd = result.get("usdinr", {}) if core_fetch.get("usdinr", {}).get("status") == "fresh" else {}
+        fresh_brent = result.get("brent", {}) if core_fetch.get("brent", {}).get("status") == "fresh" else {}
+        fresh_vix = result.get("india_vix", {}) if vix_fetch_status == "fresh" else {}
         result["signals"] = score_setups(
-            score_nifty,
-            result.get("usdinr", {}),
-            result.get("brent", {}),
-            result.get("india_vix", {}),
-            result.get("breadth", {}),
-            result.get("fii_dii", {}),
-            basis_label=score_basis,
+            score_nifty, fresh_usd, fresh_brent, fresh_vix,
+            result.get("breadth", {}), result.get("fii_dii", {}), basis_label=score_basis,
         )
+        result["signals"].update({
+            "available": True,
+            "decision_eligible": bool(gate.get("allow_rule")),
+            "status": "fresh" if all_core_fresh else "technical_only_reference",
+            "display_note": "最新判断に使用可能" if gate.get("allow_rule") else "参考表示。データ品質ゲートにより売買判断は保留。",
+        })
 
-        if arrays and daily_vals:
-            result["outlook_1m"] = nearest_analog_outlook(daily_dates, daily_vals, arrays)
-            result["anomalies"] = anomaly_stats(daily_dates, daily_vals)
-            result["score_backtest"] = setup_backtest(daily_dates, daily_vals, arrays)
-        else:
-            result["outlook_1m"] = {"available": False, "message": "日足データ不足"}
-            result["anomalies"] = {"available": False}
-            result["score_backtest"] = {"available": False, "message": "日足データ不足"}
+        result["outlook_1m"] = nearest_analog_outlook(daily_dates, daily_vals, arrays)
+        result["outlook_1m"]["_data_status"] = "fresh"
+        result["anomalies"] = anomaly_stats(daily_dates, daily_vals)
+        result["anomalies"]["_data_status"] = "fresh"
+        result["score_backtest"] = setup_backtest(daily_dates, daily_vals, arrays)
+        result["score_backtest"]["_data_status"] = "fresh"
+    else:
+        old_sig = old.get("signals") or {}
+        result["signals"] = {
+            "available": False,
+            "decision_eligible": False,
+            "status": "not_updated",
+            "message": "NIFTYの最新取得に失敗したため、前兆スコアを今回は更新していません。",
+            "last_valid_score": {
+                "buy_setup_score": old_sig.get("buy_setup_score"),
+                "sell_setup_score": old_sig.get("sell_setup_score"),
+                "generated_at_jst": old.get("generated_at_jst"),
+            },
+            "definition": "前回スコアは参考情報としてのみ保持し、最新判断には使用しません。",
+        }
+        for key, default in (
+            ("outlook_1m", {"available": False, "message": "NIFTY日足の最新取得に失敗"}),
+            ("anomalies", {"available": False, "message": "NIFTY日足の最新取得に失敗"}),
+            ("score_backtest", {"available": False, "message": "NIFTY日足の最新取得に失敗"}),
+        ):
+            prior = old.get(key)
+            if isinstance(prior, dict) and prior:
+                result[key] = {**prior, "_data_status": "fallback", "_message": "今回NIFTY履歴を更新できなかったため前回計算結果を表示"}
+            else:
+                result[key] = default
 
-        result["data_quality"] = build_data_quality(result, now_jst)
-
-        history = load_json(HISTORY_OUT, {"schema_version": 2, "records": []})
-        # comparison before today's best snapshot can still use the prior day.
+    history = load_json(HISTORY_OUT, {"schema_version": 2, "records": []})
+    if all_core_fresh:
         result["comparison"] = comparison_from_history(result, history)
-        result["summary"] = build_summary(
-            result.get("nifty", {}),
-            result.get("signals", {}),
-            result.get("outlook_1m", {}),
-            result.get("breadth", {}),
-            result.get("fii_dii", {}),
-            result.get("data_quality", {}),
-        )
+    else:
+        result["comparison"] = {
+            "available": False,
+            "basis": "前回14:00保存値",
+            "message": "主要データに前回値が含まれるため、今回の前回比較は保留しています。",
+        }
+
+    result["summary"] = build_summary(
+        result.get("nifty", {}), result.get("signals", {}), result.get("outlook_1m", {}),
+        result.get("breadth", {}), result.get("fii_dii", {}), result.get("data_quality", {}),
+    )
+
+    # Never contaminate 14:00 history with fallback values.
+    if all_core_fresh:
         history = update_history(history, result, now_jst)
-        HISTORY_OUT.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
+    HISTORY_OUT.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
 
     MARKET_OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({
         "status": result["status"],
         "schema_version": SCHEMA_VERSION,
-        "core_updated": core_updated,
+        "app_version": APP_VERSION,
+        "core_fetch": {k: (core_fetch.get(k) or {}).get("status") for k in ("nifty", "usdinr", "brent")},
         "errors": errors,
         "optional_errors": optional_errors,
         "decision_gate": ((result.get("data_quality") or {}).get("decision_gate") or {}).get("code"),
