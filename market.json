@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-19T13:14:17+00:00",
-  "generated_at_jst": "2026-09-19T22:14:17+09:00",
+  "generated_at_utc": "2026-09-19T13:18:58+00:00",
+  "generated_at_jst": "2026-09-19T22:18:58+09:00",
   "status": "partial",
   "source": "Zero-cost provider priority: NIFTY=Google Finance quote + official NSE Indices history; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance is last-resort fallback; optional NSE live context may be unavailable on hosted runners",
   "nifty": {
@@ -22,7 +22,7 @@
     "symbol": "INR=X",
     "provider_symbol": "USD/INR",
     "provider": "Twelve Data",
-    "price": 96.0031,
+    "price": 96.0022,
     "as_of_jst": "2026-09-19T06:00+09:00",
     "change_5d_pct": 0.11
   },
@@ -74,7 +74,7 @@
     "last_valid_score": {
       "buy_setup_score": null,
       "sell_setup_score": null,
-      "generated_at_jst": "2026-09-19T21:13:15+09:00"
+      "generated_at_jst": "2026-09-19T22:14:17+09:00"
     },
     "definition": "前回スコアは参考情報としてのみ保持し、最新判断には使用しません。"
   },
@@ -115,7 +115,7 @@
         "provider": null,
         "provider_symbol": null,
         "as_of_jst": "2026-09-18T19:00+09:00",
-        "age_minutes": 1634.3,
+        "age_minutes": 1639.0,
         "error": "NIFTY current quote fetched, but daily history unavailable and no saved technical cache exists"
       },
       "usdinr": {
@@ -125,7 +125,7 @@
         "provider": "Twelve Data",
         "provider_symbol": "USD/INR",
         "as_of_jst": "2026-09-19T06:00+09:00",
-        "age_minutes": 974.3,
+        "age_minutes": 979.0,
         "error": null
       },
       "brent": {
@@ -135,7 +135,7 @@
         "provider": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
         "as_of_jst": "2026-09-19T06:50+09:00",
-        "age_minutes": 924.3,
+        "age_minutes": 929.0,
         "error": null
       }
     },
