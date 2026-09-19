@@ -3,9 +3,9 @@ name: Update India 14:00 market data
 on:
   workflow_dispatch:
   schedule:
-    # UTC. 04:50-05:10 UTC = 13:50-14:10 JST
-    - cron: '50,55 4 * * 1-5'
-    - cron: '0,5,10 5 * * 1-5'
+    # UTC. 04:55-05:05 UTC = 13:55-14:05 JST. 3回に抑えてAPI負荷を低減
+    - cron: '55 4 * * 1-5'
+    - cron: '0,5 5 * * 1-5'
 
 permissions:
   contents: write
@@ -18,6 +18,9 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    env:
+      TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +41,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "Update India 14:00 market analytics v4"
+            git commit -m "Update India 14:00 market analytics v4.2"
             git push
           fi
