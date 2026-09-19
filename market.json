@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-09-19T09:55:59+00:00",
-  "generated_at_jst": "2026-09-19T18:55:59+09:00",
-  "status": "fallback",
-  "source": "Yahoo Finance chart endpoint for core reference data; official NSE/NSE Indices optional cross-check/context",
+  "generated_at_utc": "2026-09-19T12:13:15+00:00",
+  "generated_at_jst": "2026-09-19T21:13:15+09:00",
+  "status": "partial",
+  "source": "Core provider priority: Twelve Data (when TWELVEDATA_API_KEY is configured) -> Yahoo Finance fallback; official NSE/NSE Indices optional cross-check/context",
   "nifty": {
     "symbol": "^NSEI",
     "price": 23346.4,
@@ -20,8 +20,11 @@
   },
   "usdinr": {
     "symbol": "INR=X",
-    "price": 95.863,
-    "as_of_jst": "2026-09-19T06:50+09:00"
+    "provider_symbol": "USD/INR",
+    "provider": "Twelve Data",
+    "price": 95.9909,
+    "as_of_jst": "2026-09-19T06:00+09:00",
+    "change_5d_pct": 0.1
   },
   "brent": {
     "symbol": "BZ=F",
@@ -29,11 +32,10 @@
     "as_of_jst": "2026-09-19T05:58+09:00"
   },
   "errors": [
-    "NIFTY: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
-    "USD/INR: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
-    "Brent: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+    "NIFTY: Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests",
+    "Brent: Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
   ],
-  "note": "v4.1: failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
+  "note": "v4.2: Twelve Data can be enabled through a GitHub Secret. Failed core fetches may retain the previous value for continuity, but are explicitly marked fallback and never qualify as a fresh trading decision.",
   "india_vix": {
     "symbol": "^INDIAVIX",
     "price": null,
@@ -68,9 +70,9 @@
     "status": "not_updated",
     "message": "NIFTYの最新取得に失敗したため、前兆スコアを今回は更新していません。",
     "last_valid_score": {
-      "buy_setup_score": 26,
-      "sell_setup_score": 0,
-      "generated_at_jst": "2026-09-19T18:26:07+09:00"
+      "buy_setup_score": null,
+      "sell_setup_score": null,
+      "generated_at_jst": "2026-09-19T18:55:59+09:00"
     },
     "definition": "前回スコアは参考情報としてのみ保持し、最新判断には使用しません。"
   },
@@ -100,7 +102,6 @@
     },
     "reasons": [
       "NIFTYは今回取得できず、前回取得値を表示しています。",
-      "USD/INRは今回取得できず、前回取得値を表示しています。",
       "Brentは今回取得できず、前回取得値を表示しています。",
       "主要3データが今回すべて更新できていないため、前兆・購入ルールを最新判断として確定しません。",
       "通常取引時間中ではないため、第1弾購入ルールは自動確定しません。"
@@ -111,24 +112,24 @@
         "status": "fallback",
         "fetched_this_run": false,
         "as_of_jst": "2026-09-18T19:00+09:00",
-        "age_minutes": 1436.0,
-        "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+        "age_minutes": 1573.3,
+        "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
       },
       "usdinr": {
         "label": "USD/INR",
-        "status": "fallback",
-        "fetched_this_run": false,
-        "as_of_jst": "2026-09-19T06:50+09:00",
-        "age_minutes": 726.0,
-        "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+        "status": "fresh",
+        "fetched_this_run": true,
+        "as_of_jst": "2026-09-19T06:00+09:00",
+        "age_minutes": 913.3,
+        "error": null
       },
       "brent": {
         "label": "Brent",
         "status": "fallback",
         "fetched_this_run": false,
         "as_of_jst": "2026-09-19T05:58+09:00",
-        "age_minutes": 778.0,
-        "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+        "age_minutes": 915.3,
+        "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
       }
     },
     "all_core_fresh_this_run": false,
@@ -148,28 +149,34 @@
     "detail": "週末。NIFTY価格は 2026/09/18 19:00 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "4.1",
+  "app_version": "4.2",
   "core_fetch": {
     "nifty": {
       "status": "fallback",
       "fetched_this_run": false,
       "reused_previous_value": true,
       "previous_as_of_jst": "2026-09-18T19:00+09:00",
-      "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
     },
     "usdinr": {
-      "status": "fallback",
-      "fetched_this_run": false,
-      "reused_previous_value": true,
-      "previous_as_of_jst": "2026-09-19T06:50+09:00",
-      "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "status": "fresh",
+      "fetched_this_run": true,
+      "as_of_jst": "2026-09-19T06:00+09:00",
+      "provider": "Twelve Data",
+      "provider_symbol": "USD/INR",
+      "error": null
     },
     "brent": {
       "status": "fallback",
       "fetched_this_run": false,
       "reused_previous_value": true,
       "previous_as_of_jst": "2026-09-19T05:58+09:00",
-      "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "error": "Twelve Data: HTTP Error 404: Not Found; Yahoo Finance: query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+    }
+  },
+  "provider_symbols": {
+    "twelvedata": {
+      "usdinr": "USD/INR"
     }
   }
 }
