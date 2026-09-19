@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "index": "NIFTY 50",
+  "basis": "Official NSE price-index daily close cache for technicals/backtests",
+  "source": "not_initialized",
+  "updated_at_jst": null,
+  "records": []
+}
