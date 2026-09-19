@@ -17,7 +17,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,17 +27,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Fetch market data and calculate indicators
+      - name: Fetch market data and calculate analytics
         run: python update_market.py
 
-      - name: Commit market.json
+      - name: Commit market and history data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add market.json
+          git add market.json history.json
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "Update India 14:00 market data"
+            git commit -m "Update India 14:00 market analytics v4"
             git push
           fi
