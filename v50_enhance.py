@@ -7,8 +7,8 @@ import update_market as core
 MARKET=Path("market.json")
 DAILY=Path("nifty_daily_history.json")
 INDICATOR_HISTORY=Path("indicator_history.json")
-APP_VERSION="4.9"
-CHART_METHOD_VERSION="4.9-chart-1"
+APP_VERSION="5.0"
+CHART_METHOD_VERSION="5.0-chart-1"
 CHART_WINDOW=30
 EXTERNAL_HISTORY_LIMIT=120
 
