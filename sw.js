@@ -1,5 +1,5 @@
-const CACHE = "india1400-v4-7-20260920";
-const SHELL = ["./?v=4.7", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v4-8-20260920";
+const SHELL = ["./?v=4.8", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
