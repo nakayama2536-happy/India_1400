@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "updated_at_jst": "2026-09-20T09:24:50+09:00",
+  "series": {
+    "usdinr": [
+      {
+        "date": "2026-09-20",
+        "value": 95.9943,
+        "as_of_jst": "2026-09-20T06:00+09:00",
+        "provider": "Twelve Data"
+      }
+    ],
+    "brent": [
+      {
+        "date": "2026-09-19",
+        "value": 98.77,
+        "as_of_jst": "2026-09-19T06:50+09:00",
+        "provider": "Google Finance"
+      }
+    ],
+    "india_vix": [
+      {
+        "date": "2026-09-18",
+        "value": 11.38,
+        "as_of_jst": "2026-09-18T19:13+09:00",
+        "provider": "Google Finance"
+      }
+    ]
+  }
+}
