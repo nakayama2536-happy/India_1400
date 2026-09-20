@@ -3,10 +3,11 @@ name: Update India 14:00 market data
 on:
   workflow_dispatch:
   schedule:
-    # UTC. 04:57 / 05:03 / 05:08 UTC = 13:57 / 14:03 / 14:08 JST
+    # 14:00 JST check window. Avoid exact :00 to reduce scheduler congestion.
     - cron: '57 4 * * 1-5'
     - cron: '3,8 5 * * 1-5'
-    # UTC. 10:47 UTC = 19:47 JST（インド市場引け後の日足確定用）
+    # 19:47 JST = 16:17 IST, after the regular NSE close.
+    # This persists today's close for the next day's confirmed technicals.
     - cron: '47 10 * * 1-5'
 
 permissions:
@@ -33,7 +34,9 @@ jobs:
           python-version: '3.12'
 
       - name: Fetch market data and calculate analytics
-        run: python update_market.py
+        run: |
+          python update_market.py
+          python v48_enhance.py
 
       - name: Commit market and history data
         run: |
@@ -43,6 +46,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "Update India 14:00 market analytics v4.7"
+            git commit -m "Update India 14:00 market analytics v4.8"
             git push
           fi
