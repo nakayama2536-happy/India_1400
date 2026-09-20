@@ -9,19 +9,20 @@
   <meta name="apple-mobile-web-app-title" content="India 14:00">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>India 14:00 Check v4.9</title>
+  <link rel="icon" href="icon-192.png">
+  <title>India 14:00 Check v5.0</title>
   <style>
-    :root{color-scheme:dark;--bg:#07111f;--card:#0f1b2e;--card2:#0a1525;--line:#263854;--text:#f4f7fb;--muted:#9eb0c8;--ok:#29c777;--ng:#ff7272;--warn:#f4c14b;--accent:#70a9ff;--shadow:0 8px 24px rgba(0,0,0,.18)}
+    :root{color-scheme:dark;--bg:#07111f;--card:#0f1b2e;--card2:#0a1525;--line:#263854;--text:#f4f7fb;--muted:#9eb0c8;--ok:#29c777;--ng:#ff7272;--warn:#f4c14b;--accent:#70a9ff;--c-nifty:#70a9ff;--c-ma5:#f4c14b;--c-ma25:#29c777;--c-ma75:#ff7272;--c-rsi:#59d8ff;--c-macd:#b59cff;--c-usd:#50d6c1;--c-brent:#ff9f43;--c-vix:#ff7ab6;--shadow:0 8px 24px rgba(0,0,0,.18)}
     *{box-sizing:border-box}html{background:var(--bg)}
     body{margin:0;background:linear-gradient(180deg,#07111f 0%,#0a1629 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
     .app{max-width:760px;margin:auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(90px + env(safe-area-inset-bottom))}
-    header{padding:4px 2px 10px}h1{font-size:26px;margin:2px 0 3px}.sub,.small{color:var(--muted);font-size:12px;line-height:1.55}
+    header{padding:4px 2px 10px}.title-row{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}.title-row h1{font-size:26px;margin:2px 0 3px}.version-badge{font-size:10px;line-height:1;margin-top:8px;padding:4px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-weight:750;background:rgba(10,21,37,.72)}.sub,.small{color:var(--muted);font-size:12px;line-height:1.55}
     .card{background:rgba(15,27,46,.97);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
     .hero{border-left:4px solid var(--accent)}.hero.ok{border-left-color:var(--ok)}.hero.warn{border-left-color:var(--warn)}.hero.ng{border-left-color:var(--ng)}
     .eyebrow{font-size:12px;color:var(--muted);font-weight:700}.decision{font-size:34px;font-weight:850;letter-spacing:-.8px;margin:3px 0 4px}.stage{font-size:15px;font-weight:750;color:#dbe7f8}
     .statusline{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:750;background:#0a1525}.pill.ok{color:var(--ok)}.pill.warn{color:var(--warn)}.pill.ng{color:var(--ng)}
     h2{font-size:18px;margin:0 0 12px}h3{font-size:14px;margin:0 0 7px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-    .metric{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}.metric .label{font-size:11px;color:var(--muted);margin-bottom:5px}.metric .value{font-size:18px;font-weight:800;overflow-wrap:anywhere}.metric .detail{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+    .metric{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}.metric .label{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:750}.metric .label.series-nifty,.series-nifty{color:var(--c-nifty)}.metric .label.series-ma5,.series-ma5{color:var(--c-ma5)}.metric .label.series-ma25,.series-ma25{color:var(--c-ma25)}.metric .label.series-ma75,.series-ma75{color:var(--c-ma75)}.metric .label.series-rsi,.series-rsi{color:var(--c-rsi)}.metric .label.series-macd,.series-macd{color:var(--c-macd)}.metric .label.series-usd,.series-usd{color:var(--c-usd)}.metric .label.series-brent,.series-brent{color:var(--c-brent)}.metric .label.series-vix,.series-vix{color:var(--c-vix)}.metric .value{font-size:18px;font-weight:800;overflow-wrap:anywhere}.metric .detail{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
     .forecast{background:var(--card2);border:1px solid var(--line);border-radius:15px;padding:12px;text-align:center}.forecast .day{font-size:12px;color:var(--muted)}.forecast .dir{font-size:19px;font-weight:850;margin:4px 0}.forecast .ret{font-size:14px;font-weight:750}.forecast .range{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
     .up{color:var(--ok)}.down{color:var(--ng)}.neutral{color:var(--warn)}
     .reason{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.45}.reason:last-child{border-bottom:0}.dot{width:8px;height:8px;border-radius:999px;margin-top:5px;flex:0 0 auto;background:var(--accent)}
@@ -33,13 +34,13 @@
     .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#e9f1ff;color:#08111f;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:750;opacity:0;pointer-events:none;transition:.2s;z-index:50;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     @media(max-width:430px){.grid3{grid-template-columns:repeat(3,1fr)}.forecast{padding:10px 6px}.forecast .dir{font-size:16px}.decision{font-size:31px}}
   
-    .chart-card{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:11px;margin-top:10px}.chart-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:6px}.chart-title{font-size:13px;font-weight:800}.chart-meta{font-size:10px;color:var(--muted);text-align:right}.chart{width:100%;height:132px;display:block;overflow:visible}.chart text{font-size:9px;fill:var(--muted)}.chart .gridline{stroke:var(--line);stroke-width:1}.chart .guide{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4;opacity:.7}.chart .line-main{fill:none;stroke:var(--accent);stroke-width:2.4}.chart .line-ma5{fill:none;stroke:#f4c14b;stroke-width:1.5}.chart .line-ma25{fill:none;stroke:#29c777;stroke-width:1.5}.chart .line-ma75{fill:none;stroke:#ff7272;stroke-width:1.5}.chart .line-rsi{fill:none;stroke:var(--accent);stroke-width:2.2}.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:4px}.external-chart-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-top:10px}.history-wait{height:84px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;border:1px dashed var(--line);border-radius:10px}
+    .chart-card{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:11px;margin-top:10px}.chart-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:6px}.chart-title{font-size:13px;font-weight:800}.chart-meta{font-size:10px;color:var(--muted);text-align:right}.chart{width:100%;height:132px;display:block;overflow:visible}.chart text{font-size:9px;fill:var(--muted)}.chart .gridline{stroke:var(--line);stroke-width:1}.chart .guide{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4;opacity:.7}.chart .line-main{fill:none;stroke:var(--c-nifty);stroke-width:2.4}.chart .line-ma5{fill:none;stroke:var(--c-ma5);stroke-width:1.5}.chart .line-ma25{fill:none;stroke:var(--c-ma25);stroke-width:1.5}.chart .line-ma75{fill:none;stroke:var(--c-ma75);stroke-width:1.5}.chart .line-rsi{fill:none;stroke:var(--c-rsi);stroke-width:2.2}.chart .line-macd{fill:none;stroke:var(--c-macd);stroke-width:2.2}.chart .line-usd{fill:none;stroke:var(--c-usd);stroke-width:2.2}.chart .line-brent{fill:none;stroke:var(--c-brent);stroke-width:2.2}.chart .line-vix{fill:none;stroke:var(--c-vix);stroke-width:2.2}.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px;font-size:10px}.legend i{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:4px}.external-chart-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-top:10px}.history-wait{height:84px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;border:1px dashed var(--line);border-radius:10px}.history-wait.compact{height:48px}.source-list{display:grid;gap:0}.source-row{display:grid;grid-template-columns:104px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.source-row:last-child{border-bottom:0}.source-name{font-weight:800;color:#dce7f7}.source-detail{color:var(--muted);overflow-wrap:anywhere;line-height:1.55}
   </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <h1>India 14:00 Check <span class="small">v4.9</span></h1>
+    <div class="title-row"><h1>India 14:00 Check</h1><span class="version-badge">v5.0</span></div>
     <div class="sub">3分割売買目安＋1・3・14営業日予測＋指標ミニグラフ</div>
   </header>
 
@@ -78,18 +79,18 @@
     <div class="card">
       <h2>NIFTYテクニカル</h2>
       <div id="niftyMetrics" class="grid"></div>
-      <div class="chart-card"><div class="chart-head"><div class="chart-title">NIFTY＋移動平均</div><div id="niftyChartMeta" class="chart-meta">直近30営業日</div></div><div id="niftyChart"></div><div class="legend"><span><i style="background:#70a9ff"></i>NIFTY</span><span><i style="background:#f4c14b"></i>MA5</span><span><i style="background:#29c777"></i>MA25</span><span><i style="background:#ff7272"></i>MA75</span></div></div>
-      <div class="chart-card"><div class="chart-head"><div class="chart-title">RSI(14)</div><div class="chart-meta">30＝低位 / 70＝高位</div></div><div id="rsiChart"></div></div>
-      <div class="chart-card"><div class="chart-head"><div class="chart-title">MACD Histogram</div><div class="chart-meta">0ラインと改善方向を確認</div></div><div id="macdChart"></div></div>
+      <div class="chart-card"><div class="chart-head"><div class="chart-title series-nifty">NIFTY＋移動平均</div><div id="niftyChartMeta" class="chart-meta">直近30営業日</div></div><div id="niftyChart"></div><div class="legend"><span class="series-nifty"><i style="background:var(--c-nifty)"></i>NIFTY</span><span class="series-ma5"><i style="background:var(--c-ma5)"></i>MA5</span><span class="series-ma25"><i style="background:var(--c-ma25)"></i>MA25</span><span class="series-ma75"><i style="background:var(--c-ma75)"></i>MA75</span></div></div>
+      <div class="chart-card"><div class="chart-head"><div class="chart-title series-rsi">RSI(14)</div><div class="chart-meta">30＝低位 / 70＝高位</div></div><div id="rsiChart"></div></div>
+      <div class="chart-card"><div class="chart-head"><div class="chart-title series-macd">MACD Histogram</div><div class="chart-meta">0ラインと改善方向を確認</div></div><div id="macdChart"></div></div>
     </div>
     <div class="card">
       <h2>外部環境</h2>
       <div id="externalMetrics" class="grid"></div>
       <div id="externalRisk" class="note" style="margin-top:10px">--</div>
       <div class="external-chart-grid">
-        <div class="chart-card"><div class="chart-head"><div class="chart-title">USD/INR</div><div id="usdChartMeta" class="chart-meta">履歴蓄積中</div></div><div id="usdChart"></div></div>
-        <div class="chart-card"><div class="chart-head"><div class="chart-title">Brent</div><div id="brentChartMeta" class="chart-meta">履歴蓄積中</div></div><div id="brentChart"></div></div>
-        <div class="chart-card"><div class="chart-head"><div class="chart-title">India VIX</div><div id="vixChartMeta" class="chart-meta">履歴蓄積中</div></div><div id="vixChart"></div></div>
+        <div class="chart-card"><div class="chart-head"><div class="chart-title series-usd">USD/INR</div><div id="usdChartMeta" class="chart-meta">履歴蓄積中</div></div><div id="usdChart"></div></div>
+        <div class="chart-card"><div class="chart-head"><div class="chart-title series-brent">Brent</div><div id="brentChartMeta" class="chart-meta">履歴蓄積中</div></div><div id="brentChart"></div></div>
+        <div class="chart-card"><div class="chart-head"><div class="chart-title series-vix">India VIX</div><div id="vixChartMeta" class="chart-meta">履歴蓄積中</div></div><div id="vixChart"></div></div>
       </div>
     </div>
     <div class="card"><h2>データ時刻・取得元</h2><div id="dataTimes" class="small">--</div></div>
@@ -137,7 +138,7 @@ const dc=$("decisionCard");dc.className="card hero "+(g.action_code==="SELL_CAUT
 const hs=f.horizons||{};$("forecastCards").innerHTML=forecastCard(hs["1"],"1営業日")+forecastCard(hs["3"],"3営業日")+forecastCard(hs["14"],"14営業日");
 const rs=g.reasons||[];$("reasons").innerHTML=rs.length?rs.map(x=>`<div class="reason"><span class="dot"></span><div>${x}</div></div>`).join(""):`<div class="note">判断理由を算出できません。</div>`;
 const bc=Number(g.buy_condition_count||0),bt=Number(g.buy_condition_total||5),sc=Number(g.sell_condition_count||0),st=Number(g.sell_condition_total||4);setText("buyCount",`${bc}/${bt}`);setText("sellCount",`${sc}/${st}`);$("buyBar").style.width=`${bt?bc/bt*100:0}%`;$("sellBar").style.width=`${st?sc/st*100:0}%`;setText("generatedAt",`生成 ${market?.generated_at_jst||"--"}`)}
-function metric(l,v,d=""){return`<div class="metric"><div class="label">${l}</div><div class="value">${v}</div><div class="detail">${d}</div></div>`}
+function metric(l,v,d="",c=""){return`<div class="metric"><div class="label ${c}">${l}</div><div class="value">${v}</div><div class="detail">${d}</div></div>`}
 
 function chartSvg(points,series,guides){
   guides=guides||[];
@@ -166,11 +167,11 @@ function renderIndicators(){
   var nc=cd.nifty||{};
   $("niftyChart").innerHTML=chartSvg(nc.price||[],[{key:"close",cls:"line-main"},{key:"ma5",cls:"line-ma5"},{key:"ma25",cls:"line-ma25"},{key:"ma75",cls:"line-ma75"}],[]);
   $("rsiChart").innerHTML=chartSvg(nc.rsi14||[],[{key:"value",cls:"line-rsi"}],[{value:30,label:"30"},{value:70,label:"70"}]);
-  $("macdChart").innerHTML=chartSvg(nc.macd_hist||[],[{key:"value",cls:"line-main"}],[{value:0,label:"0"}]);
+  $("macdChart").innerHTML=chartSvg(nc.macd_hist||[],[{key:"value",cls:"line-macd"}],[{value:0,label:"0"}]);
   setText("niftyChartMeta",nc.available===false?"履歴不足":"直近"+(nc.window_trading_days||30)+"営業日");
   $("externalMetrics").innerHTML=metric("USD/INR",fmt(u.price,4),"5日 "+signed(u.change_5d_pct,2,"%"))+metric("Brent",fmt(b.price,2),"5日 "+signed(b.change_5d_pct,2,"%"))+metric("India VIX",fmt(v.price,2),"5日 "+signed(v.change_5d_pct,2,"%"))+metric("外部環境",g.external_risk==="CAUTION"?"警戒":"通常",(g.external_risk_factors||[]).join(" / ")||"大きな警戒条件なし");
   setText("externalRisk",g.external_risk==="CAUTION"?"外部環境警戒："+(g.external_risk_factors||[]).join(" / "):"外部環境は売買段階を押し上げず、悪化時だけ慎重判定に使います。");
-  var ext=cd.external||{};simpleExternalChart("usdChart","usdChartMeta",ext.usdinr);simpleExternalChart("brentChart","brentChartMeta",ext.brent);simpleExternalChart("vixChart","vixChartMeta",ext.india_vix);
+  var ext=cd.external||{};simpleExternalChart("usdChart","usdChartMeta",ext.usdinr,"line-usd");simpleExternalChart("brentChart","brentChartMeta",ext.brent,"line-brent");simpleExternalChart("vixChart","vixChartMeta",ext.india_vix,"line-vix");
   setText("dataTimes","NIFTY現在値 "+(n.as_of_jst||"--")+" / "+(src.nifty_current?.provider||n.provider||"--")+"\nNIFTY日足履歴 "+(src.nifty_history?.last_date||n.technical_date||"--")+" / "+(src.nifty_history?.provider||"--")+"\nUSD/INR "+(u.as_of_jst||"--")+" / "+(u.provider||"--")+"\nBrent "+(b.as_of_jst||"--")+" / "+(b.provider||"--")+"\nVIX "+(v.as_of_jst||"--")+" / "+(v.provider||"--"));
 }
 function renderForecast(){const f=market?.technical_forecast||{};if(!f.available){setText("forecastBasis",f.message||"予測を算出できません。");$("forecastTable").innerHTML="--";return}setText("forecastBasis",`${f.basis} / 基準 ${f.basis_date} / 類似 ${f.analog_count}局面 / ${f.method}`);const hs=f.horizons||{};$("forecastTable").innerHTML=`<table class="table"><thead><tr><th>期間</th><th>方向</th><th>中央値</th><th>予測価格中央値</th><th>中央50%価格</th><th>過去上昇割合</th></tr></thead><tbody>${[1,3,14].map(d=>{const h=hs[String(d)]||{};return`<tr><td>${d}営業日</td><td class="${dirClass(h.label)}">${h.label||"--"}</td><td>${signed(h.median_return_pct,2,"%")}</td><td>${fmt(h.median_price,0)}</td><td>${fmt(h.q25_price,0)}～${fmt(h.q75_price,0)}</td><td>${fmt(h.historical_up_share_pct,1)}%</td></tr>`}).join("")}</tbody></table><div class="small" style="margin-top:10px">${f.warning||""}</div>`}
