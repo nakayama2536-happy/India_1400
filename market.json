@@ -30,24 +30,9 @@
     "price_vs_ma75_pct": -2.73,
     "technical_basis": "前営業日までの確定日足",
     "provisional": {
-      "available": true,
-      "basis": "14:00時点価格を当日終値と仮定した暫定計算",
-      "date": "2026-09-18",
-      "price": 23346.4,
-      "ma5": 23270.26,
-      "ma25": 23875.81,
-      "ma75": 24002.02,
-      "rsi14": 33.66,
-      "rsi14_prev": 29.95,
-      "macd": -257.38,
-      "macd_signal": -199.911,
-      "macd_hist": -57.469,
-      "macd_hist_prev": -75.578,
-      "ret5_pct": -0.56,
-      "vol20_annualized_pct": 7.12,
-      "price_vs_ma5_pct": 0.33,
-      "price_vs_ma25_pct": -2.22,
-      "price_vs_ma75_pct": -2.73
+      "available": false,
+      "basis": "休場・時間外のため14:00暫定テクニカルは使用しません。確定日足を参照します。",
+      "date": "2026-09-18"
     }
   },
   "usdinr": {
@@ -67,7 +52,7 @@
     "change_5d_pct": null
   },
   "errors": [],
-  "note": "v4.8 decision-focused: three-step buy/sell guidance plus 1/3/14-trading-day technical statistical forecasts. Scores remain audit-only; the primary UI shows transparent conditions and data-quality gating.",
+  "note": "v4.9 decision-focused: v4.8 guidance/forecast plus compact indicator charts and external-indicator history.",
   "india_vix": {
     "symbol": "^INDIAVIX",
     "provider": "Google Finance",
@@ -247,7 +232,7 @@
         "sample_count": 496,
         "sample_adequacy": "高",
         "avg_return_pct": 0.13,
-        "up_rate_pct": 55.0,
+        "up_rate_pct": 55,
         "excess_vs_baseline_pct": 0.09
       },
       {
@@ -282,7 +267,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": -0.14,
         "median_return_pct": -0.43,
-        "up_rate_pct": 20.0,
+        "up_rate_pct": 20,
         "excess_vs_baseline_pct": -1.06
       },
       {
@@ -291,7 +276,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": -1.17,
         "median_return_pct": -1.29,
-        "up_rate_pct": 30.0,
+        "up_rate_pct": 30,
         "excess_vs_baseline_pct": -2.09
       },
       {
@@ -300,7 +285,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": -1.39,
         "median_return_pct": 1.34,
-        "up_rate_pct": 70.0,
+        "up_rate_pct": 70,
         "excess_vs_baseline_pct": -2.31
       },
       {
@@ -309,7 +294,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 3.71,
         "median_return_pct": 2.44,
-        "up_rate_pct": 80.0,
+        "up_rate_pct": 80,
         "excess_vs_baseline_pct": 2.79
       },
       {
@@ -318,7 +303,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 0.76,
         "median_return_pct": 0.73,
-        "up_rate_pct": 50.0,
+        "up_rate_pct": 50,
         "excess_vs_baseline_pct": -0.16
       },
       {
@@ -327,7 +312,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 1.58,
         "median_return_pct": 1.12,
-        "up_rate_pct": 60.0,
+        "up_rate_pct": 60,
         "excess_vs_baseline_pct": 0.65
       },
       {
@@ -336,7 +321,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 2.87,
         "median_return_pct": 3.43,
-        "up_rate_pct": 80.0,
+        "up_rate_pct": 80,
         "excess_vs_baseline_pct": 1.95
       },
       {
@@ -345,7 +330,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 1.14,
         "median_return_pct": 0.14,
-        "up_rate_pct": 50.0,
+        "up_rate_pct": 50,
         "excess_vs_baseline_pct": 0.22
       },
       {
@@ -363,7 +348,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 0.89,
         "median_return_pct": 1.91,
-        "up_rate_pct": 70.0,
+        "up_rate_pct": 70,
         "excess_vs_baseline_pct": -0.03
       },
       {
@@ -372,8 +357,8 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 1.92,
         "median_return_pct": 1.69,
-        "up_rate_pct": 60.0,
-        "excess_vs_baseline_pct": 1.0
+        "up_rate_pct": 60,
+        "excess_vs_baseline_pct": 1
       },
       {
         "month": 12,
@@ -381,7 +366,7 @@
         "sample_adequacy": "不足",
         "avg_return_pct": 1.55,
         "median_return_pct": 0.4,
-        "up_rate_pct": 50.0,
+        "up_rate_pct": 50,
         "excess_vs_baseline_pct": 0.62
       }
     ],
@@ -464,7 +449,7 @@
         "sample_adequacy": "中",
         "calibration": "WEAK_OR_CONTRADICTORY",
         "success_rate_20d_pct": 62.2,
-        "success_rate_lift_vs_baseline_pctpt": -1.0,
+        "success_rate_lift_vs_baseline_pctpt": -1,
         "avg_return_5d_pct": 0.08,
         "avg_return_20d_pct": 0.43,
         "median_return_20d_pct": 0.87,
@@ -589,7 +574,7 @@
         "sample_count": 120,
         "sample_adequacy": "高",
         "calibration": "WEAK_OR_CONTRADICTORY",
-        "success_rate_20d_pct": 30.0,
+        "success_rate_20d_pct": 30,
         "success_rate_lift_vs_baseline_pctpt": -6.8,
         "avg_return_5d_pct": 0.26,
         "avg_return_20d_pct": 1.41,
@@ -644,7 +629,7 @@
         "sample_count": 10,
         "sample_adequacy": "不足",
         "calibration": "INSUFFICIENT",
-        "success_rate_20d_pct": 10.0,
+        "success_rate_20d_pct": 10,
         "success_rate_lift_vs_baseline_pctpt": -26.8,
         "avg_return_5d_pct": 0.68,
         "avg_return_20d_pct": 2.57,
@@ -771,7 +756,7 @@
     "detail": "週末。NIFTY価格は 2026/09/18 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "4.8",
+  "app_version": "4.9",
   "core_fetch": {
     "nifty": {
       "status": "fresh",
@@ -841,7 +826,8 @@
   "analysis_meta": {
     "method_version": "4.8-stat-1",
     "window_years": 10,
-    "principle": "14:00暫定値と確定日足を分離。売買目安は透明な条件判定、短期予測は直近10年の類似局面による1・3・14営業日分布。"
+    "principle": "14:00暫定値と確定日足を分離。売買目安は透明な条件判定、短期予測は直近10年の類似局面による1・3・14営業日分布。",
+    "chart_method_version": "4.9-chart-1"
   },
   "data_lineage": {
     "fetched_at_jst": "2026-09-20T09:24:50+09:00",
@@ -859,7 +845,7 @@
         "data_age_minutes": 2303.8,
         "status": "fresh",
         "fallback_used": false,
-        "provisional": true,
+        "provisional": false,
         "market_open": false
       },
       "usdinr": {
@@ -889,7 +875,7 @@
       "technical_date": "2026-09-18",
       "technical_status": "fresh",
       "technical_basis": "前営業日までの確定日足",
-      "provisional_available": true
+      "provisional_available": false
     },
     "history": {
       "source": "Tickjournal recent-history bridge + self-maintained Google close",
@@ -926,7 +912,7 @@
         "mean_return_pct": 0.34,
         "q25_return_pct": -0.65,
         "q75_return_pct": 0.93,
-        "historical_up_share_pct": 65.0,
+        "historical_up_share_pct": 65,
         "median_price": 23483.47,
         "q25_price": 23195.33,
         "q75_price": 23563.17,
@@ -942,7 +928,7 @@
         "mean_return_pct": 0.59,
         "q25_return_pct": -0.74,
         "q75_return_pct": 1.47,
-        "historical_up_share_pct": 70.0,
+        "historical_up_share_pct": 70,
         "median_price": 23488.28,
         "q25_price": 23172.47,
         "q75_price": 23690.57,
@@ -958,7 +944,7 @@
         "mean_return_pct": 0.8,
         "q25_return_pct": -1.39,
         "q75_return_pct": 2.63,
-        "historical_up_share_pct": 55.0,
+        "historical_up_share_pct": 55,
         "median_price": 23548.68,
         "q25_price": 23022.45,
         "q75_price": 23959.33,
@@ -1051,5 +1037,508 @@
       "○ 5日線回復：23346 / MA5 23270"
     ],
     "rule_note": "3分割の市場段階を示す目安です。実際の注文は、既に実施した購入段階・資金配分・投信締切を確認して決定してください。"
+  },
+  "chart_data": {
+    "available": true,
+    "method_version": "4.9-chart-1",
+    "window_trading_days": 30,
+    "nifty": {
+      "available": true,
+      "window_trading_days": 30,
+      "price": [
+        {
+          "date": "2026-08-07",
+          "close": 24570.65,
+          "ma5": 24644.1,
+          "ma25": 24233.67,
+          "ma75": 23959.75
+        },
+        {
+          "date": "2026-08-10",
+          "close": 24583.8,
+          "ma5": 24606,
+          "ma25": 24239.8,
+          "ma75": 23962.49
+        },
+        {
+          "date": "2026-08-11",
+          "close": 24471.7,
+          "ma5": 24577.36,
+          "ma25": 24242.72,
+          "ma75": 23966.48
+        },
+        {
+          "date": "2026-08-12",
+          "close": 24435.95,
+          "ma5": 24539.62,
+          "ma25": 24264.88,
+          "ma75": 23973.65
+        },
+        {
+          "date": "2026-08-13",
+          "close": 24395.85,
+          "ma5": 24491.59,
+          "ma25": 24282.2,
+          "ma75": 23977.69
+        },
+        {
+          "date": "2026-08-14",
+          "close": 24366,
+          "ma5": 24450.66,
+          "ma25": 24288.57,
+          "ma75": 23982.63
+        },
+        {
+          "date": "2026-08-17",
+          "close": 24287.65,
+          "ma5": 24391.43,
+          "ma25": 24291.63,
+          "ma75": 23984.1
+        },
+        {
+          "date": "2026-08-18",
+          "close": 24154.9,
+          "ma5": 24328.07,
+          "ma25": 24295.75,
+          "ma75": 23986.19
+        },
+        {
+          "date": "2026-08-19",
+          "close": 24078.3,
+          "ma5": 24256.54,
+          "ma25": 24295.74,
+          "ma75": 23985.65
+        },
+        {
+          "date": "2026-08-20",
+          "close": 24231.85,
+          "ma5": 24223.74,
+          "ma25": 24302.1,
+          "ma75": 23988.3
+        },
+        {
+          "date": "2026-08-21",
+          "close": 24252,
+          "ma5": 24200.94,
+          "ma25": 24298.81,
+          "ma75": 23987.25
+        },
+        {
+          "date": "2026-08-24",
+          "close": 24219.05,
+          "ma5": 24187.22,
+          "ma25": 24298.03,
+          "ma75": 23985.81
+        },
+        {
+          "date": "2026-08-25",
+          "close": 24334.55,
+          "ma5": 24223.15,
+          "ma25": 24303.91,
+          "ma75": 23987.93
+        },
+        {
+          "date": "2026-08-26",
+          "close": 24207.75,
+          "ma5": 24249.04,
+          "ma25": 24312.37,
+          "ma75": 23993.15
+        },
+        {
+          "date": "2026-08-27",
+          "close": 24090.85,
+          "ma5": 24220.84,
+          "ma25": 24321.22,
+          "ma75": 24002.63
+        },
+        {
+          "date": "2026-08-28",
+          "close": 24175.65,
+          "ma5": 24205.57,
+          "ma25": 24337.54,
+          "ma75": 24012.81
+        },
+        {
+          "date": "2026-08-31",
+          "close": 24080.4,
+          "ma5": 24177.84,
+          "ma25": 24340.92,
+          "ma75": 24018.02
+        },
+        {
+          "date": "2026-09-01",
+          "close": 24055.8,
+          "ma5": 24122.09,
+          "ma25": 24343.74,
+          "ma75": 24023.52
+        },
+        {
+          "date": "2026-09-02",
+          "close": 23914.45,
+          "ma5": 24063.43,
+          "ma25": 24330.31,
+          "ma75": 24027.04
+        },
+        {
+          "date": "2026-09-03",
+          "close": 23873.45,
+          "ma5": 24019.95,
+          "ma25": 24312.56,
+          "ma75": 24030.45
+        },
+        {
+          "date": "2026-09-04",
+          "close": 23897.7,
+          "ma5": 23964.36,
+          "ma25": 24293.13,
+          "ma75": 24033.63
+        },
+        {
+          "date": "2026-09-07",
+          "close": 23779.15,
+          "ma5": 23904.11,
+          "ma25": 24253.32,
+          "ma75": 24035.29
+        },
+        {
+          "date": "2026-09-08",
+          "close": 23635.1,
+          "ma5": 23819.97,
+          "ma25": 24214.13,
+          "ma75": 24034.17
+        },
+        {
+          "date": "2026-09-09",
+          "close": 23431.5,
+          "ma5": 23723.38,
+          "ma25": 24166.4,
+          "ma75": 24026.17
+        },
+        {
+          "date": "2026-09-10",
+          "close": 23477.8,
+          "ma5": 23644.25,
+          "ma25": 24120.07,
+          "ma75": 24020.35
+        },
+        {
+          "date": "2026-09-11",
+          "close": 23398.1,
+          "ma5": 23544.33,
+          "ma25": 24073.17,
+          "ma75": 24013.57
+        },
+        {
+          "date": "2026-09-15",
+          "close": 23118.6,
+          "ma5": 23412.22,
+          "ma25": 24014.56,
+          "ma75": 24007.84
+        },
+        {
+          "date": "2026-09-16",
+          "close": 23217.6,
+          "ma5": 23328.72,
+          "ma25": 23964.4,
+          "ma75": 24005.64
+        },
+        {
+          "date": "2026-09-17",
+          "close": 23270.6,
+          "ma5": 23296.54,
+          "ma25": 23917.79,
+          "ma75": 24002.81
+        },
+        {
+          "date": "2026-09-18",
+          "close": 23346.4,
+          "ma5": 23270.26,
+          "ma25": 23875.81,
+          "ma75": 24002.02
+        }
+      ],
+      "rsi14": [
+        {
+          "date": "2026-08-07",
+          "value": 59.89
+        },
+        {
+          "date": "2026-08-10",
+          "value": 60.21
+        },
+        {
+          "date": "2026-08-11",
+          "value": 56.1
+        },
+        {
+          "date": "2026-08-12",
+          "value": 54.81
+        },
+        {
+          "date": "2026-08-13",
+          "value": 53.33
+        },
+        {
+          "date": "2026-08-14",
+          "value": 52.21
+        },
+        {
+          "date": "2026-08-17",
+          "value": 49.26
+        },
+        {
+          "date": "2026-08-18",
+          "value": 44.67
+        },
+        {
+          "date": "2026-08-19",
+          "value": 42.22
+        },
+        {
+          "date": "2026-08-20",
+          "value": 48.33
+        },
+        {
+          "date": "2026-08-21",
+          "value": 49.09
+        },
+        {
+          "date": "2026-08-24",
+          "value": 47.85
+        },
+        {
+          "date": "2026-08-25",
+          "value": 52.39
+        },
+        {
+          "date": "2026-08-26",
+          "value": 47.5
+        },
+        {
+          "date": "2026-08-27",
+          "value": 43.47
+        },
+        {
+          "date": "2026-08-28",
+          "value": 46.98
+        },
+        {
+          "date": "2026-08-31",
+          "value": 43.7
+        },
+        {
+          "date": "2026-09-01",
+          "value": 42.86
+        },
+        {
+          "date": "2026-09-02",
+          "value": 38.34
+        },
+        {
+          "date": "2026-09-03",
+          "value": 37.11
+        },
+        {
+          "date": "2026-09-04",
+          "value": 38.37
+        },
+        {
+          "date": "2026-09-07",
+          "value": 34.72
+        },
+        {
+          "date": "2026-09-08",
+          "value": 30.88
+        },
+        {
+          "date": "2026-09-09",
+          "value": 26.44
+        },
+        {
+          "date": "2026-09-10",
+          "value": 28.94
+        },
+        {
+          "date": "2026-09-11",
+          "value": 27.22
+        },
+        {
+          "date": "2026-09-15",
+          "value": 22.23
+        },
+        {
+          "date": "2026-09-16",
+          "value": 27.31
+        },
+        {
+          "date": "2026-09-17",
+          "value": 29.95
+        },
+        {
+          "date": "2026-09-18",
+          "value": 33.66
+        }
+      ],
+      "macd_hist": [
+        {
+          "date": "2026-08-07",
+          "value": 46.421
+        },
+        {
+          "date": "2026-08-10",
+          "value": 37.903
+        },
+        {
+          "date": "2026-08-11",
+          "value": 22.267
+        },
+        {
+          "date": "2026-08-12",
+          "value": 7.811
+        },
+        {
+          "date": "2026-08-13",
+          "value": -5.443
+        },
+        {
+          "date": "2026-08-14",
+          "value": -16.582
+        },
+        {
+          "date": "2026-08-17",
+          "value": -28.87
+        },
+        {
+          "date": "2026-08-18",
+          "value": -44.638
+        },
+        {
+          "date": "2026-08-19",
+          "value": -58.077
+        },
+        {
+          "date": "2026-08-20",
+          "value": -54.531
+        },
+        {
+          "date": "2026-08-21",
+          "value": -48.914
+        },
+        {
+          "date": "2026-08-24",
+          "value": -45.571
+        },
+        {
+          "date": "2026-08-25",
+          "value": -34.251
+        },
+        {
+          "date": "2026-08-26",
+          "value": -33.909
+        },
+        {
+          "date": "2026-08-27",
+          "value": -39.757
+        },
+        {
+          "date": "2026-08-28",
+          "value": -36.216
+        },
+        {
+          "date": "2026-08-31",
+          "value": -38.383
+        },
+        {
+          "date": "2026-09-01",
+          "value": -39.418
+        },
+        {
+          "date": "2026-09-02",
+          "value": -47.05
+        },
+        {
+          "date": "2026-09-03",
+          "value": -51.905
+        },
+        {
+          "date": "2026-09-04",
+          "value": -50.484
+        },
+        {
+          "date": "2026-09-07",
+          "value": -54.201
+        },
+        {
+          "date": "2026-09-08",
+          "value": -62.447
+        },
+        {
+          "date": "2026-09-09",
+          "value": -76.758
+        },
+        {
+          "date": "2026-09-10",
+          "value": -77.997
+        },
+        {
+          "date": "2026-09-11",
+          "value": -78.841
+        },
+        {
+          "date": "2026-09-15",
+          "value": -91.964
+        },
+        {
+          "date": "2026-09-16",
+          "value": -87.731
+        },
+        {
+          "date": "2026-09-17",
+          "value": -75.578
+        },
+        {
+          "date": "2026-09-18",
+          "value": -57.469
+        }
+      ]
+    },
+    "external": {
+      "usdinr": [
+        {
+          "date": "2026-09-20",
+          "value": 95.9943,
+          "as_of_jst": "2026-09-20T06:00+09:00",
+          "provider": "Twelve Data"
+        }
+      ],
+      "brent": [
+        {
+          "date": "2026-09-19",
+          "value": 98.77,
+          "as_of_jst": "2026-09-19T06:50+09:00",
+          "provider": "Google Finance"
+        }
+      ],
+      "india_vix": [
+        {
+          "date": "2026-09-18",
+          "value": 11.38,
+          "as_of_jst": "2026-09-18T19:13+09:00",
+          "provider": "Google Finance"
+        }
+      ]
+    },
+    "external_history_note": "USD/INR・Brent・India VIXはv4.9以降の取得値を蓄積して表示します。"
+  },
+  "source_summary": {
+    "nifty_current": {
+      "provider": "Google Finance + NSE Indices",
+      "as_of_jst": "2026-09-18T19:01+09:00"
+    },
+    "nifty_history": {
+      "provider": "Tickjournal recent-history bridge + self-maintained Google close",
+      "last_date": "2026-09-18",
+      "rows": 6490
+    }
   }
 }
