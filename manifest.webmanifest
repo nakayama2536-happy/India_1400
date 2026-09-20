@@ -1,8 +1,8 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "description": "インド株14:00定点確認 v4.7・データ系譜監査・履歴連続性・直近10年統計・前兆・1か月見通し",
-  "start_url": "./?v=4.7",
+  "description": "インド株14:00定点確認 v4.8・3分割売買目安・1/3/14営業日テクニカル予測・データ品質",
+  "start_url": "./?v=4.8",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
