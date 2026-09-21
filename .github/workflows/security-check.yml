@@ -1,0 +1,41 @@
+name: Security Check
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  secret-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Reject tracked secret files
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad_files="$(git ls-files | grep -E '(^|/)(\.env($|\.)|.*\.(pem|key|p12|pfx)$)' || true)"
+          if [ -n "$bad_files" ]; then
+            echo "Potential secret files are tracked:"
+            echo "$bad_files"
+            exit 1
+          fi
+
+      - name: Scan for common credential patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          patterns='(ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sk-[A-Za-z0-9_-]{20,})'
+          if git grep -nEI "$patterns" -- . ':!*.png' ':!*.jpg' ':!*.jpeg' ':!*.webp' ':!*.ico'; then
+            echo "Potential credential detected. Review before publishing."
+            exit 1
+          fi
+          echo "No common credential patterns detected."
