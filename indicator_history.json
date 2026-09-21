@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_jst": "2026-09-21T19:36:49+09:00",
+  "updated_at_jst": "2026-09-22T01:37:00+09:00",
   "series": {
     "usdinr": [
       {
@@ -11,7 +11,7 @@
       },
       {
         "date": "2026-09-21",
-        "value": 95.8194,
+        "value": 95.7704,
         "as_of_jst": "2026-09-21T06:00+09:00",
         "provider": "Twelve Data"
       }
@@ -28,6 +28,12 @@
         "value": 96.78,
         "as_of_jst": "2026-09-21T19:19+09:00",
         "provider": "Google Finance"
+      },
+      {
+        "date": "2026-09-22",
+        "value": 95.45,
+        "as_of_jst": "2026-09-22T01:19+09:00",
+        "provider": "Google Finance"
       }
     ],
     "india_vix": [
@@ -39,8 +45,8 @@
       },
       {
         "date": "2026-09-21",
-        "value": 11.22,
-        "as_of_jst": "2026-09-21T18:47+09:00",
+        "value": 11.25,
+        "as_of_jst": "2026-09-21T19:12+09:00",
         "provider": "Google Finance"
       }
     ]
