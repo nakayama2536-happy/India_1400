@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "method_version": "5.7-candle-1",
+  "basis": "NIFTY daily OHLC for optional detailed chart only",
+  "records": [],
+  "source_reports": []
+}
