@@ -52,7 +52,7 @@
     "change_5d_pct": null
   },
   "errors": [],
-  "note": "v5.2 reliability: forecast and three-step market stage use one time-consistent technical snapshot.",
+  "note": "v5.4 reliability: fixed market-state and data-freshness classifications.",
   "india_vix": {
     "symbol": "^INDIAVIX",
     "provider": "Google Finance",
@@ -761,7 +761,7 @@
     "detail": "NIFTY価格は 2026/09/21 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "5.3",
+  "app_version": "5.4",
   "core_fetch": {
     "nifty": {
       "status": "fresh",
@@ -834,10 +834,11 @@
     "principle": "14:00暫定値と確定日足を分離。売買目安は透明な条件判定、短期予測は直近10年の類似局面による1・3・14営業日分布。",
     "chart_method_version": "5.0-chart-1",
     "decision_gate_version": "5.1-gate-1",
-    "release_version": "5.3",
+    "release_version": "5.4",
     "basis_method_version": "5.2-basis-1",
     "basis_principle": "取引中は当日暫定スナップショット、時間外は最新確定日足スナップショットを使用し、価格・MA・RSI・MACD・1/3/14営業日予測を同一時点に統一。",
-    "history_method_version": "5.3-history-1"
+    "history_method_version": "5.3-history-1",
+    "status_method_version": "5.4-status-1"
   },
   "data_lineage": {
     "fetched_at_jst": "2026-09-22T01:37:00+09:00",
@@ -1596,8 +1597,10 @@
         "date": null,
         "provider": "GitHub Actions",
         "age_minutes": 0,
-        "freshness": "生成",
-        "basis": "この画面の判定を生成した時刻"
+        "freshness": "最新",
+        "basis": "この画面の判定を生成した時刻",
+        "freshness_code": "LATEST",
+        "status_note": "判定生成時刻"
       },
       {
         "key": "nifty_current",
@@ -1607,8 +1610,10 @@
         "date": null,
         "provider": "Google Finance + NSE Indices",
         "age_minutes": 396,
-        "freshness": "要確認",
-        "basis": "現在値"
+        "freshness": "参考",
+        "basis": "現在値",
+        "freshness_code": "REFERENCE",
+        "status_note": "直近セッションの取得値"
       },
       {
         "key": "nifty_confirmed",
@@ -1618,8 +1623,10 @@
         "date": "2026-09-21",
         "provider": "Tickjournal recent-history bridge + self-maintained Google close",
         "age_minutes": null,
-        "freshness": "前営業日確定",
-        "basis": "移動平均・RSI・MACDの確定基準"
+        "freshness": "最新",
+        "basis": "移動平均・RSI・MACDの確定基準",
+        "freshness_code": "LATEST",
+        "status_note": "最新確定日足 2026-09-21"
       },
       {
         "key": "usdinr",
@@ -1630,7 +1637,9 @@
         "provider": "Twelve Data",
         "age_minutes": 1177,
         "freshness": "古い",
-        "basis": null
+        "basis": null,
+        "freshness_code": "STALE",
+        "status_note": "1177分前"
       },
       {
         "key": "brent",
@@ -1641,7 +1650,9 @@
         "provider": "Google Finance",
         "age_minutes": 18,
         "freshness": "最新",
-        "basis": null
+        "basis": null,
+        "freshness_code": "LATEST",
+        "status_note": "18分前"
       },
       {
         "key": "india_vix",
@@ -1652,7 +1663,9 @@
         "provider": "Google Finance",
         "age_minutes": 385,
         "freshness": "参考",
-        "basis": null
+        "basis": null,
+        "freshness_code": "REFERENCE",
+        "status_note": "385分前"
       }
     ],
     "note": "時刻はすべてJST。NIFTYを判断主体、為替・原油・VIXを外部参考として表示します。",
@@ -1664,7 +1677,14 @@
       "source": "Tickjournal recent-history bridge + self-maintained Google close",
       "quote_as_of_jst": null,
       "consistency": "OK"
-    }
+    },
+    "status_version": "5.4-status-1",
+    "freshness_classes": [
+      "最新",
+      "参考",
+      "古い",
+      "利用不可"
+    ]
   },
   "technical_basis_snapshot": {
     "available": true,
@@ -1691,5 +1711,53 @@
     "record_count": 0,
     "date_jst": "2026-09-22",
     "message": "14:00保存時間帯外です。次の通常営業日の13:57・14:03・14:08実行から自動選択します。"
+  },
+  "operational_state": {
+    "version": "5.4-status-1",
+    "code": "CONFIRMED",
+    "label": "確定済",
+    "detail": "最新確定日足 2026-09-21 を利用しています。",
+    "raw_code": "PREVIOUS_SESSION",
+    "raw_label": "前営業日データ",
+    "regular_trading_day": true,
+    "technical_date": "2026-09-21"
+  },
+  "quality_state": {
+    "version": "5.4-status-1",
+    "code": "PARTIAL",
+    "label": "一部参考",
+    "data": {
+      "nifty_current": {
+        "code": "REFERENCE",
+        "label": "参考",
+        "note": "直近セッションの取得値"
+      },
+      "nifty_confirmed": {
+        "code": "LATEST",
+        "label": "最新",
+        "note": "最新確定日足 2026-09-21"
+      },
+      "nifty_provisional": {
+        "code": "UNAVAILABLE",
+        "label": "利用不可",
+        "note": "取引時間外は暫定値を使用しません。"
+      },
+      "usdinr": {
+        "code": "STALE",
+        "label": "古い",
+        "note": "1177分前"
+      },
+      "brent": {
+        "code": "LATEST",
+        "label": "最新",
+        "note": "18分前"
+      },
+      "india_vix": {
+        "code": "REFERENCE",
+        "label": "参考",
+        "note": "385分前"
+      }
+    },
+    "principle": "NIFTY判断主体と外部参考データを分離し、最新・参考・古い・利用不可の4分類で表示。"
   }
 }
