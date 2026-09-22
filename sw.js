@@ -1,5 +1,5 @@
-const CACHE = "india1400-v5-3-20260922";
-const SHELL = ["./?v=5.3", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v5-4-20260922";
+const SHELL = ["./?v=5.4", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
