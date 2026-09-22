@@ -40,6 +40,7 @@ jobs:
           python v50_enhance.py
           python v51_enhance.py
           python v52_enhance.py
+          python v53_history.py
 
       - name: Commit market and history data
         run: |
@@ -49,6 +50,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "Update India 14:00 market analytics v5.2"
+            git commit -m "Update India 14:00 market analytics v5.3"
             git push
           fi
