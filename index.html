@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="/India_1400/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="./favicon-v502.png">
-  <title>India 14:00 Check v5.4</title>
+  <title>India 14:00 Check v5.5</title>
   <style>
     :root{color-scheme:dark;--bg:#07111f;--card:#0f1b2e;--card2:#0a1525;--line:#263854;--text:#f4f7fb;--muted:#9eb0c8;--ok:#29c777;--ng:#ff7272;--warn:#f4c14b;--accent:#70a9ff;--c-nifty:#70a9ff;--c-ma5:#f4c14b;--c-ma25:#29c777;--c-ma75:#ff7272;--c-rsi:#59d8ff;--c-macd:#b59cff;--c-usd:#50d6c1;--c-brent:#ff9f43;--c-vix:#ff7ab6;--shadow:0 8px 24px rgba(0,0,0,.18)}
     *{box-sizing:border-box}html{background:var(--bg)}
@@ -28,7 +28,7 @@
     .reason{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.45}.reason:last-child{border-bottom:0}.dot{width:8px;height:8px;border-radius:999px;margin-top:5px;flex:0 0 auto;background:var(--accent)}
     .barrow{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;margin:8px 0}.bar{height:8px;background:#16243a;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:var(--accent);border-radius:999px}.bar.sell span{background:var(--warn)}
     button{font:inherit;cursor:pointer}.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}.primary,.secondary{border-radius:14px;padding:13px 10px;font-size:14px;font-weight:800}.primary{border:0;background:var(--accent);color:#06101e}.secondary{background:#192943;color:var(--text);border:1px solid #35517a}
-    .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:9px 5px;border-bottom:1px solid var(--line);text-align:right}.table th:first-child,.table td:first-child{text-align:left}.table th{color:var(--muted);font-size:10px}.table tr:last-child td{border-bottom:0}
+    .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6}.tranche-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.tranche-box{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:11px 8px;text-align:center}.tranche-box.done{border-color:rgba(41,199,119,.55);background:rgba(41,199,119,.08)}.tranche-box .tname{font-size:11px;color:var(--muted);font-weight:750}.tranche-box .tstate{font-size:15px;font-weight:850;margin-top:4px}.tranche-box.done .tstate{color:var(--ok)}.tranche-box.pending .tstate{color:var(--warn)}.next-check{margin-top:10px;border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:#0a1525}.next-check .label{font-size:10px;color:var(--muted);font-weight:750}.next-check .value{font-size:18px;font-weight:850;margin-top:2px}.tranche-controls{display:grid;gap:8px}.tranche-control{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:10px 11px}.tranche-toggle{min-width:86px;border:1px solid #35517a;border-radius:999px;padding:8px 10px;background:#192943;color:var(--text);font-weight:800;font-size:12px}.tranche-toggle.done{background:rgba(41,199,119,.14);border-color:rgba(41,199,119,.55);color:var(--ok)}.local-only{font-size:10px;color:var(--muted);line-height:1.55;margin-top:8px}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:9px 5px;border-bottom:1px solid var(--line);text-align:right}.table th:first-child,.table td:first-child{text-align:left}.table th{color:var(--muted);font-size:10px}.table tr:last-child td{border-bottom:0}
     details{background:var(--card2);border:1px solid var(--line);border-radius:13px;margin:9px 0;overflow:hidden}summary{padding:13px;font-weight:750;cursor:pointer}details .body{padding:0 13px 13px;color:#dce5f1;font-size:12px;line-height:1.7}
     .page{display:none}.page.active{display:block}.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(7,17,31,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:7px 8px calc(7px + env(safe-area-inset-bottom));z-index:20}.tabbar{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.tab{border:0;background:transparent;color:var(--muted);padding:10px 3px;border-radius:12px;font-size:12px;font-weight:800}.tab.active{background:#172843;color:var(--text)}
     .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#e9f1ff;color:#08111f;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:750;opacity:0;pointer-events:none;transition:.2s;z-index:50;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -40,7 +40,7 @@
 <body>
 <div class="app">
   <header>
-    <div class="title-row"><h1>India 14:00 Check</h1><span class="version-badge">v5.4</span></div>
+    <div class="title-row"><h1>India 14:00 Check</h1><span class="version-badge">v5.5</span></div>
     <div class="sub">3分割売買目安＋1・3・14営業日予測＋指標ミニグラフ</div>
   </header>
 
@@ -51,6 +51,17 @@
       <div id="marketStage" class="stage">市場段階 --</div>
       <div class="statusline"><span id="marketState" class="pill">--</span><span id="qualityGate" class="pill">--</span><span id="forecastConsensus" class="pill">--</span></div>
       <div id="decisionBasis" class="small" style="margin-top:10px">--</div>
+    </div>
+
+    <div class="card">
+      <h2>3分割購入進捗</h2>
+      <div id="purchaseProgress" class="tranche-grid">--</div>
+      <div class="next-check">
+        <div class="label">次の確認対象</div>
+        <div id="nextPurchaseCheck" class="value">--</div>
+        <div id="nextPurchaseReason" class="small" style="margin-top:4px">--</div>
+      </div>
+      <div class="local-only">購入進捗はこの端末のブラウザ内だけに保存し、GitHubには送信しません。</div>
     </div>
 
     <div class="card">
@@ -112,6 +123,13 @@
   </section>
 
   <section id="page-detail" class="page">
+    <div class="card">
+      <h2>3分割購入状況</h2>
+      <div id="purchaseControls" class="tranche-controls">--</div>
+      <div class="btnrow" style="margin-top:10px"><button id="resetPurchaseBtn" class="secondary">購入進捗をリセット</button><div></div></div>
+      <div id="purchaseUpdated" class="local-only">--</div>
+      <div class="local-only">上位段階を「実施済」にすると、それ以前の段階も実施済になります。下位段階を未実施へ戻すと、それ以降も未実施へ戻ります。SafariのWebサイトデータを削除すると、この記録も消えます。</div>
+    </div>
     <div class="card"><h2>データ品質</h2><div id="qualityReasons">--</div></div>
     <div class="card"><h2>前回14:00比較</h2><div id="historyStatus" class="small" style="margin-bottom:8px">--</div><div id="comparison">--</div></div>
     <div class="card"><h2>監査情報</h2><div id="audit" class="small">--</div></div>
@@ -135,6 +153,17 @@ function dirClass(label){return label==="上向き"?"up":label==="下向き"?"do
 function fmtJstShort(v){if(!v)return"--";const s=String(v);const m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);if(!m)return s;return Number(m[2])+"/"+Number(m[3])+(m[4]?" "+m[4]+":"+m[5]:"")}
 function ageText(m){if(m===null||m===undefined||Number.isNaN(Number(m)))return"";const n=Math.max(0,Math.round(Number(m)));if(n<60)return n+"分前";const h=Math.floor(n/60),mm=n%60;return h+"時間"+(mm?mm+"分":"")+"前"}
 function refBadgeClass(x){if(x==="最新")return"latest";if(x==="参考")return"reference";if(x==="古い"||x==="利用不可")return"check";return"confirmed"}
+const PURCHASE_STATE_KEY="india1400.purchaseProgress.v1";
+function defaultPurchaseState(){return{t1:false,t2:false,t3:false,updated_at:null}}
+function loadPurchaseState(){try{const x=JSON.parse(localStorage.getItem(PURCHASE_STATE_KEY)||"null");return x&&typeof x==="object"?{...defaultPurchaseState(),...x}:defaultPurchaseState()}catch(e){return defaultPurchaseState()}}
+function savePurchaseState(s){try{localStorage.setItem(PURCHASE_STATE_KEY,JSON.stringify(s));return true}catch(e){toast("購入進捗を端末に保存できません",4200);return false}}
+function stageLevel(code){return code==="TRANCHE3"?3:code==="TRANCHE2"?2:code==="TRANCHE1"?1:0}
+function firstPendingTranche(s){if(!s.t1)return 1;if(!s.t2)return 2;if(!s.t3)return 3;return 0}
+function setTranche(stage,done){const s=loadPurchaseState();if(done){for(let i=1;i<=stage;i++)s["t"+i]=true}else{for(let i=stage;i<=3;i++)s["t"+i]=false}s.updated_at=new Date().toISOString();if(savePurchaseState(s)){renderPurchaseProgress();toast("購入進捗を更新しました")}}
+function resetPurchaseState(){if(!confirm("第1～第3弾の購入進捗をすべて未実施に戻しますか？"))return;const s=defaultPurchaseState();s.updated_at=new Date().toISOString();if(savePurchaseState(s)){renderPurchaseProgress();toast("購入進捗をリセットしました")}}
+function purchaseNextText(s,g,q,os){const next=firstPendingTranche(s);if(!next)return{title:"3分割完了",reason:"第1～第3弾を実施済として記録しています。"};if(g?.market_stage_code==="SELL_CAUTION")return{title:"追加購入は保留",reason:"市場段階が売り・過熱注意です。保有状況を確認してください。"};const level=stageLevel(g?.market_stage_code);const allowed=!!q?.decision_gate?.allow_rule;if(!allowed)return{title:`第${next}弾 未実施`,reason:`${os?.label||"市場状態確認中"}のため実行判断は保留。市場段階は${g?.market_stage_label||"--"}です。`};if(level>=next)return{title:`第${next}弾を確認`,reason:`市場段階が第${level}弾相当まで到達しています。既実施分を飛ばさず第${next}弾から確認します。`};return{title:`待機（次は第${next}弾）`,reason:`現在の市場段階は${g?.market_stage_label||"待機"}です。`}}
+function renderPurchaseProgress(){const s=loadPurchaseState(),g=market?.trade_guide||{},q=market?.data_quality||{},os=market?.operational_state||market?.market_state||{};const box=(n)=>`<div class="tranche-box ${s["t"+n]?"done":"pending"}"><div class="tname">第${n}弾</div><div class="tstate">${s["t"+n]?"実施済":"未実施"}</div></div>`;$("purchaseProgress").innerHTML=box(1)+box(2)+box(3);const nx=purchaseNextText(s,g,q,os);setText("nextPurchaseCheck",nx.title);setText("nextPurchaseReason",nx.reason);$("purchaseControls").innerHTML=[1,2,3].map(n=>`<div class="tranche-control"><div><b>第${n}弾</b><div class="small">${s["t"+n]?"実施済として端末保存":"未実施"}</div></div><button class="tranche-toggle ${s["t"+n]?"done":""}" data-tranche="${n}" aria-pressed="${s["t"+n]?"true":"false"}">${s["t"+n]?"実施済":"未実施"}</button></div>`).join("");setText("purchaseUpdated",s.updated_at?"最終更新 "+new Date(s.updated_at).toLocaleString("ja-JP"):"購入進捗はまだ記録されていません。");document.querySelectorAll(".tranche-toggle").forEach(btn=>btn.addEventListener("click",()=>setTranche(Number(btn.dataset.tranche),btn.getAttribute("aria-pressed")!=="true")))}
+
 function fallbackReferenceItems(){const n=market?.nifty||{},cf=market?.core_fetch||{},v=market?.india_vix||{},g=market?.generated_at_jst;const age=(ts)=>{if(!ts||!g)return null;const a=Date.parse(ts),b=Date.parse(g);return Number.isFinite(a)&&Number.isFinite(b)?Math.max(0,Math.floor((b-a)/60000)):null};const p=n.provisional||{};return[
 {key:"generated",label:"判定生成",role:"生成時刻",as_of_jst:g,provider:"GitHub Actions",age_minutes:0,freshness:"生成",basis:"画面判定の生成時刻"},
 {key:"nifty_current",label:"NIFTY現在値",role:"判断主体",as_of_jst:n.as_of_jst,provider:n.provider,age_minutes:age(n.as_of_jst),freshness:(age(n.as_of_jst)<=20?"最新":"要確認"),basis:"現在値"},
@@ -214,9 +243,9 @@ function renderIndicators(){
   $("dataTimes").innerHTML='<div class="source-list">'+items.filter(x=>x.key!=="generated"&&x.label!=="判定生成").map(x=>{const when=x.as_of_jst?fmtJstShort(x.as_of_jst)+" JST":(x.date?fmtJstShort(x.date):"--");return '<div class="source-row"><div class="source-name">'+(x.label||"--")+'</div><div><div class="ref-main">'+when+'<span class="ref-badge '+refBadgeClass(x.freshness)+'">'+(x.freshness||"--")+'</span></div><div class="ref-sub">'+(x.provider||"--")+(x.age_minutes!=null?" / "+ageText(x.age_minutes):"")+'</div></div></div>'}).join("")+'</div>';
 }
 function renderForecast(){const f=market?.technical_forecast||{};if(!f.available){setText("forecastBasis",f.message||"予測を算出できません。");$("forecastTable").innerHTML="--";return}setText("forecastBasis",`${f.basis} / 基準 ${f.basis_date} / 基準価格 ${fmt(f.basis_price,2)} / ${f.basis_consistency==="OK"?"時点統一 OK":"時点確認"} / 類似 ${f.analog_count}局面 / ${f.method}`);const hs=f.horizons||{};$("forecastTable").innerHTML='<div class="forecast-list">'+[1,3,14].map(d=>{const h=hs[String(d)]||{};return `<div class="forecast-row"><div class="fday">${d}営業日</div><div class="fdir ${dirClass(h.label)}">${h.label||"--"}</div><div class="fmain">中央値 ${signed(h.median_return_pct,2,"%")} / 価格 ${fmt(h.median_price,0)}<div class="fsub">中央50% ${fmt(h.q25_price,0)}～${fmt(h.q75_price,0)} / 過去上昇割合 ${fmt(h.historical_up_share_pct,1)}% / 参考度 ${h.statistical_reference||"--"}</div></div></div>`}).join("")+'</div><div class="small" style="margin-top:10px">'+(f.warning||"")+'</div>'}
-function renderDetail(){const q=market?.data_quality||{},c=market?.comparison||{},dl=market?.data_lineage||{},nmeta=market?.core_fetch?.nifty||{},am=market?.analysis_meta||{},h=market?.history_1400||{},os=market?.operational_state||{},qs=market?.quality_state||{};const qr=(q.reasons||[]).length?(q.reasons||[]).map(x=>`<div class="reason"><span class="dot"></span><div>${x}</div></div>`).join(""):`<div class="note">品質上の警告なし</div>`;$("qualityReasons").innerHTML=`<div class="note" style="margin-bottom:8px">市場状態：${os.label||"--"} / データ品質：${qs.label||"--"}<br>${os.detail||""}</div>`+qr;setText("historyStatus",`14:00履歴 ${h.record_count??0}件 / ${h.message||"次回14:00保存待ち"}${h.selected_price_as_of_jst?" / 採用時刻 "+fmtJstShort(h.selected_price_as_of_jst)+" JST":""}`);if(c.available){const v=c.values||{},row=(name,x)=>x?`<tr><td>${name}</td><td>${fmt(x.previous,2)}</td><td>${fmt(x.current,2)}</td><td>${signed(x.delta_pct,2,"%")}</td></tr>`:"";$("comparison").innerHTML=`<div class="small">基準 ${c.previous_date_jst||"--"}</div><table class="table"><tbody>${row("NIFTY",v.nifty_price)}${row("USD/INR",v.usdinr)}${row("Brent",v.brent)}</tbody></table>`}else setText("comparison",c.message||"14:00履歴を蓄積中です。");setText("audit",`UI v5.4 / データ処理 v${market?.app_version||"--"}\n状態分類 ${am.status_method_version||"--"} / ${market?.operational_state?.code||"--"} / ${market?.quality_state?.code||"--"}\n判断ゲート ${am.decision_gate_version||"--"}\n時点統一 ${am.basis_method_version||"--"} / ${market?.technical_basis_snapshot?.available?"OK":"要確認"}\n14:00履歴 ${am.history_method_version||"--"} / ${h.record_count??0}件\n予測基準 ${market?.technical_basis_snapshot?.date||"--"} / ${fmt(market?.technical_basis_snapshot?.price,2)}\n日足履歴 ${nmeta.history_cache_rows||0}件 / 最新 ${nmeta.history_cache_last_date||"--"}\n連続性 ${nmeta.history_recent_contiguous?"OK":"要確認"} / 最大gap ${nmeta.history_continuity?.max_gap_days??"--"}日\n予測 ${am.method_version||"--"} / ${am.window_years||"--"}年\nグラフ ${market?.chart_data?.method_version||"--"}\n本日暫定 ${market?.nifty?.provisional?.available?"利用可能":"未使用"}\nデータ生成 ${market?.generated_at_jst||dl.fetched_at_jst||"--"}`)}
-function renderAll(){renderDecision();renderReferenceTimes();renderIndicators();renderForecast();renderDetail()}
-$("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);refreshData(true);
+function renderDetail(){const q=market?.data_quality||{},c=market?.comparison||{},dl=market?.data_lineage||{},nmeta=market?.core_fetch?.nifty||{},am=market?.analysis_meta||{},h=market?.history_1400||{},os=market?.operational_state||{},qs=market?.quality_state||{};const qr=(q.reasons||[]).length?(q.reasons||[]).map(x=>`<div class="reason"><span class="dot"></span><div>${x}</div></div>`).join(""):`<div class="note">品質上の警告なし</div>`;$("qualityReasons").innerHTML=`<div class="note" style="margin-bottom:8px">市場状態：${os.label||"--"} / データ品質：${qs.label||"--"}<br>${os.detail||""}</div>`+qr;setText("historyStatus",`14:00履歴 ${h.record_count??0}件 / ${h.message||"次回14:00保存待ち"}${h.selected_price_as_of_jst?" / 採用時刻 "+fmtJstShort(h.selected_price_as_of_jst)+" JST":""}`);if(c.available){const v=c.values||{},row=(name,x)=>x?`<tr><td>${name}</td><td>${fmt(x.previous,2)}</td><td>${fmt(x.current,2)}</td><td>${signed(x.delta_pct,2,"%")}</td></tr>`:"";$("comparison").innerHTML=`<div class="small">基準 ${c.previous_date_jst||"--"}</div><table class="table"><tbody>${row("NIFTY",v.nifty_price)}${row("USD/INR",v.usdinr)}${row("Brent",v.brent)}</tbody></table>`}else setText("comparison",c.message||"14:00履歴を蓄積中です。");setText("audit",`UI v5.5 / データ処理 v${market?.app_version||"--"}\n状態分類 ${am.status_method_version||"--"} / ${market?.operational_state?.code||"--"} / ${market?.quality_state?.code||"--"}\n判断ゲート ${am.decision_gate_version||"--"}\n時点統一 ${am.basis_method_version||"--"} / ${market?.technical_basis_snapshot?.available?"OK":"要確認"}\n14:00履歴 ${am.history_method_version||"--"} / ${h.record_count??0}件\n予測基準 ${market?.technical_basis_snapshot?.date||"--"} / ${fmt(market?.technical_basis_snapshot?.price,2)}\n日足履歴 ${nmeta.history_cache_rows||0}件 / 最新 ${nmeta.history_cache_last_date||"--"}\n連続性 ${nmeta.history_recent_contiguous?"OK":"要確認"} / 最大gap ${nmeta.history_continuity?.max_gap_days??"--"}日\n予測 ${am.method_version||"--"} / ${am.window_years||"--"}年\nグラフ ${market?.chart_data?.method_version||"--"}\n本日暫定 ${market?.nifty?.provisional?.available?"利用可能":"未使用"}\nデータ生成 ${market?.generated_at_jst||dl.fetched_at_jst||"--"}`)}
+function renderAll(){renderDecision();renderPurchaseProgress();renderReferenceTimes();renderIndicators();renderForecast();renderDetail()}
+$("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);$("resetPurchaseBtn").addEventListener("click",resetPurchaseState);refreshData(true);
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!sessionStorage.getItem("india1400.swReloaded")){sessionStorage.setItem("india1400.swReloaded","1");location.reload()}})}
 </script>
 </body>
