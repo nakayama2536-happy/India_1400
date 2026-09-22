@@ -761,7 +761,7 @@
     "detail": "NIFTY価格は 2026/09/21 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
-  "app_version": "5.4",
+  "app_version": "5.6",
   "core_fetch": {
     "nifty": {
       "status": "fresh",
@@ -834,11 +834,12 @@
     "principle": "14:00暫定値と確定日足を分離。売買目安は透明な条件判定、短期予測は直近10年の類似局面による1・3・14営業日分布。",
     "chart_method_version": "5.0-chart-1",
     "decision_gate_version": "5.1-gate-1",
-    "release_version": "5.4",
+    "release_version": "5.6",
     "basis_method_version": "5.2-basis-1",
     "basis_principle": "取引中は当日暫定スナップショット、時間外は最新確定日足スナップショットを使用し、価格・MA・RSI・MACD・1/3/14営業日予測を同一時点に統一。",
     "history_method_version": "5.3-history-1",
-    "status_method_version": "5.4-status-1"
+    "status_method_version": "5.4-status-1",
+    "forecast_verification_version": "5.6-eval-1"
   },
   "data_lineage": {
     "fetched_at_jst": "2026-09-22T01:37:00+09:00",
@@ -1759,5 +1760,41 @@
       }
     },
     "principle": "NIFTY判断主体と外部参考データを分離し、最新・参考・古い・利用不可の4分類で表示。"
+  },
+  "forecast_verification": {
+    "method_version": "5.6-eval-1",
+    "forecast_count": 0,
+    "pending_count": 0,
+    "horizons": {
+      "1": {
+        "evaluated_count": 0,
+        "sample_adequacy": "不足",
+        "median_absolute_return_error_pct": null,
+        "mean_absolute_return_error_pct": null,
+        "median_price_error_pct": null,
+        "range_25_75_hit_pct": null,
+        "direction_match_pct": null
+      },
+      "3": {
+        "evaluated_count": 0,
+        "sample_adequacy": "不足",
+        "median_absolute_return_error_pct": null,
+        "mean_absolute_return_error_pct": null,
+        "median_price_error_pct": null,
+        "range_25_75_hit_pct": null,
+        "direction_match_pct": null
+      },
+      "14": {
+        "evaluated_count": 0,
+        "sample_adequacy": "不足",
+        "median_absolute_return_error_pct": null,
+        "mean_absolute_return_error_pct": null,
+        "median_price_error_pct": null,
+        "range_25_75_hit_pct": null,
+        "direction_match_pct": null
+      }
+    },
+    "note": "誤差・レンジ内率・方向一致率は過去予測の検証指標であり、将来の上昇確率ではありません。",
+    "latest_evaluated": null
   }
 }
