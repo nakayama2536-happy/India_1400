@@ -23,11 +23,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Python syntax check
-        run: |
-          python -m py_compile update_market.py v48_enhance.py v49_enhance.py v50_enhance.py v51_enhance.py
-
-      - name: JSON and PWA version validation
+      - name: Validate public PWA and JSON
         run: |
           python - <<'PY'
           import json
@@ -42,9 +38,14 @@ jobs:
           appv = version["APP_VERSION"]
           manifest = json.loads(Path("manifest.webmanifest").read_text(encoding="utf-8"))
           market = json.loads(Path("market.json").read_text(encoding="utf-8"))
-          json.loads(Path("history.json").read_text(encoding="utf-8"))
-          json.loads(Path("indicator_history.json").read_text(encoding="utf-8"))
-          json.loads(Path("nifty_daily_history.json").read_text(encoding="utf-8"))
+          for name in (
+              "history.json",
+              "indicator_history.json",
+              "forecast_evaluation.json",
+              "nifty_daily_history.json",
+              "nifty_ohlc_history.json",
+          ):
+              json.loads(Path(name).read_text(encoding="utf-8"))
 
           index = Path("index.html").read_text(encoding="utf-8")
           sw = Path("sw.js").read_text(encoding="utf-8")
@@ -56,11 +57,21 @@ jobs:
 
           required = [
               "index.html", "manifest.webmanifest", "sw.js", "market.json",
-              "update_market.py", ".github/workflows/update-market.yml",
-              ".github/workflows/security-check.yml"
+              "history.json", "indicator_history.json", "forecast_evaluation.json",
+              "nifty_daily_history.json", "nifty_ohlc_history.json",
+              ".github/workflows/security-check.yml",
           ]
           missing = [p for p in required if not Path(p).exists()]
-          assert not missing, f"missing required files: {missing}"
+          assert not missing, f"missing required public files: {missing}"
 
-          print(f"VALIDATION PASS: India 14:00 Check v{appv}")
+          forbidden_private_code = [
+              "update_market.py", "v48_enhance.py", "v49_enhance.py",
+              "v50_enhance.py", "v51_enhance.py", "v52_enhance.py",
+              "v53_history.py", "v54_status.py", "v56_forecast_eval.py",
+              "v57_detail_chart.py", ".github/workflows/update-market.yml",
+          ]
+          exposed = [p for p in forbidden_private_code if Path(p).exists()]
+          assert not exposed, f"private calculation/update files exposed publicly: {exposed}"
+
+          print(f"VALIDATION PASS: public India 14:00 Check v{appv}")
           PY

@@ -1,21 +1,20 @@
-# India 14:00 Check PWA v5.1
+# India 14:00 Check PWA v5.7
 
 ## 目的
 
-iPhoneで14:00頃に開き、NIFTY 50、USD/INR、Brent、India VIX、移動平均、RSI、MACDを確認し、設定済みの条件に基づく3分割売買目安と1・3・14営業日の短期テクニカル予測を表示するPWAです。
+iPhoneで14:00頃に開き、NIFTY 50、USD/INR、Brent、India VIX、移動平均、RSI、MACDなどを確認する個人用PWAです。設定済みの条件に基づく3分割売買目安と、1・3・14営業日の統計的参考表示を提供します。
 
-## 現在のVersion
+## 現在の構成
 
-- APP_VERSION: 5.1
-- ANALYTICS_VERSION: 5.1
-- DECISION_GATE_VERSION: 5.1-gate-1
-- 安定版ブランチ: `release/v5.1`
+このRepositoryはGitHub Pages公開専用です。データ取得・計算ロジックはPrivate Repository `india-stock-check` で実行し、公開可能性を検査したJSONだけをこのRepositoryへ転送します。
+
+`Private core → public-safe validation → India_1400 → GitHub Pages / PWA`
+
+Public側にはAPIキー、個人の保有数量・取得単価・口座情報、Private側の計算コードを置きません。
 
 ## 自動更新
 
-GitHub Actionsの `Update India 14:00 market data` が平日の14:00前後とNSE引け後に実行され、`market.json` と履歴データを更新します。
-
-現在の主な実行時刻は以下です。
+平日の自動更新はPrivate coreのGitHub Actionsで実行します。主な実行時刻は以下です。
 
 - 13:57 JST
 - 14:03 JST
@@ -24,67 +23,46 @@ GitHub Actionsの `Update India 14:00 market data` が平日の14:00前後とNSE
 
 GitHubのスケジュール実行は混雑等により遅れる場合があります。
 
-## データ
+## 公開データ
 
-- NIFTY 50
-- USD/INR
-- Brent
-- India VIX
-- 前営業日までの確定日足と当日参考値を分離
-- 5/25/75日線、RSI(14)、MACD/Signal
-- 1・3・14営業日の類似局面ベースの統計的参考表示
+- `market.json`：最新の市場・分析データ
+- `history.json`：14:00定点履歴
+- `nifty_daily_history.json`：NIFTY日足履歴
+- `nifty_ohlc_history.json`：詳細チャート用OHLC
+- `indicator_history.json`：外部指標履歴
+- `forecast_evaluation.json`：予測検証データ
 
 画面の「参照データ時刻」「データ品質」を必ず確認してください。
 
-## GitHub運用
-
-手動改修は以下を標準とします。
-
-`Issue → feature branch → 実装 → Pull Request → PR Validation / Security Check → main`
-
-- `main`：公開中の現行版
-- `feature/...`：手動改修用
-- `release/v5.1`：v5.1安定版・復旧基準
-- Issues：改善・不具合・新機能を管理
-- `CHANGELOG.md`：主要変更履歴
-- `VERSION`：Version基準
-- PR Validation：Python構文、JSON、PWA Version整合性を自動確認
-- Security Check：秘密情報の混入を自動確認
-
-### 自動市場更新の例外
-
-`Update India 14:00 market data` は運用データを定時更新するため、GitHub Actionsから `main` へ直接commit/pushします。手動のアプリ改修とは分離します。
-
-## Security
-
-このRepositoryはGitHub Pages公開用のためPublicです。
-
-- APIキーをHTML、Python、JSONへ直接記載しない
-- `.env` や秘密鍵をcommitしない
-- Twelve Data等の認証情報はGitHub Secretsで管理
-- Security Checkで代表的なトークン・秘密鍵パターンを検査
-- GitHub Actionsは検証済みcommit SHAへ固定
-- DependabotでActions依存関係を保守
-
-## 主なファイル
+## 公開PWA
 
 - `index.html`：PWA本体
 - `manifest.webmanifest`：PWA設定
 - `sw.js`：Service Worker
-- `market.json`：最新の市場・分析データ
-- `history.json`：定点履歴
-- `nifty_daily_history.json`：NIFTY日足履歴
-- `indicator_history.json`：外部指標履歴
-- `update_market.py`：データ取得・基本計算
-- `v48_enhance.py` ～ `v51_enhance.py`：分析拡張
-- `.github/workflows/update-market.yml`：定時更新
-- `.github/workflows/security-check.yml`：Secret Guard
-- `.github/workflows/pr-validation.yml`：PR検証
+- アイコン類：ホーム画面・favicon用
+- `.github/workflows/security-check.yml`：公開Repositoryの安全性検査
+- `.github/workflows/pr-validation.yml`：公開PWA/JSONの整合性検査
+
+## GitHub運用
+
+手動改修は `Issue → feature branch → 実装 → Pull Request → PR Validation / Security Check → main` を標準とします。
+
+市場データの生成・計算・定時更新はPrivate coreで管理し、このPublic Repositoryは表示と公開可能なスナップショットの配信に限定します。
+
+## Security
+
+このRepositoryはインターネットから閲覧できます。
+
+- APIキー、PAT、パスワード、秘密鍵、`.env` を保存しない
+- 個人の保有数量、取得単価、口座種別、取引履歴などを保存しない
+- Private coreからの公開前にpublic-safe検査を行う
+- Security CheckとDependabotを維持する
+- GitHub Actionsは検証済みcommit SHAへ固定する
 
 ## GitHub Pages
 
-Pagesは `main / root` を公開対象とします。iPhone SafariでPages URLを開き、「共有 → ホーム画面に追加」でPWAとして利用できます。
+Pagesは `main / root` を公開対象とします。iPhone SafariでPagesを開き、「共有 → ホーム画面に追加」でPWAとして利用できます。
 
-## 重要
+## 注意
 
-このアプリは投資判断を補助する定点確認ツールです。自動取得元の仕様変更、価格遅延、休場日、GitHub Actionsの遅延等により値が更新されない場合があります。画面の更新時刻・取得元・データ品質を確認してください。
+このアプリは投資判断を補助する定点確認ツールです。自動取得元の仕様変更、価格遅延、休場日、GitHub Actionsの遅延等により値が更新されない場合があります。更新時刻・取得元・データ品質を確認してください。

@@ -4,6 +4,15 @@ India 14:00 Check の主要な変更履歴を記録します。
 
 ## [Unreleased]
 
+## [5.7] - 2026-09-23
+
+### Security / Architecture
+- データ取得・計算・定時更新をPrivate `india-stock-check`へ移行
+- Private側でpublic-safe検査後、公開可能なJSONのみ`India_1400`へ転送
+- Public Repositoryからデータ取得・計算Pythonコードを撤去
+- Public Repositoryから旧市場更新workflowを撤去
+- Public PR ValidationでPrivate計算コードの再混入を検知する検査を追加
+
 ## [5.1] - 2026-09-21
 
 ### Added
@@ -20,15 +29,9 @@ India 14:00 Check の主要な変更履歴を記録します。
 - .env / 秘密鍵ファイルを.gitignore対象化
 - APIキーはGitHub Secretsのみで管理
 
-### Baseline
-- APP_VERSION: 5.1
-- ANALYTICS_VERSION: 5.1
-- DECISION_GATE_VERSION: 5.1-gate-1
-- 安定版ブランチ: `release/v5.1`
-
 ## 運用ルール
 
 - 手動改修は Issue → feature branch → Pull Request → 自動検証 → main の順で行う
-- `Update India 14:00 market data` による市場データ更新は自動運用のためmain直接更新を許容する
-- APIキー、トークン、秘密鍵をRepositoryへ保存しない
+- 市場データ更新はPrivate coreで実行し、Public Repositoryにはpublic-safe JSONのみ配信する
+- APIキー、トークン、秘密鍵をPublic Repositoryへ保存しない
 - Version確定時はVERSIONとCHANGELOGを更新する
