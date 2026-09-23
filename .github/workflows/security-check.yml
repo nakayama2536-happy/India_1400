@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          private_fields='"(shares|quantity|position_size|average_cost|cost_basis|purchase_price|account_type|position_id|planned_total_shares|stage_size|completed_stages|max_stages|opened_at|closed_at)"[[:space:]]*:'
+          private_fields='"(shares|quantity|position_size|average_cost|cost_basis|purchase_price|account_type|position_id|planned_total_shares|stage_size|completed_stages|max_stages|opened_at|closed_at|brokerage_account|brokerage_account_id|portfolio_id)"[[:space:]]*:'
           public_data="market.json history.json indicator_history.json forecast_evaluation.json nifty_daily_history.json nifty_ohlc_history.json"
           if grep -nEI "$private_fields" $public_data; then
             echo "Private portfolio field detected in public runtime data."
