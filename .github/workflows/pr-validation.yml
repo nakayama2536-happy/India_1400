@@ -38,6 +38,7 @@ jobs:
                   version[k.strip()] = v.strip()
 
           appv = version["APP_VERSION"]
+          uiv = version["UI_VERSION"]
           manifest = json.loads(Path("manifest.webmanifest").read_text(encoding="utf-8"))
           market = json.loads(Path("market.json").read_text(encoding="utf-8"))
           for name in (
@@ -53,9 +54,9 @@ jobs:
           sw = Path("sw.js").read_text(encoding="utf-8")
 
           assert market.get("app_version") == appv, "market.json app_version mismatch"
-          assert f"v={appv}" in manifest.get("start_url", ""), "manifest version mismatch"
-          assert f"v{appv}" in index, "index version mismatch"
-          assert f"v{appv.replace('.', '-')}" in sw, "service worker cache version mismatch"
+          assert f"v={uiv}" in manifest.get("start_url", ""), "manifest UI version mismatch"
+          assert f"v{uiv}" in index, "index UI version mismatch"
+          assert f"v{uiv.replace('.', '-')}" in sw, "service worker UI cache version mismatch"
 
           required = [
               "index.html", "manifest.webmanifest", "sw.js", "market.json",
@@ -75,7 +76,7 @@ jobs:
           exposed = [p for p in forbidden_private_code if Path(p).exists()]
           assert not exposed, f"private calculation/update files exposed publicly: {exposed}"
 
-          print(f"VALIDATION PASS: public India 14:00 Check v{appv}")
+          print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
           PY
 
       - name: Check inline JavaScript syntax
