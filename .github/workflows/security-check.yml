@@ -51,3 +51,14 @@ jobs:
             exit 1
           fi
           echo "No private portfolio fields detected in public runtime data."
+
+      - name: Reject private burn-in evidence from public repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -Eq '(^|/)burnin_evidence\.json; then
+            echo "Private burn-in evidence must not be tracked in the public PWA repository."
+            git ls-files | grep -E '(^|/)burnin_evidence\.json
+            exit 1
+          fi
+          echo "No private burn-in evidence is tracked publicly."
