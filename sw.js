@@ -1,4 +1,4 @@
-const CACHE = "india1400-v5-13-20260926-ui3";
+const CACHE = "india1400-v5-13-20260926-ui4";
 const SHELL = ["./?v=5.13", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const DYNAMIC_JSON = new Set([
   "market.json",
