@@ -1,5 +1,5 @@
-const CACHE = "india1400-v5-10-20260925-ops1";
-const SHELL = ["./?v=5.10", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v5-11-20260926-ui1";
+const SHELL = ["./?v=5.11", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const DYNAMIC_JSON = new Set([
   "market.json",
   "history.json",
