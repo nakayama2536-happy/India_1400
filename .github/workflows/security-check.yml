@@ -46,7 +46,11 @@ jobs:
           set -euo pipefail
           private_fields='"(shares|quantity|position_size|average_cost|cost_basis|purchase_price|account_type|position_id|planned_total_shares|stage_size|completed_stages|max_stages|opened_at|closed_at|brokerage_account|brokerage_account_id|portfolio_id)"[[:space:]]*:'
           public_data="market.json history.json indicator_history.json forecast_evaluation.json nifty_daily_history.json nifty_ohlc_history.json common_snapshot.json"
-          if grep -nEI "$private_fields" $public_data; then
+          existing_public_data=""
+          for file in $public_data; do
+            if [ -f "$file" ]; then existing_public_data="$existing_public_data $file"; fi
+          done
+          if [ -n "$existing_public_data" ] && grep -nEI "$private_fields" $existing_public_data; then
             echo "Private portfolio field detected in public runtime data."
             exit 1
           fi
