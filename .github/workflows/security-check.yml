@@ -60,9 +60,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git ls-files | grep -Eq '(^|/)burnin_evidence\.json; then
+          bad_burnin="$(git ls-files | awk -F/ '$NF == "burnin_evidence.json" {print}')"
+          if [ -n "$bad_burnin" ]; then
             echo "Private burn-in evidence must not be tracked in the public PWA repository."
-            git ls-files | grep -E '(^|/)burnin_evidence\.json
+            echo "$bad_burnin"
             exit 1
           fi
           echo "No private burn-in evidence is tracked publicly."
