@@ -77,3 +77,15 @@ jobs:
 
           print(f"VALIDATION PASS: public India 14:00 Check v{appv}")
           PY
+
+      - name: Check inline JavaScript syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>", html, flags=re.S|re.I)
+          inline = "\n".join(x for x in scripts if x.strip())
+          Path(".inline-app.js").write_text(inline, encoding="utf-8")
+          PY
+          node --check .inline-app.js
