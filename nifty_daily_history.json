@@ -3,7 +3,7 @@
   "index": "NIFTY 50",
   "basis": "Official NSE price-index daily close cache for technicals/backtests",
   "source": "Tickjournal recent-history bridge + self-maintained Google close",
-  "updated_at_jst": "2026-09-26T00:34:07+09:00",
+  "updated_at_jst": "2026-09-26T06:31:05+09:00",
   "records": [
     {
       "date": "2000-01-03",
