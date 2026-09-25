@@ -76,6 +76,18 @@ jobs:
           exposed = [p for p in forbidden_private_code if Path(p).exists()]
           assert not exposed, f"private calculation/update files exposed publicly: {exposed}"
 
+          common_ui_markers = [
+              'id="commonDigestCard"',
+              'id="commonPhase"',
+              'id="commonEligibility"',
+              'id="commonDataState"',
+              'id="commonQcState"',
+              'fetchJson("common_snapshot.json").catch(()=>null)',
+              'function renderCommonDigest()',
+          ]
+          missing_common = [x for x in common_ui_markers if x not in index]
+          assert not missing_common, f"missing Common Schema fallback UI markers: {missing_common}"
+
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
           PY
 
