@@ -330,13 +330,15 @@ function externalChartSvg(points,lineClass){
   return '<svg class="chart" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" role="img">'+grid+weeks+'<path class="'+lineClass+'" d="'+d+'" fill="none"/><text x="'+px+'" y="9">'+rangeLabel+'</text></svg>';
 }
 function simpleExternalChart(id,metaId,points,lineClass,digits=2){
-  var xs=(points||[]).filter(function(p){return Number.isFinite(Number(p.value))});
+  var xs=(points||[]).filter(function(p){return Number.isFinite(Number(p.value))&&/^\d{4}-\d{2}-\d{2}/.test(String(p.date||""))}).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   if(xs.length<3){
     setText(metaId,"履歴 "+xs.length+"点 / 28日表示");
     $(id).innerHTML='<div class="history-wait compact">履歴3点でグラフ表示（現在'+xs.length+'点）</div>';
     return;
   }
-  setText(metaId,"28日表示 / 履歴 "+xs.length+"点 / 最新 "+fmt(xs[xs.length-1].value,digits));
+  const end=Date.parse(String(xs[xs.length-1].date).slice(0,10)+"T00:00:00Z"),cut=end-27*86400000;
+  const visibleCount=xs.filter(p=>Date.parse(String(p.date).slice(0,10)+"T00:00:00Z")>=cut).length;
+  setText(metaId,"28日表示 / 表示内 "+visibleCount+"点 / 最新 "+fmt(xs[xs.length-1].value,digits));
   $(id).innerHTML=externalChartSvg(xs,lineClass);
 }
 function renderIndicators(){
