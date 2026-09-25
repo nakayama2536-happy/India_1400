@@ -88,6 +88,20 @@ jobs:
           missing_common = [x for x in common_ui_markers if x not in index]
           assert not missing_common, f"missing Common Schema fallback UI markers: {missing_common}"
 
+          expected_private_workflow = (
+              "https://github.com/nakayama2536-happy/"
+              "india-stock-check/actions/workflows/update-market.yml"
+          )
+          obsolete_public_workflow = (
+              "https://github.com/nakayama2536-happy/"
+              "India_1400/actions/workflows/update-market.yml"
+          )
+          assert expected_private_workflow in index, "PWA update target is not the approved Private workflow"
+          assert obsolete_public_workflow not in index, "obsolete Public market workflow target remains in PWA"
+          assert "POLL_MAX_ATTEMPTS=48" in index, "update polling must cover the measured publication latency"
+          assert "h.current_date_has_record" in index, "14:00 status must use actual snapshot evidence"
+          assert "DYNAMIC_JSON" in sw and "canonicalKey" in sw, "dynamic JSON cache must use bounded canonical keys"
+
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
           PY
 

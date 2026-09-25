@@ -29,6 +29,24 @@ jobs:
       - name: Update India Core latest NAV
         run: python update_india_core.py
 
+      - name: Check India Core update status
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+
+          data = json.load(open("india_core.json", encoding="utf-8"))
+          status = data.get("status")
+          as_of = data.get("as_of_date")
+          if status == "ok":
+              print(f"India Core NAV OK: {as_of}")
+          elif status == "fallback":
+              print(f"::warning::India Core NAV fetch fell back to the previous saved value ({as_of or 'unknown date'}).")
+          else:
+              print(f"::error::India Core NAV is unavailable: {data.get('error') or 'unknown error'}")
+              sys.exit(1)
+          PY
+
       - name: Commit fund data
         run: |
           git config user.name "github-actions[bot]"
