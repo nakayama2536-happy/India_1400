@@ -1,4 +1,4 @@
-const CACHE = "india1400-v5-9-20260925";
+const CACHE = "india1400-v5-9-20260925-common1";
 const SHELL = ["./?v=5.9", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", event => {
@@ -33,7 +33,7 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  if (url.pathname.endsWith("/market.json") || url.pathname.endsWith("/history.json") || url.pathname.endsWith("/nifty_daily_history.json") || url.pathname.endsWith("/indicator_history.json")) {
+  if (url.pathname.endsWith("/market.json") || url.pathname.endsWith("/history.json") || url.pathname.endsWith("/nifty_daily_history.json") || url.pathname.endsWith("/indicator_history.json") || url.pathname.endsWith("/common_snapshot.json")) {
     event.respondWith(networkFirst(event.request));
     return;
   }
