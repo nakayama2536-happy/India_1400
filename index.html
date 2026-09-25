@@ -118,7 +118,7 @@
     </div>
 
     <div class="card">
-      <div class="btnrow"><button id="refreshBtn" class="secondary">最新データを読み込む</button><button id="updateBtn" class="primary">最新データに更新</button></div>
+      <div class="btnrow"><button id="refreshBtn" class="secondary">最新データを読み込む</button><button id="updateBtn" class="primary">GitHubで市場データ更新</button></div>
       <div id="generatedAt" class="small" style="margin-top:10px">--</div>
     </div>
   </section>
@@ -194,7 +194,7 @@
 <nav class="tabs"><div class="tabbar"><button class="tab active" data-page="decision">判断</button><button class="tab" data-page="indicators">指標</button><button class="tab" data-page="forecast">予測</button><button class="tab" data-page="detail">詳細</button></div></nav>
 <div id="toast" class="toast"></div>
 <script>
-const REPO_WORKFLOW_URL="https://github.com/nakayama2536-happy/India_1400/actions/workflows/update-market.yml";
+const REPO_WORKFLOW_URL="https://github.com/nakayama2536-happy/india-stock-check/actions/workflows/update-market.yml";
 let market=null,indiaCore=null,commonSnapshot=null,lastGenerated=null,pollTimer=null;
 const $=id=>document.getElementById(id);
 function fmt(x,d=2){if(x===null||x===undefined||Number.isNaN(Number(x)))return"--";return Number(x).toLocaleString("ja-JP",{minimumFractionDigits:d,maximumFractionDigits:d})}
