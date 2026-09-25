@@ -54,6 +54,20 @@
       <div id="nextAction" class="next-action">次のアクション：--</div>
     </div>
 
+    <div id="commonDigestCard" class="card" style="display:none">
+      <h2>10秒ダイジェスト</h2>
+      <div class="statusline">
+        <span id="commonPhase" class="pill">Phase --</span>
+        <span id="commonEligibility" class="pill">判断可否 --</span>
+        <span id="commonDataState" class="pill">Data --</span>
+        <span id="commonQcState" class="pill">QC --</span>
+      </div>
+      <div id="commonStrategy" class="stage" style="margin-top:10px">市場段階 --</div>
+      <div id="commonReasons" class="note" style="margin-top:10px">--</div>
+      <div id="commonNextCondition" class="next-action">次に確認：--</div>
+      <div id="commonAsOf" class="small" style="margin-top:8px">--</div>
+    </div>
+
     <div class="card">
       <h2>3分割購入進捗</h2>
       <div id="purchaseProgress" class="tranche-grid">--</div>
@@ -181,7 +195,7 @@
 <div id="toast" class="toast"></div>
 <script>
 const REPO_WORKFLOW_URL="https://github.com/nakayama2536-happy/India_1400/actions/workflows/update-market.yml";
-let market=null,indiaCore=null,lastGenerated=null,pollTimer=null;
+let market=null,indiaCore=null,commonSnapshot=null,lastGenerated=null,pollTimer=null;
 const $=id=>document.getElementById(id);
 function fmt(x,d=2){if(x===null||x===undefined||Number.isNaN(Number(x)))return"--";return Number(x).toLocaleString("ja-JP",{minimumFractionDigits:d,maximumFractionDigits:d})}
 function signed(x,d=2,s=""){if(x===null||x===undefined||Number.isNaN(Number(x)))return"--";const n=Number(x);return`${n>0?"+":""}${fmt(n,d)}${s}`}
@@ -221,8 +235,33 @@ function referenceRowHtml(x){const when=x.as_of_jst?fmtJstShort(x.as_of_jst)+" J
 function renderReferenceTimes(){const items=market?.reference_data?.items||fallbackReferenceItems();$("decisionDataTimes").innerHTML=items.map(referenceRowHtml).join("")}
 function renderDataTimes(){const el=$("dataTimes");if(!el||!market)return;const items=market?.reference_data?.items||fallbackReferenceItems();el.innerHTML='<div class="source-list">'+items.filter(x=>x.key!=="generated"&&x.label!=="判定生成").map(referenceRowHtml).join("")+'</div>'}
 function renderClockDependent(){if(!market)return;const cw=checkWindowStatus();setText("checkWindowState",cw.label);const el=$("checkWindowState");if(el)el.className="pill "+cw.cls;setText("nextAction","次のアクション："+cw.action);renderReferenceTimes();renderDataTimes()}
+function commonPillClass(value){return["PASS","FRESH","ELIGIBLE","DECISION"].includes(value)?"ok":["FAIL","STALE","MISSING","NOT_ELIGIBLE"].includes(value)?"ng":"warn"}
+function renderCommonDigest(){
+  const card=$("commonDigestCard");
+  if(!card)return;
+  const c=commonSnapshot;
+  if(!c||c.schema_version!=="1.0"){card.style.display="none";return}
+  card.style.display="";
+  const d=c.decision||{},q=c.data_quality||{},ts=c.timestamps||{},ms=c.market_specific||{};
+  const phase=d.phase||"対象外",elig=d.eligibility||"--",ds=q.data_state||"--",qc=q.qc_state||"--";
+  setText("commonPhase","Phase "+phase);$("commonPhase").className="pill "+commonPillClass(phase);
+  setText("commonEligibility",elig==="ELIGIBLE"?"判断可能":"判断不可");$("commonEligibility").className="pill "+commonPillClass(elig);
+  setText("commonDataState","Data "+ds);$("commonDataState").className="pill "+commonPillClass(ds);
+  setText("commonQcState","QC "+qc);$("commonQcState").className="pill "+commonPillClass(qc);
+  setText("commonStrategy","市場段階："+(ms.strategy_stage_label||d.strategy_action||"--"));
+  const reasons=(d.reason_summary||[]).filter(Boolean).slice(0,3);
+  const passed=(d.passed_conditions||[]).map(x=>x.label).filter(Boolean);
+  const risks=(d.risk_conditions||[]).map(x=>x.label).filter(Boolean);
+  const fallback=[passed.length?"成立："+passed.slice(0,2).join("・"):"",risks.length?"注意："+risks.slice(0,2).join("・"):""].filter(Boolean);
+  setText("commonReasons",(reasons.length?reasons:fallback).join(" / ")||"判断理由を確認できません。");
+  const changes=(d.change_conditions||[]).map(x=>x.label).filter(Boolean);
+  const pending=(d.pending_conditions||[]).map(x=>x.label).filter(Boolean);
+  const next=(changes.length?changes:pending).slice(0,3);
+  setText("commonNextCondition","次に確認："+(next.length?next.join("・"):"追加条件なし"));
+  setText("commonAsOf","NIFTY "+fmtJstShort(ts.market_as_of)+" JST / 判定 "+fmtJstShort(ts.calculated_at)+" JST / Common Spec "+(c.common_spec_version||"--"));
+}
 async function fetchJson(path){const r=await fetch(`${path}?v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}
-async function refreshData(silent=false){try{const [m,fund]=await Promise.all([fetchJson("market.json"),fetchJson("india_core.json").catch(()=>null)]);const old=lastGenerated;market=m;indiaCore=fund;lastGenerated=m.generated_at_jst||null;renderAll();if(!silent)toast(old&&old!==lastGenerated?"新しいデータを読み込みました":"最新保存データを読み込みました");return !!(old&&old!==lastGenerated)}catch(e){toast(`読込失敗: ${e.message}`,4500);return false}}
+async function refreshData(silent=false){try{const [m,fund,common]=await Promise.all([fetchJson("market.json"),fetchJson("india_core.json").catch(()=>null),fetchJson("common_snapshot.json").catch(()=>null)]);const old=lastGenerated;market=m;indiaCore=fund;commonSnapshot=common;lastGenerated=m.generated_at_jst||null;renderAll();if(!silent)toast(old&&old!==lastGenerated?"新しいデータを読み込みました":"最新保存データを読み込みました");return !!(old&&old!==lastGenerated)}catch(e){toast(`読込失敗: ${e.message}`,4500);return false}}
 function startPolling(){if(pollTimer)clearInterval(pollTimer);let n=0;pollTimer=setInterval(async()=>{n++;if(await refreshData(true)){clearInterval(pollTimer);pollTimer=null;toast("更新完了を検知しました",4500)}if(n>=12){clearInterval(pollTimer);pollTimer=null}},5000)}
 function openUpdate(){localStorage.setItem("india1400.awaitUpdate","1");window.open(REPO_WORKFLOW_URL,"_blank","noopener");toast("GitHubで Run workflow を実行してください",4500);startPolling()}
 window.addEventListener("focus",()=>{if(localStorage.getItem("india1400.awaitUpdate")==="1"){localStorage.removeItem("india1400.awaitUpdate");refreshData(true);startPolling()}});
@@ -298,7 +337,7 @@ function candlePath(points,key,x,y){let d="";points.forEach((p,i)=>{const v=Numb
 function candlestickSvg(points){const rows=(points||[]).filter(p=>p&&["open","high","low","close"].every(k=>Number.isFinite(Number(p[k]))));if(rows.length<10)return '<div class="history-wait">OHLC履歴を準備中です</div>';const w=680,h=260,pl=46,pr=12,pt=14,pb=24;let vals=[];rows.forEach(p=>{["high","low","ma5","ma25","ma75"].forEach(k=>{const v=Number(p[k]);if(Number.isFinite(v))vals.push(v)})});let lo=Math.min(...vals),hi=Math.max(...vals);const pad=Math.max(1,(hi-lo)*.06);lo-=pad;hi+=pad;const x=i=>pl+(i+.5)*(w-pl-pr)/rows.length;const y=v=>pt+(hi-v)*(h-pt-pb)/(hi-lo);const step=(w-pl-pr)/rows.length,bodyW=Math.max(2,Math.min(8,step*.58));let out=`<svg class="candle-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">`;for(let g=0;g<4;g++){const yy=pt+g*(h-pt-pb)/3;const vv=hi-g*(hi-lo)/3;out+=`<line class="gridline" x1="${pl}" y1="${yy}" x2="${w-pr}" y2="${yy}"/><text x="2" y="${yy+3}">${Math.round(vv).toLocaleString("ja-JP")}</text>`}rows.forEach((p,i)=>{const o=Number(p.open),hh=Number(p.high),ll=Number(p.low),cl=Number(p.close),up=cl>=o,cls=up?"up":"down",xx=x(i),yo=y(o),yc=y(cl),yt=y(hh),yb=y(ll),top=Math.min(yo,yc),bh=Math.max(1.5,Math.abs(yc-yo));out+=`<line class="wick-${cls}" x1="${xx}" y1="${yt}" x2="${xx}" y2="${yb}" stroke-width="1"/><rect class="body-${cls}" x="${xx-bodyW/2}" y="${top}" width="${bodyW}" height="${bh}" stroke-width=".8"/>`});out+=`<path class="ma5" d="${candlePath(rows,"ma5",x,y)}"/><path class="ma25" d="${candlePath(rows,"ma25",x,y)}"/><path class="ma75" d="${candlePath(rows,"ma75",x,y)}"/>`;const marks=[0,Math.floor((rows.length-1)/2),rows.length-1];marks.forEach(i=>{const d=String(rows[i].date||"").slice(5);out+=`<text x="${x(i)}" y="${h-5}" text-anchor="middle">${d}</text>`});out+="</svg>";return out}
 function renderDetailChart(){const d=market?.detail_chart||{},rows=d.candles||[];setText("detailCandleMeta",d.available?`直近 ${rows.length}営業日 / OHLC最新 ${d.latest_ohlc_date||"--"}`:"OHLC準備中");$("detailCandleChart").innerHTML=d.available?candlestickSvg(rows):'<div class="history-wait">詳細ローソク足データを準備中です</div>';let note=d.note||"";if(d.latest_confirmed_date&&d.latest_ohlc_date&&d.latest_confirmed_date!==d.latest_ohlc_date)note+=` 確定終値は ${d.latest_confirmed_date}、OHLCは ${d.latest_ohlc_date} までです。`;setText("detailCandleNote",note||"詳細確認用チャートです。")}
 function renderDetail(){const q=market?.data_quality||{},c=market?.comparison||{},dl=market?.data_lineage||{},nmeta=market?.core_fetch?.nifty||{},am=market?.analysis_meta||{},h=market?.history_1400||{},os=market?.operational_state||{},qs=market?.quality_state||{};const qr=(q.reasons||[]).length?(q.reasons||[]).map(x=>`<div class="reason"><span class="dot"></span><div>${x}</div></div>`).join(""):`<div class="note">品質上の警告なし</div>`;$("qualityReasons").innerHTML=`<div class="note" style="margin-bottom:8px">市場状態：${os.label||"--"} / データ品質：${qs.label||"--"}<br>${os.detail||""}</div>`+qr;setText("historyStatus",`14:00履歴 ${h.record_count??0}件 / ${h.message||"次回14:00保存待ち"}${h.selected_price_as_of_jst?" / 採用時刻 "+fmtJstShort(h.selected_price_as_of_jst)+" JST":""}`);if(c.available){const v=c.values||{},row=(name,x)=>x?`<tr><td>${name}</td><td>${fmt(x.previous,2)}</td><td>${fmt(x.current,2)}</td><td>${signed(x.delta_pct,2,"%")}</td></tr>`:"";$("comparison").innerHTML=`<div class="small">基準 ${c.previous_date_jst||"--"}</div><table class="table"><tbody>${row("NIFTY",v.nifty_price)}${row("USD/INR",v.usdinr)}${row("Brent",v.brent)}</tbody></table>`}else setText("comparison",c.message||"14:00履歴を蓄積中です。");setText("audit",`UI v5.9 / データ処理 v${market?.app_version||"--"}\n状態分類 ${am.status_method_version||"--"} / ${market?.operational_state?.code||"--"} / ${market?.quality_state?.code||"--"}\n判断ゲート ${am.decision_gate_version||"--"}\n時点統一 ${am.basis_method_version||"--"} / ${market?.technical_basis_snapshot?.available?"OK":"要確認"}\n14:00履歴 ${am.history_method_version||"--"} / ${h.record_count??0}件\n予測基準 ${market?.technical_basis_snapshot?.date||"--"} / ${fmt(market?.technical_basis_snapshot?.price,2)}\n日足履歴 ${nmeta.history_cache_rows||0}件 / 最新 ${nmeta.history_cache_last_date||"--"}\n連続性 ${nmeta.history_recent_contiguous?"OK":"要確認"} / 最大gap ${nmeta.history_continuity?.max_gap_days??"--"}日\n予測 ${am.method_version||"--"} / ${am.window_years||"--"}年\n予測検証 ${am.forecast_verification_version||"--"} / 保存 ${market?.forecast_verification?.forecast_count??0}件\nグラフ ${market?.chart_data?.method_version||"--"}\n詳細チャート ${am.detail_chart_version||"--"} / ${market?.detail_chart?.available?"OK":"準備中"}\n本日暫定 ${market?.nifty?.provisional?.available?"利用可能":"未使用"}\nデータ生成 ${market?.generated_at_jst||dl.fetched_at_jst||"--"}`)}
-function renderAll(){renderDecision();renderPurchaseProgress();renderIndicators();renderForecast();renderForecastVerification();renderDetailChart();renderDetail()}
+function renderAll(){renderDecision();renderCommonDigest();renderPurchaseProgress();renderIndicators();renderForecast();renderForecastVerification();renderDetailChart();renderDetail()}
 $("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);$("resetPurchaseBtn").addEventListener("click",resetPurchaseState);refreshData(true);setInterval(()=>{if(market)renderClockDependent()},60000);
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!sessionStorage.getItem("india1400.swReloaded")){sessionStorage.setItem("india1400.swReloaded","1");location.reload()}})}
 </script>
