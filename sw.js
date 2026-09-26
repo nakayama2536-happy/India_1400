@@ -9,6 +9,7 @@ const DYNAMIC_JSON = new Set([
   "forecast_evaluation.json",
   "nifty_ohlc_history.json",
   "india_core.json",
+  "india_core_history.json",
 ]);
 
 self.addEventListener("install", event => {
