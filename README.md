@@ -1,4 +1,4 @@
-# India 14:00 Check PWA v5.17
+# India 14:00 Check PWA v5.18
 
 ## 目的
 
@@ -36,9 +36,14 @@ PWAの「GitHubで市場データ更新」はPrivate coreの手動Workflow画面
 
 画面の「参照データ時刻」「データ品質」を必ず確認してください。
 
+## ChatGPT深掘り
+
+管理タブの「ChatGPT 深掘り分析」は、必要なときだけ公開済みの分析JSON全体と端末内の3分割実施状況を読み込み、1つのMarkdownスナップショットを生成します。OpenAI APIやAPIキーは使用せず、iOS共有・ファイル保存・全文コピーでChatGPTへ渡します。通常表示時は長期履歴を追加読込しません。
+
 ## 公開PWA
 
 - `index.html`：PWA本体
+- `deep-dive.js`：必要時のみ全分析データを集約してChatGPT用Markdownを生成
 - `manifest.webmanifest`：PWA設定
 - `sw.js`：Service Worker
 - アイコン類：ホーム画面・favicon用
