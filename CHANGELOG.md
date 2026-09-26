@@ -18,6 +18,15 @@ India 14:00 Check の主要な変更履歴を記録します。
 
 ## [Unreleased]
 
+## [5.15] - 2026-09-26
+
+### App-only migration
+- インド・コア基準価額の履歴ファイルを追加
+- SBI公開履歴からMA25/MA75、MACD/Signal、RSI14、GC/DCを再現可能に計算する構造を追加
+- 基準価額テクニカルをアプリ内で展開表示
+- NIFTYの3分割判定ロジックとは分離して表示
+- 14:00市場補足（breadth、FII/FPI、DII）を維持
+
 ## [5.14] - 2026-09-26
 
 ### App-only migration
