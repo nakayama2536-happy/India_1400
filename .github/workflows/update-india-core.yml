@@ -3,8 +3,12 @@ name: Update India Core fund NAV
 on:
   workflow_dispatch:
   schedule:
-    # 22:20 JST on weekdays. Fund NAV is generally available by evening.
-    - cron: '20 13 * * 1-5'
+    # App-only migration: check several times in the evening so the PWA can
+    # replace the recurring narrative report without guessing publication time.
+    - cron: '15 10 * * 1-5'  # 19:15 JST
+    - cron: '15 11 * * 1-5'  # 20:15 JST retry
+    - cron: '20 13 * * 1-5'  # 22:20 JST retry
+    - cron: '45 14 * * 1-5'  # 23:45 JST safety retry
 
 permissions:
   contents: write
