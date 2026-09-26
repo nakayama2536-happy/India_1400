@@ -43,6 +43,7 @@ PWAの「GitHubで市場データ更新」はPrivate coreの手動Workflow画面
 ## 公開PWA
 
 - `index.html`：PWA本体
+- `deep-dive.js`：必要時のみ全分析データを集約してChatGPT用Markdownを生成
 - `manifest.webmanifest`：PWA設定
 - `sw.js`：Service Worker
 - アイコン類：ホーム画面・favicon用
