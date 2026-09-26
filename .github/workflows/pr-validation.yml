@@ -96,6 +96,9 @@ jobs:
               'id="deepDiveShareBtn"',
               'id="deepDiveSaveBtn"',
               'id="deepDiveCopyBtn"',
+              'id="deepDiveTriggerCard"',
+              'id="deepDiveTriggerLevel"',
+              'id="deepDiveTriggerOpenBtn"',
               '<script src="deep-dive.js"></script>',
           ]
           missing_deep_ui = [x for x in deep_ui_markers if x not in index]
@@ -107,6 +110,9 @@ jobs:
               "function buildDeepDiveArtifact",
               "navigator.canShare",
               'scope:"purchase_progress_only"',
+              "function evaluateDeepDiveTriggers",
+              "trigger_context:trigger",
+              "mandatory_checks",
           ]
           missing_deep_code = [x for x in deep_code_markers if x not in deep]
           assert not missing_deep_code, f"missing deep-dive implementation markers: {missing_deep_code}"

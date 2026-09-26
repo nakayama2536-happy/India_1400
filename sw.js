@@ -1,5 +1,5 @@
-const CACHE = "india1400-v5-18-20260926-chatgpt-deep-dive";
-const SHELL = ["./?v=5.18", "index.html", "deep-dive.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v5-19-20260926-gpt-trigger";
+const SHELL = ["./?v=5.19", "index.html", "deep-dive.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const DYNAMIC_JSON = new Set([
   "market.json",
   "history.json",
