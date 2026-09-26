@@ -1,8 +1,8 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "description": "インド株14:00定点確認 v5.14・3分割売買目安・1/3/14営業日予測・指標ミニグラフ・データ品質",
-  "start_url": "./?v=5.14",
+  "description": "インド株14:00定点確認 v5.15・3分割売買目安・1/3/14営業日予測・指標ミニグラフ・データ品質",
+  "start_url": "./?v=5.15",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
