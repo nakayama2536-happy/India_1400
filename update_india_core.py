@@ -8,11 +8,12 @@ This data is display/reference information and is never used by NIFTY trading lo
 from __future__ import annotations
 
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import html
 import json
 import re
+import urllib.parse
 import urllib.request
 
 OUT = Path("india_core.json")
@@ -20,6 +21,7 @@ HISTORY_OUT = Path("india_core_history.json")
 JST = ZoneInfo("Asia/Tokyo")
 OFFICIAL_URL = "https://www.eastspring.co.jp/funds/fund-listings/fund-details?isincode=200027"
 SBI_URL = "https://site0.sbisec.co.jp/marble/fund/history/standardprice.do?fund_sec_code=83311227"
+YAHOO_HISTORY_URL = "https://finance.yahoo.co.jp/quote/83311227/history"
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
 
 
@@ -99,6 +101,61 @@ def parse_rows(text: str):
     return [rows[k] for k in sorted(rows)]
 
 
+def parse_yahoo_rows(text: str):
+    """Parse Yahoo! Finance Japan fund history rows from visible page text."""
+    pattern = re.compile(
+        r"(20\d{2})/(\d{1,2})/(\d{1,2})\s+"
+        r"([0-9][0-9,]*)\s+"
+        r"([+\-−]?[0-9][0-9,]*)\s+"
+        r"([0-9][0-9,]*)"
+    )
+    rows = {}
+    for m in pattern.finditer(text):
+        date = f"{int(m.group(1)):04d}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+        nav = int(m.group(4).replace(",", ""))
+        change = int(m.group(5).replace(",", "").replace("−", "-"))
+        assets = int(m.group(6).replace(",", ""))
+        if 1000 <= nav <= 100000 and assets >= 0:
+            rows[date] = {
+                "date": date,
+                "nav_yen": nav,
+                "change_yen": change,
+                "net_assets_million_yen": assets,
+            }
+    return [rows[k] for k in sorted(rows)]
+
+
+def fetch_yahoo_history(now, pages=5):
+    """Fetch up to ~100 recent fund observations for MA75/RSI/MACD."""
+    start = (now - timedelta(days=800)).strftime("%Y%m%d")
+    end = now.strftime("%Y%m%d")
+    merged = {}
+    last_signature = None
+    for page in range(1, pages + 1):
+        params = urllib.parse.urlencode({
+            "from": start,
+            "to": end,
+            "timeFrame": "d",
+            "page": page,
+        })
+        text = strip_html(fetch_text(f"{YAHOO_HISTORY_URL}?{params}"))
+        rows = parse_yahoo_rows(text)
+        if not rows:
+            break
+        signature = tuple((r["date"], r["nav_yen"]) for r in rows)
+        if signature == last_signature:
+            break
+        last_signature = signature
+        for row in rows:
+            merged[row["date"]] = row
+        if len(rows) < 20:
+            break
+    out = [merged[k] for k in sorted(merged)]
+    if len(out) < 26:
+        raise RuntimeError(f"Yahoo fund history too short: {len(out)} rows")
+    return out
+
+
 def sma(values, period):
     if len(values) < period:
         return None
@@ -171,8 +228,21 @@ def main():
     old = load_old()
     try:
         sbi_page = strip_html(fetch_text(SBI_URL))
-        rows = parse_rows(sbi_page)
-        sbi_latest = rows[-1]
+        sbi_rows = parse_rows(sbi_page)
+        sbi_latest = sbi_rows[-1]
+
+        history_source = "SBI証券（基準価額履歴）"
+        history_source_url = SBI_URL
+        history_error = None
+        try:
+            yahoo_rows = fetch_yahoo_history(now)
+            rows = yahoo_rows if len(yahoo_rows) >= len(sbi_rows) else sbi_rows
+            if rows is yahoo_rows:
+                history_source = "Yahoo!ファイナンス（基準価額時系列）"
+                history_source_url = YAHOO_HISTORY_URL
+        except Exception as e:
+            history_error = str(e)
+            rows = sbi_rows
 
         official = None
         official_error = None
@@ -205,8 +275,8 @@ def main():
         history_doc = {
             "schema_version": 2,
             "fund_key": "eastspring_india_core",
-            "source": "SBI証券（履歴）",
-            "source_url": SBI_URL,
+            "source": history_source,
+            "source_url": history_source_url,
             "updated_at_jst": now.isoformat(timespec="seconds"),
             "records": rows[-520:],
         }
@@ -219,8 +289,9 @@ def main():
             "source": "イーストスプリング公式" if use_official else "SBI証券",
             "source_url": OFFICIAL_URL if use_official else SBI_URL,
             "official_source_url": OFFICIAL_URL,
-            "history_source": "SBI証券（基準価額履歴）",
-            "history_source_url": SBI_URL,
+            "history_source": history_source,
+            "history_source_url": history_source_url,
+            "history_error": history_error,
             "official_status": "ok" if use_official else ("older_than_sbi" if official else "unavailable"),
             "official_error": official_error,
             "fund_sec_code": "83311227",
@@ -233,7 +304,7 @@ def main():
             "fetched_at_jst": now.isoformat(timespec="seconds"),
             "status": "ok",
             "technical": technical,
-            "note": "最新値は運用会社公式を優先し、テクニカルはSBIの基準価額履歴から再計算します。NIFTYの3分割判定ロジックには混在させません。",
+            "note": "最新値は運用会社公式を優先し、テクニカルはYahoo/SBIの基準価額履歴から再計算します。NIFTYの3分割判定ロジックには混在させません。",
         }
     except Exception as e:
         data = dict(old) if isinstance(old, dict) else {}
