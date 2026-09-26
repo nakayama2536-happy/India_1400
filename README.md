@@ -1,8 +1,8 @@
-# India 14:00 Check PWA v5.16
+# India 14:00 Check PWA v5.17
 
 ## 目的
 
-iPhoneで14:00頃に開き、NIFTY 50、USD/INR、Brent、India VIX、移動平均、RSI、MACDなどを確認する個人用PWAです。設定済みの条件に基づく3分割売買目安と、1・3・14営業日の統計的参考表示を提供します。
+iPhoneで14:00頃に開き、NIFTY 50、インド・コア、USD/INR、USD/JPY、INR/JPY、Brent、India VIX、移動平均、RSI、MACDなどを確認する個人用PWAです。設定済みの条件に基づく3分割売買目安と、1・3・14営業日の統計的参考表示を提供します。
 
 ## 現在の構成
 
