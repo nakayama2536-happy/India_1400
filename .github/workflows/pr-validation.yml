@@ -53,6 +53,7 @@ jobs:
 
           index = Path("index.html").read_text(encoding="utf-8")
           sw = Path("sw.js").read_text(encoding="utf-8")
+          deep = Path("deep-dive.js").read_text(encoding="utf-8")
 
           assert market.get("app_version") == appv, "market.json app_version mismatch"
           assert f"v={uiv}" in manifest.get("start_url", ""), "manifest UI version mismatch"
@@ -60,7 +61,7 @@ jobs:
           assert f"v{uiv.replace('.', '-')}" in sw, "service worker UI cache version mismatch"
 
           required = [
-              "index.html", "manifest.webmanifest", "sw.js", "market.json",
+              "index.html", "deep-dive.js", "manifest.webmanifest", "sw.js", "market.json",
               "history.json", "indicator_history.json", "forecast_evaluation.json",
               "nifty_daily_history.json", "nifty_ohlc_history.json", "india_core_history.json",
               ".github/workflows/security-check.yml",
@@ -88,6 +89,37 @@ jobs:
           ]
           missing_common = [x for x in common_ui_markers if x not in index]
           assert not missing_common, f"missing Common Schema fallback UI markers: {missing_common}"
+
+          deep_ui_markers = [
+              'id="deepDiveBuildBtn"',
+              'id="deepDiveShareBtn"',
+              'id="deepDiveSaveBtn"',
+              'id="deepDiveCopyBtn"',
+              '<script src="deep-dive.js"></script>',
+          ]
+          missing_deep_ui = [x for x in deep_ui_markers if x not in index]
+          assert not missing_deep_ui, f"missing deep-dive UI markers: {missing_deep_ui}"
+
+          deep_code_markers = [
+              "const DEEP_DIVE_FILES",
+              "function buildDeepDiveMarkdown",
+              "function buildDeepDiveArtifact",
+              "navigator.canShare",
+              'scope:"purchase_progress_only"',
+          ]
+          missing_deep_code = [x for x in deep_code_markers if x not in deep]
+          assert not missing_deep_code, f"missing deep-dive implementation markers: {missing_deep_code}"
+
+          dynamic_match = re.search(r"const DYNAMIC_JSON\s*=\s*new Set\(\[(.*?)\]\);", sw, flags=re.S)
+          assert dynamic_match, "service worker DYNAMIC_JSON declaration not found"
+          dynamic_json = set(re.findall(r'"([^"]+\.json)"', dynamic_match.group(1)))
+          deep_json = set(re.findall(r'path:"([^"]+\.json)"', deep))
+          missing_from_deep = sorted(dynamic_json - deep_json)
+          assert not missing_from_deep, (
+              "deep-dive export is missing app analytical JSON files: "
+              + ", ".join(missing_from_deep)
+          )
+          assert "VERSION" in deep and "VERSION" in sw, "deep-dive VERSION snapshot/cache marker missing"
 
           expected_private_workflow = (
               "https://github.com/nakayama2536-happy/"
@@ -120,3 +152,4 @@ jobs:
           Path(".inline-app.js").write_text(inline, encoding="utf-8")
           PY
           node --check .inline-app.js
+          node --check deep-dive.js
