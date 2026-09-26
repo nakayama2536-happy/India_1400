@@ -15,6 +15,7 @@ import re
 import urllib.request
 
 OUT = Path("india_core.json")
+HISTORY_OUT = Path("india_core_history.json")
 JST = ZoneInfo("Asia/Tokyo")
 URL = "https://site0.sbisec.co.jp/marble/fund/history/standardprice.do?fund_sec_code=83311227"
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
@@ -50,7 +51,7 @@ def strip_html(src: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def parse_latest(text: str):
+def parse_rows(text: str):
     # Expected visible sequence in SBI history table:
     # YYYY/MM/DD | 15,821円 | +346円 | 14,848百万円
     pattern = re.compile(
@@ -59,22 +60,78 @@ def parse_latest(text: str):
         r"([+\-−]?[0-9][0-9,]*)円\s+"
         r"([0-9][0-9,]*)百万円"
     )
-    matches = list(pattern.finditer(text))
-    if not matches:
-        raise RuntimeError("SBI fund row not found")
-    rows = []
-    for m in matches:
+    rows = {}
+    for m in pattern.finditer(text):
         date = m.group(1).replace("/", "-")
         nav = int(m.group(2).replace(",", ""))
         change_raw = m.group(3).replace(",", "").replace("−", "-")
         change = int(change_raw)
         assets = int(m.group(4).replace(",", ""))
         if 1000 <= nav <= 100000 and assets >= 0:
-            rows.append((date, nav, change, assets))
+            rows[date] = {"date": date, "nav_yen": nav, "change_yen": change, "net_assets_million_yen": assets}
     if not rows:
         raise RuntimeError("No valid SBI fund rows")
-    rows.sort(key=lambda x: x[0], reverse=True)
-    return rows[0]
+    return [rows[k] for k in sorted(rows)]
+
+
+def sma(values, period):
+    if len(values) < period:
+        return None
+    return sum(values[-period:]) / period
+
+
+def ema_series(values, period):
+    if not values:
+        return []
+    alpha = 2.0 / (period + 1.0)
+    out = [float(values[0])]
+    for value in values[1:]:
+        out.append(alpha * float(value) + (1.0 - alpha) * out[-1])
+    return out
+
+
+def rsi14(values, period=14):
+    if len(values) < period + 1:
+        return None
+    gains, losses = [], []
+    for a, b in zip(values[-(period + 1):-1], values[-period:]):
+        d = float(b) - float(a)
+        gains.append(max(d, 0.0))
+        losses.append(max(-d, 0.0))
+    avg_gain = sum(gains) / period
+    avg_loss = sum(losses) / period
+    if avg_loss == 0:
+        return 100.0 if avg_gain > 0 else 50.0
+    rs = avg_gain / avg_loss
+    return 100.0 - 100.0 / (1.0 + rs)
+
+
+def build_technical(rows):
+    values = [float(r["nav_yen"]) for r in rows]
+    ema12 = ema_series(values, 12)
+    ema26 = ema_series(values, 26)
+    macd_series = [a - b for a, b in zip(ema12, ema26)]
+    signal_series = ema_series(macd_series, 9)
+    macd = macd_series[-1] if macd_series else None
+    signal = signal_series[-1] if signal_series else None
+    ma25 = sma(values, 25)
+    ma75 = sma(values, 75)
+    rsi = rsi14(values)
+    gc_dc = "GC" if ma25 is not None and ma75 is not None and ma25 >= ma75 else ("DC" if ma25 is not None and ma75 is not None else None)
+    return {
+        "available": len(values) >= 26,
+        "method_version": "fund-tech-1",
+        "basis_date": rows[-1]["date"] if rows else None,
+        "history_count": len(values),
+        "ma25": round(ma25, 2) if ma25 is not None else None,
+        "ma75": round(ma75, 2) if ma75 is not None else None,
+        "macd": round(macd, 3) if macd is not None else None,
+        "macd_signal": round(signal, 3) if signal is not None else None,
+        "macd_hist": round(macd - signal, 3) if macd is not None and signal is not None else None,
+        "rsi14": round(rsi, 2) if rsi is not None else None,
+        "gc_dc": gc_dc,
+        "note": "基準価額履歴から25/75日線、EMA12/26、Signal9、RSI14を再計算。",
+    }
 
 
 def load_old():
@@ -89,11 +146,26 @@ def main():
     old = load_old()
     try:
         page = strip_html(fetch_text())
-        date, nav, change, assets = parse_latest(page)
+        rows = parse_rows(page)
+        latest = rows[-1]
+        date = latest["date"]
+        nav = latest["nav_yen"]
+        change = latest["change_yen"]
+        assets = latest["net_assets_million_yen"]
         previous_nav = nav - change
         change_pct = (change / previous_nav * 100.0) if previous_nav else None
+        technical = build_technical(rows)
+        history_doc = {
+            "schema_version": 2,
+            "fund_key": "eastspring_india_core",
+            "source": "SBI証券",
+            "source_url": URL,
+            "updated_at_jst": now.isoformat(timespec="seconds"),
+            "records": rows[-520:],
+        }
+        HISTORY_OUT.write_text(json.dumps(history_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         data = {
-            "schema_version": 1,
+            "schema_version": 2,
             "fund_key": "eastspring_india_core",
             "fund_name": "イーストスプリング・インド・コア株式ファンド",
             "short_name": "インド・コア",
@@ -108,7 +180,8 @@ def main():
             "net_assets_oku_yen": round(assets / 100.0, 2),
             "fetched_at_jst": now.isoformat(timespec="seconds"),
             "status": "ok",
-            "note": "基準価額は投信の最新状況表示用で、NIFTYの売買判定ロジックには使用しません。",
+            "technical": technical,
+            "note": "基準価額と基準価額テクニカルをアプリ内で確認できます。NIFTYの3分割判定ロジックには混在させません。",
         }
     except Exception as e:
         data = dict(old) if isinstance(old, dict) else {}
