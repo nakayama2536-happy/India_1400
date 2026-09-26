@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "fund_key": "eastspring_india_core",
+  "source": "SBI証券",
+  "source_url": "https://site0.sbisec.co.jp/marble/fund/history/standardprice.do?fund_sec_code=83311227",
+  "updated_at_jst": "2026-09-26T02:57:22+09:00",
+  "records": [
+    {
+      "date": "2026-09-25",
+      "nav_yen": 15679,
+      "change_yen": -142,
+      "net_assets_million_yen": 14716
+    }
+  ]
+}
