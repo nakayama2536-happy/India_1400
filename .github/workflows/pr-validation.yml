@@ -47,6 +47,7 @@ jobs:
               "forecast_evaluation.json",
               "nifty_daily_history.json",
               "nifty_ohlc_history.json",
+              "india_core_history.json",
           ):
               json.loads(Path(name).read_text(encoding="utf-8"))
 
@@ -61,7 +62,7 @@ jobs:
           required = [
               "index.html", "manifest.webmanifest", "sw.js", "market.json",
               "history.json", "indicator_history.json", "forecast_evaluation.json",
-              "nifty_daily_history.json", "nifty_ohlc_history.json",
+              "nifty_daily_history.json", "nifty_ohlc_history.json", "india_core_history.json",
               ".github/workflows/security-check.yml",
           ]
           missing = [p for p in required if not Path(p).exists()]
