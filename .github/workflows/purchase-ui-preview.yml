@@ -1,19 +1,21 @@
-name: Purchase UI Preview
+name: Purchase UI Contract
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'maintenance/prepare_compact_purchase.py'
+      - 'index.html'
+      - 'VERSION'
+      - 'manifest.webmanifest'
+      - 'sw.js'
       - 'tests/purchase-compact.test.cjs'
       - '.github/workflows/purchase-ui-preview.yml'
-      - 'index.html'
 
 permissions:
   contents: read
 
 jobs:
-  purchase-ui-preview:
+  purchase-ui-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
@@ -23,11 +25,17 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - name: Build guarded preview in a temporary directory
-        run: python maintenance/prepare_compact_purchase.py --output-dir "${RUNNER_TEMP}/purchase-ui-preview"
-      - name: Check generated JavaScript and execute behavior tests
+      - name: Extract and check production inline JavaScript
         run: |
-          node --check "${RUNNER_TEMP}/purchase-ui-preview/inline.js"
-          PURCHASE_PREVIEW_HTML="${RUNNER_TEMP}/purchase-ui-preview/index.html" node --test tests/purchase-compact.test.cjs
-      - name: Verify tracked application files are untouched
-        run: git diff --exit-code
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path("index.html").read_text(encoding="utf-8")
+          scripts=re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>",html,re.S|re.I)
+          Path(".inline-purchase.js").write_text("\n".join(s for s in scripts if s.strip()),encoding="utf-8")
+          PY
+          node --check .inline-purchase.js
+      - name: Execute production purchase-state behavior tests
+        env:
+          PURCHASE_PREVIEW_HTML: index.html
+        run: node --test tests/purchase-compact.test.cjs
