@@ -172,7 +172,8 @@ async function buildDeepDiveArtifact(){
   try{
     if(!window.IndiaDeepDiveBundle?.loadVerifiedSources)throw new Error("publication検証モジュールを読み込めません");
     const verified=await window.IndiaDeepDiveBundle.loadVerifiedSources(DEEP_DIVE_FILES,{attempts:2});
-    const sources=verified.sources,publication=verified.manifest,includePurchaseProgress=$("deepDiveIncludePurchase")?.checked===true;\n    const text=buildDeepDiveMarkdown(sources,publication,{includePurchaseProgress}),stamp=deepDiveStamp();
+    const sources=verified.sources,publication=verified.manifest,includePurchaseProgress=$("deepDiveIncludePurchase")?.checked===true;
+    const text=buildDeepDiveMarkdown(sources,publication,{includePurchaseProgress}),stamp=deepDiveStamp();
     const name=`India_DeepDive_${stamp.file}.md`,file=new File([text],name,{type:"text/markdown;charset=utf-8"});
     deepDiveArtifact={bundle_id:"INDIA:"+publication.publication_id+":"+stamp.file,publication_id:publication.publication_id,name,text,file,sources,publication,local_data_included:includePurchaseProgress};
     setDeepDiveReady(true);
