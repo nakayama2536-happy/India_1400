@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "india1400-v";
-const CACHE = "india1400-v5-22-20260927-review-history-cache1";
-const SHELL = ["./?v=5.22", "index.html", "deep-dive.js", "review-history.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v5-23-20260927-deep-dive-manifest-cache1";
+const SHELL = ["./?v=5.23", "index.html", "deep-dive.js", "deep-dive-bundle.js", "review-history.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const DYNAMIC_JSON = new Set([
   "market.json",
   "history.json",
@@ -11,8 +11,10 @@ const DYNAMIC_JSON = new Set([
   "nifty_ohlc_history.json",
   "india_core.json",
   "india_core_history.json",
+  "publication_manifest.json",
 ]);
-function isDynamic(url) { return DYNAMIC_JSON.has(url.pathname.split("/").pop()); }
+const DYNAMIC_TEXT = new Set(["VERSION"]);
+function isDynamic(url) { const name=url.pathname.split("/").pop(); return DYNAMIC_JSON.has(name) || DYNAMIC_TEXT.has(name); }
 
 // Cache contract: COM-CACHE-002/003, revision 1 (2026-09-27).
 // This namespace prevents accidental cross-app use; it is not an origin security boundary.
