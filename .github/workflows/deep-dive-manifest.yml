@@ -7,6 +7,7 @@ on:
       - 'deep-dive-bundle.js'
       - 'deep-dive.js'
       - 'tests/deep-dive-manifest.test.cjs'
+      - 'tests/deep-dive-privacy.test.cjs'
       - '.github/workflows/deep-dive-manifest.yml'
       - 'index.html'
       - 'VERSION'
@@ -18,6 +19,7 @@ on:
       - 'deep-dive-bundle.js'
       - 'deep-dive.js'
       - 'tests/deep-dive-manifest.test.cjs'
+      - 'tests/deep-dive-privacy.test.cjs'
       - '.github/workflows/deep-dive-manifest.yml'
       - 'index.html'
       - 'VERSION'
@@ -42,5 +44,5 @@ jobs:
         run: |
           node --check deep-dive-bundle.js
           node --check deep-dive.js
-      - name: Execute FULL manifest contract
-        run: node --test tests/deep-dive-manifest.test.cjs
+      - name: Execute FULL manifest and privacy contracts
+        run: node --test tests/deep-dive-manifest.test.cjs tests/deep-dive-privacy.test.cjs
