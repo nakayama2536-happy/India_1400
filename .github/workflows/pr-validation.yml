@@ -112,13 +112,23 @@ jobs:
               "function buildDeepDiveMarkdown",
               "function buildDeepDiveArtifact",
               "navigator.canShare",
-              'scope:"purchase_progress_only"',
+              'scope:"tranche_status_and_dates"',
+              'const DEEP_DIVE_PRIVACY_VERSION="0.1"',
+              "function readDeepDivePurchaseProgress",
+              "function deepDiveExportTrigger",
+              "function invalidateDeepDivePrivacy",
+              "choice.checked=false",
+              "window.confirm",
               "function evaluateDeepDiveTriggers",
               "trigger_context:trigger",
               "mandatory_checks",
           ]
           missing_deep_code = [x for x in deep_code_markers if x not in deep]
           assert not missing_deep_code, f"missing deep-dive implementation markers: {missing_deep_code}"
+          assert version.get("DEEP_DIVE_PRIVACY_VERSION") == "0.1", "privacy component version mismatch"
+          assert Path("tests/deep-dive-privacy.test.cjs").exists(), "privacy behavior tests missing"
+          privacy_ci = Path(".github/workflows/deep-dive-manifest.yml").read_text(encoding="utf-8")
+          assert "node --test tests/deep-dive-manifest.test.cjs tests/deep-dive-privacy.test.cjs" in privacy_ci, "privacy behavior tests must execute in CI"
 
           dynamic_match = re.search(r"const DYNAMIC_JSON\s*=\s*new Set\(\[(.*?)\]\);", sw, flags=re.S)
           assert dynamic_match, "service worker DYNAMIC_JSON declaration not found"
