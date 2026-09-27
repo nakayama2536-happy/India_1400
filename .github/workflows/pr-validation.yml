@@ -55,6 +55,8 @@ jobs:
           index = Path("index.html").read_text(encoding="utf-8")
           sw = Path("sw.js").read_text(encoding="utf-8")
           deep = Path("deep-dive.js").read_text(encoding="utf-8")
+          bundle = Path("deep-dive-bundle.js").read_text(encoding="utf-8")
+          publication = json.loads(Path("publication_manifest.json").read_text(encoding="utf-8"))
 
           assert market.get("app_version") == appv, "market.json app_version mismatch"
           assert f"v={uiv}" in manifest.get("start_url", ""), "manifest UI version mismatch"
@@ -62,7 +64,7 @@ jobs:
           assert f"v{uiv.replace('.', '-')}" in sw, "service worker UI cache version mismatch"
 
           required = [
-              "index.html", "deep-dive.js", "review-history.js", "manifest.webmanifest", "sw.js", "market.json",
+              "index.html", "deep-dive.js", "deep-dive-bundle.js", "review-history.js", "publication_manifest.json", "manifest.webmanifest", "sw.js", "market.json",
               "history.json", "indicator_history.json", "forecast_evaluation.json",
               "nifty_daily_history.json", "nifty_ohlc_history.json", "india_core_history.json",
               ".github/workflows/security-check.yml",
@@ -99,6 +101,7 @@ jobs:
               'id="deepDiveTriggerCard"',
               'id="deepDiveTriggerLevel"',
               'id="deepDiveTriggerOpenBtn"',
+              '<script src="deep-dive-bundle.js"></script>',
               '<script src="deep-dive.js"></script>',
           ]
           missing_deep_ui = [x for x in deep_ui_markers if x not in index]
@@ -121,12 +124,27 @@ jobs:
           assert dynamic_match, "service worker DYNAMIC_JSON declaration not found"
           dynamic_json = set(re.findall(r'"([^"]+\.json)"', dynamic_match.group(1)))
           deep_json = set(re.findall(r'path:"([^"]+\.json)"', deep))
-          missing_from_deep = sorted(dynamic_json - deep_json)
+          missing_from_deep = sorted((dynamic_json - {"publication_manifest.json"}) - deep_json)
           assert not missing_from_deep, (
               "deep-dive export is missing app analytical JSON files: "
               + ", ".join(missing_from_deep)
           )
           assert "VERSION" in deep and "VERSION" in sw, "deep-dive VERSION snapshot/cache marker missing"
+          assert "publication_manifest.json" in dynamic_json, "publication manifest must be network-first"
+          assert 'const DYNAMIC_TEXT = new Set(["VERSION"])' in sw, "VERSION must use bounded network-first cache"
+          assert "IndiaDeepDiveBundle" in bundle, "deep-dive bundle verifier missing"
+          assert "loadVerifiedSources" in deep, "deep-dive builder is not using verified sources"
+          assert publication.get("market") == "INDIA", "publication manifest market mismatch"
+          assert publication.get("source_state") == "READY", "publication manifest is not READY"
+          required_manifest_paths = {x.get("path") for x in publication.get("files",[]) if x.get("required_for_bundle")}
+          expected_bundle_paths = {
+              "market.json","history.json","indicator_history.json","forecast_evaluation.json",
+              "nifty_daily_history.json","nifty_ohlc_history.json","common_snapshot.json",
+              "india_core.json","india_core_history.json","VERSION",
+          }
+          assert required_manifest_paths == expected_bundle_paths, "publication manifest source set mismatch"
+          assert all(len(str(x.get("sha256") or "")) == 64 for x in publication.get("files",[])), "publication manifest hash missing"
+          assert Path("tests/deep-dive-manifest.test.cjs").exists(), "deep-dive manifest tests missing"
           assert '<script src="review-history.js"></script>' in index, "review history module script missing"
           assert 'id="deepDiveReviewPanel"' in index, "review panel missing"
           assert 'IndiaReviewHistory' in index, "review history runtime hooks missing"
@@ -166,3 +184,5 @@ jobs:
           PY
           node --check .inline-app.js
           node --check deep-dive.js
+          node --check deep-dive-bundle.js
+          node --check review-history.js
