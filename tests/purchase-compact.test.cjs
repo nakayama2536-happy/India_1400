@@ -4,7 +4,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const html=fs.readFileSync(process.env.PURCHASE_PREVIEW_HTML,'utf8');
+const html=fs.readFileSync(process.env.PURCHASE_PREVIEW_HTML||'index.html','utf8');
 const code=html.slice(html.indexOf('const PURCHASE_STATE_KEY='),html.indexOf('function fallbackReferenceItems'));
 const KEY='india1400.purchaseProgress.v1';
 const saved={t1:true,t2:false,t3:false,updated_at:'2026-09-25T13:44:52.000Z'};
