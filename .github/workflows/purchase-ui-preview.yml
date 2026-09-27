@@ -1,0 +1,33 @@
+name: Purchase UI Preview
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'maintenance/prepare_compact_purchase.py'
+      - 'tests/purchase-compact.test.cjs'
+      - '.github/workflows/purchase-ui-preview.yml'
+      - 'index.html'
+
+permissions:
+  contents: read
+
+jobs:
+  purchase-ui-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Build guarded preview in a temporary directory
+        run: python maintenance/prepare_compact_purchase.py --output-dir "${RUNNER_TEMP}/purchase-ui-preview"
+      - name: Check generated JavaScript and execute behavior tests
+        run: |
+          node --check "${RUNNER_TEMP}/purchase-ui-preview/inline.js"
+          PURCHASE_PREVIEW_HTML="${RUNNER_TEMP}/purchase-ui-preview/index.html" node --test tests/purchase-compact.test.cjs
+      - name: Verify tracked application files are untouched
+        run: git diff --exit-code
