@@ -1,0 +1,88 @@
+name: Publication Manifest
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/build_publication_manifest.py'
+      - 'tests/test_publication_manifest.py'
+      - '.github/workflows/publication-manifest.yml'
+      - 'market.json'
+      - 'history.json'
+      - 'indicator_history.json'
+      - 'forecast_evaluation.json'
+      - 'nifty_daily_history.json'
+      - 'nifty_ohlc_history.json'
+      - 'common_snapshot.json'
+      - 'india_core.json'
+      - 'india_core_history.json'
+      - 'VERSION'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_publication_manifest.py'
+      - 'tests/test_publication_manifest.py'
+      - '.github/workflows/publication-manifest.yml'
+      - 'market.json'
+      - 'history.json'
+      - 'indicator_history.json'
+      - 'forecast_evaluation.json'
+      - 'nifty_daily_history.json'
+      - 'nifty_ohlc_history.json'
+      - 'common_snapshot.json'
+      - 'india_core.json'
+      - 'india_core_history.json'
+      - 'VERSION'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: india-publication-manifest
+  cancel-in-progress: true
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Manifest unit tests
+        run: python tests/test_publication_manifest.py
+      - name: Build manifest candidate
+        run: python scripts/build_publication_manifest.py --output "$RUNNER_TEMP/publication_manifest.json"
+      - name: Validate manifest candidate
+        run: |
+          python -m json.tool "$RUNNER_TEMP/publication_manifest.json" > /dev/null
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'publication_manifest.json'
+          m=json.loads(p.read_text())
+          assert m['source_state']=='READY'
+          assert len(m['files'])==10
+          assert all(x['status']=='OK' and x['required_for_bundle'] for x in m['files'])
+          assert len({x['path'] for x in m['files']})==10
+          print('PUBLICATION MANIFEST CONTRACT PASS',m['publication_id'])
+          PY
+      - name: Commit latest main manifest
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          python scripts/build_publication_manifest.py --output publication_manifest.json
+          git add publication_manifest.json
+          if git diff --cached --quiet; then
+            echo "Publication manifest unchanged"
+          else
+            git commit -m "Update India publication manifest"
+            git push origin main
+          fi
