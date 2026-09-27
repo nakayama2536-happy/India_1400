@@ -7,6 +7,7 @@ on:
       - 'deep-dive-bundle.js'
       - 'deep-dive.js'
       - 'tests/deep-dive-manifest.test.cjs'
+      - 'tests/deep-dive-local-data.test.cjs'
       - '.github/workflows/deep-dive-manifest.yml'
       - 'index.html'
       - 'VERSION'
@@ -43,4 +44,4 @@ jobs:
           node --check deep-dive-bundle.js
           node --check deep-dive.js
       - name: Execute FULL manifest contract
-        run: node --test tests/deep-dive-manifest.test.cjs
+        run: node --test tests/deep-dive-manifest.test.cjs tests/deep-dive-local-data.test.cjs
