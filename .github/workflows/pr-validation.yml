@@ -62,7 +62,7 @@ jobs:
           assert f"v{uiv.replace('.', '-')}" in sw, "service worker UI cache version mismatch"
 
           required = [
-              "index.html", "deep-dive.js", "manifest.webmanifest", "sw.js", "market.json",
+              "index.html", "deep-dive.js", "review-history.js", "manifest.webmanifest", "sw.js", "market.json",
               "history.json", "indicator_history.json", "forecast_evaluation.json",
               "nifty_daily_history.json", "nifty_ohlc_history.json", "india_core_history.json",
               ".github/workflows/security-check.yml",
@@ -127,6 +127,12 @@ jobs:
               + ", ".join(missing_from_deep)
           )
           assert "VERSION" in deep and "VERSION" in sw, "deep-dive VERSION snapshot/cache marker missing"
+          assert '<script src="review-history.js"></script>' in index, "review history module script missing"
+          assert 'id="deepDiveReviewPanel"' in index, "review panel missing"
+          assert 'IndiaReviewHistory' in index, "review history runtime hooks missing"
+          assert 'バックアップJSONを保存' in index and 'バックアップを復元' in index
+          assert Path("review-history.js").exists(), "review history module missing"
+          assert Path("tests/review-history.test.cjs").exists(), "review history tests missing"
 
           expected_private_workflow = (
               "https://github.com/nakayama2536-happy/"
