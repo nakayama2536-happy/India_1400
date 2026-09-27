@@ -1,0 +1,36 @@
+name: Review History Contract
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'review-history.js'
+      - 'index.html'
+      - 'tests/review-history.test.cjs'
+      - '.github/workflows/review-history.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'review-history.js'
+      - 'index.html'
+      - 'tests/review-history.test.cjs'
+      - '.github/workflows/review-history.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  review-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Check review module syntax
+        run: node --check review-history.js
+      - name: Execute review-history contract tests
+        run: node --test tests/review-history.test.cjs
