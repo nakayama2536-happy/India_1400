@@ -179,6 +179,11 @@ jobs:
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
           PY
 
+      - name: Public delivery safety gate
+        run: |
+          python scripts/public_delivery_gate.py
+          python -m unittest tests.test_public_delivery_gate
+
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
 
