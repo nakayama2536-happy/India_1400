@@ -1,0 +1,66 @@
+name: Pages Candidate - COM-PUB-001
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/pages-candidate.yml'
+      - 'scripts/public_delivery_gate.py'
+      - 'tests/test_public_delivery_gate.py'
+      - 'tests/test_pages_candidate_contract.py'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-public-delivery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Existing public delivery gate
+        run: |
+          python scripts/public_delivery_gate.py
+          python -m unittest tests.test_public_delivery_gate tests.test_pages_candidate_contract
+
+  build-pages-artifact:
+    needs: validate-public-delivery
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Build exact static tree candidate
+        run: |
+          mkdir -p _site
+          git ls-files -z | while IFS= read -r -d '' path; do
+            case "$path" in
+              .git*|tests/*|scripts/*|CACHE_OPERATIONS.md|CHANGELOG.md|README.md|SECURITY.md|update_india_core.py|fund_history_csv.py) continue ;;
+            esac
+            mkdir -p "_site/$(dirname "$path")"
+            cp -p "$path" "_site/$path"
+          done
+      - name: Upload candidate artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        with:
+          path: _site
+
+  deploy-pages:
+    if: false
+    needs: [validate-public-delivery, build-pages-artifact]
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment intentionally disabled
+        run: echo "Candidate verified; Pages source has not been switched."
