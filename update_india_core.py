@@ -13,6 +13,7 @@ import re
 import urllib.parse
 import urllib.request
 from zoneinfo import ZoneInfo
+import fund_history_csv as mufg
 
 OUT = Path("india_core.json")
 HISTORY_OUT = Path("india_core_history.json")
@@ -98,6 +99,8 @@ def valid_rows(rows, today):
             raise ValueError("fund date outside observed lifetime")
         for key in ("nav_yen", "change_yen", "net_assets_million_yen"):
             v = row.get(key)
+            if key == "change_yen" and v is None:
+                continue
             if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
                 raise ValueError("invalid numeric field: " + key)
         if not 1000 <= row["nav_yen"] <= 100000 or row["net_assets_million_yen"] < 0:
@@ -198,11 +201,12 @@ def merge_history(cached, sources, official, today):
 
 
 def collect(now, old, saved_history, fetcher=fetch_text):
-    reports, official, sbi, yahoo = [], None, [], []
+    reports, official, sbi, yahoo, bank = [], None, [], [], []
     # Official NAV must never depend on SBI/Yahoo availability.
     for label, get in ((OFFICIAL, lambda: [parse_official_snapshot(strip_html(fetcher(OFFICIAL_URL)))]),
                        (SBI, lambda: parse_rows(strip_html(fetcher(SBI_URL)))),
-                       (YAHOO, lambda: fetch_yahoo_history(now, fetcher=fetcher))):
+                       (mufg.SOURCE, lambda: mufg.parse_history(fetcher(mufg.URL), now.date())),
+                       (YAHOO, lambda: [] if len(bank) >= 75 else fetch_yahoo_history(now, fetcher=fetcher))):
         try:
             rows = valid_rows(get(), now.date())
             reports.append({"source": label, "status": "ok" if rows else "empty", "count": len(rows)})
@@ -210,6 +214,8 @@ def collect(now, old, saved_history, fetcher=fetch_text):
                 official = rows[-1] if rows else None
             elif label == SBI:
                 sbi = rows
+            elif label == mufg.SOURCE:
+                bank = rows
             else:
                 yahoo = rows
         except Exception as e:
@@ -230,13 +236,13 @@ def collect(now, old, saved_history, fetcher=fetch_text):
     try:
         if saved_history.get("_load_error"):
             raise ValueError("saved history unreadable; file retained")
-        merged = merge_history(saved_history.get("records", []), [(YAHOO, yahoo), (SBI, sbi)], official, now.date())
+        merged = merge_history(saved_history.get("records", []), [(mufg.SOURCE, bank), (YAHOO, yahoo), (SBI, sbi)], official, now.date())
         eligible = [r for r in merged if r["date"] <= row["date"]]
         technical = build_technical(eligible, row["date"])
         tail = eligible[-76:]
         breaks = [{"previous_date": a["date"], "date": b["date"]}
                   for a, b in zip(tail, tail[1:])
-                  if abs((b["nav_yen"] - b["change_yen"]) - a["nav_yen"]) > 0.01]
+                  if b["change_yen"] is None or abs((b["nav_yen"] - b["change_yen"]) - a["nav_yen"]) > 0.01]
         technical["continuity_breaks"] = breaks
         if breaks:
             technical["available"] = False
@@ -257,12 +263,13 @@ def collect(now, old, saved_history, fetcher=fetch_text):
             "net_assets_million_yen": row["net_assets_million_yen"],
             "net_assets_oku_yen": round(row["net_assets_million_yen"] / 100, 2),
             "fetched_at_jst": attempted, "attempted_at_jst": attempted, "status": "ok",
-            "history_source": "保存履歴＋Yahoo/SBI＋公式最新値", "history_source_url": YAHOO_HISTORY_URL,
+            "history_source": "保存履歴＋銀行CSV/Yahoo/SBI＋公式最新値",
+            "history_source_url": mufg.URL if bank else YAHOO_HISTORY_URL,
             "history_status": "error" if history_error else "inconsistent" if technical.get("continuity_breaks") else "ok" if technical["available"] else "insufficient",
             "history_error": history_error, "source_reports": reports, "technical": technical,
-            "note": "公式最新値を独立取得。保存履歴は削減せず重複排除して保持。市場の売買条件には使用しません。"}
+            "note": "公式最新値を独立取得。保存履歴は削減せず保持。CSVの騰落額は隣接観測差分であり営業日の完全性の証明ではありません。売買条件には使用しません。"}
     history = None if history_error else {"schema_version": 2, "fund_key": FUND_KEY,
-               "source": data["history_source"], "source_url": YAHOO_HISTORY_URL,
+               "source": data["history_source"], "source_url": data["history_source_url"],
                "updated_at_jst": attempted, "records": merged}
     return data, history
 
@@ -294,7 +301,8 @@ def main():
         write_json(OUT, data)
     summary = {k: data.get(k) for k in ("status", "as_of_date", "nav_yen", "change_yen", "official_status", "history_status")}
     summary.update(history_count=(data.get("technical") or {}).get("history_count"),
-                   technical_available=(data.get("technical") or {}).get("available"), dry_run=dry_run)
+                   technical_available=(data.get("technical") or {}).get("available"),
+                   source_reports=data.get("source_reports"), dry_run=dry_run)
     print(json.dumps(summary, ensure_ascii=False))
     return 1 if data.get("status") == "error" else 0
 
