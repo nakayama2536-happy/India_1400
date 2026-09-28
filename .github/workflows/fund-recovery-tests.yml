@@ -5,13 +5,15 @@ on:
     branches: [main]
     paths:
       - 'update_india_core.py'
-      - 'tests/test_fund_recovery.py'
+      - 'fund_history_csv.py'
+      - 'tests/test_fund*.py'
       - '.github/workflows/fund-recovery-tests.yml'
   push:
     branches: [main]
     paths:
       - 'update_india_core.py'
-      - 'tests/test_fund_recovery.py'
+      - 'fund_history_csv.py'
+      - 'tests/test_fund*.py'
       - '.github/workflows/fund-recovery-tests.yml'
 
 permissions:
@@ -29,7 +31,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Offline regression tests
-        run: python -m unittest discover -s tests -p test_fund_recovery.py -v
+        run: python -m unittest discover -s tests -p 'test_fund*.py' -v
       - name: Read-only live source probe (not acceptance)
         if: github.event_name == 'pull_request'
         continue-on-error: true
