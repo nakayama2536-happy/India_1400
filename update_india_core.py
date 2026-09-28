@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-"""Update Eastspring India Core NAV and technical context.
-
-Current NAV/previous-day change/net assets prefer Eastspring's official fund page.
-SBI Securities remains the zero-cost history source used to build MA/RSI/MACD.
-This data is display/reference information and is never used by NIFTY trading logic.
-"""
+"""Official-first fund snapshot; bounded history fetches; no trading-rule changes."""
 from __future__ import annotations
 
-from pathlib import Path
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+import argparse
+from datetime import date, datetime, timedelta
 import html
 import json
+import math
+import os
+from pathlib import Path
 import re
 import urllib.parse
 import urllib.request
+from zoneinfo import ZoneInfo
 
 OUT = Path("india_core.json")
 HISTORY_OUT = Path("india_core_history.json")
@@ -23,150 +21,119 @@ OFFICIAL_URL = "https://www.eastspring.co.jp/funds/fund-listings/fund-details?is
 SBI_URL = "https://site0.sbisec.co.jp/marble/fund/history/standardprice.do?fund_sec_code=83311227"
 YAHOO_HISTORY_URL = "https://finance.yahoo.co.jp/quote/83311227/history"
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
+OFFICIAL = "イーストスプリング公式"
+SBI = "SBI証券"
+YAHOO = "Yahoo!ファイナンス"
+FUND_KEY = "eastspring_india_core"
+FUND_NAME = "イーストスプリング・インド・コア株式ファンド"
 
 
 def fetch_text(url):
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,*/*",
-            "Accept-Language": "ja,en-US;q=0.8,en;q=0.7",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        raw = r.read()
-        ctype = r.headers.get_content_charset()
-    for enc in [ctype, "utf-8", "cp932", "shift_jis", "euc_jp"]:
-        if not enc:
-            continue
-        try:
-            return raw.decode(enc)
-        except Exception:
-            pass
-    return raw.decode("utf-8", errors="replace")
+    req = urllib.request.Request(url, headers={
+        "User-Agent": UA, "Accept": "text/html,application/xhtml+xml,*/*",
+        "Accept-Language": "ja,en-US;q=0.8,en;q=0.7",
+    })
+    with urllib.request.urlopen(req, timeout=20) as response:
+        raw = response.read(4_000_001)
+        encoding = response.headers.get_content_charset()
+    if len(raw) > 4_000_000:
+        raise ValueError("source response exceeds size limit")
+    for enc in [encoding, "utf-8", "cp932", "shift_jis", "euc_jp"]:
+        if enc:
+            try:
+                return raw.decode(enc)
+            except (UnicodeError, LookupError):
+                pass
+    raise ValueError("source encoding is unrecognized")
 
 
-def strip_html(src: str) -> str:
-    text = re.sub(r"(?is)<script.*?</script>", " ", src)
-    text = re.sub(r"(?is)<style.*?</style>", " ", text)
-    text = re.sub(r"(?is)<[^>]+>", " ", text)
-    text = html.unescape(text)
-    return re.sub(r"\s+", " ", text).strip()
+def strip_html(src):
+    text = re.sub(r"(?is)<script.*?</script>|<style.*?</style>", " ", src)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"(?is)<[^>]+>", " ", text))).strip()
 
 
-def parse_official_snapshot(text: str):
-    """Parse Eastspring's official current fund snapshot from visible page text."""
-    date_match = re.search(r"更新日[:：]?\s*(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日", text)
-    nav_match = re.search(r"基準価額\s*[（(]円[）)]\s*([0-9][0-9,]*)", text)
-    change_match = re.search(r"前日比\s*[（(]円[）)]\s*([+\-−]?[0-9][0-9,]*)", text)
-    assets_match = re.search(r"純資産総額\s*[（(]億円[）)]\s*([0-9][0-9,.]*)", text)
-    if not (date_match and nav_match and change_match and assets_match):
-        raise RuntimeError("Official Eastspring snapshot fields not found")
-    date = f"{int(date_match.group(1)):04d}-{int(date_match.group(2)):02d}-{int(date_match.group(3)):02d}"
-    nav = int(nav_match.group(1).replace(",", ""))
-    change = int(change_match.group(1).replace(",", "").replace("−", "-"))
-    assets_oku = float(assets_match.group(1).replace(",", ""))
-    if not (1000 <= nav <= 100000 and assets_oku >= 0):
-        raise RuntimeError("Official Eastspring snapshot values out of range")
-    return {
-        "date": date,
-        "nav_yen": nav,
-        "change_yen": change,
-        "net_assets_oku_yen": round(assets_oku, 2),
-        "net_assets_million_yen": int(round(assets_oku * 100.0)),
-    }
+def parse_official_snapshot(text):
+    if FUND_NAME not in text:
+        raise ValueError("official fund identity not found")
+    patterns = [r"更新日[:：]?\s*(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日",
+                r"基準価額\s*[（(]円[）)]\s*([0-9][0-9,]*)",
+                r"前日比\s*[（(]円[）)]\s*([+\-−]?[0-9][0-9,]*)",
+                r"純資産総額\s*[（(]億円[）)]\s*([0-9][0-9,.]*)"]
+    matches = [re.search(p, text) for p in patterns]
+    if not all(matches):
+        raise ValueError("official snapshot fields not found")
+    d, nav, change, assets = matches
+    value = lambda m: m.group(1).replace(",", "").replace("−", "-")
+    return {"date": date(*map(int, d.groups())).isoformat(), "nav_yen": int(value(nav)),
+            "change_yen": int(value(change)), "net_assets_million_yen": int(round(float(value(assets)) * 100))}
 
 
-def parse_rows(text: str):
-    # Expected visible sequence in SBI history table:
-    # YYYY/MM/DD | 15,821円 | +346円 | 14,848百万円
-    pattern = re.compile(
-        r"(20\d{2}/\d{2}/\d{2})\s+"
-        r"([0-9][0-9,]*)円\s+"
-        r"([+\-−]?[0-9][0-9,]*)円\s+"
-        r"([0-9][0-9,]*)百万円"
-    )
-    rows = {}
-    for m in pattern.finditer(text):
-        date = m.group(1).replace("/", "-")
-        nav = int(m.group(2).replace(",", ""))
-        change_raw = m.group(3).replace(",", "").replace("−", "-")
-        change = int(change_raw)
-        assets = int(m.group(4).replace(",", ""))
-        if 1000 <= nav <= 100000 and assets >= 0:
-            rows[date] = {"date": date, "nav_yen": nav, "change_yen": change, "net_assets_million_yen": assets}
+def parse_rows(text):
+    pattern = re.compile(r"(20\d{2}/\d{2}/\d{2})\s+([0-9][0-9,]*)円\s+([+\-−]?[0-9][0-9,]*)円\s+([0-9][0-9,]*)百万円")
+    rows = [{"date": m[1].replace("/", "-"), "nav_yen": int(m[2].replace(",", "")),
+             "change_yen": int(m[3].replace(",", "").replace("−", "-")),
+             "net_assets_million_yen": int(m[4].replace(",", ""))} for m in pattern.finditer(text)]
     if not rows:
-        raise RuntimeError("No valid SBI fund rows")
-    return [rows[k] for k in sorted(rows)]
+        raise ValueError("no valid SBI fund rows")
+    return rows
 
 
-def parse_yahoo_rows(text: str):
-    """Parse Yahoo! Finance Japan fund history rows from visible page text."""
-    pattern = re.compile(
-        r"(20\d{2})/(\d{1,2})/(\d{1,2})\s+"
-        r"([0-9][0-9,]*)\s+"
-        r"([+\-−]?[0-9][0-9,]*)\s+"
-        r"([0-9][0-9,]*)"
-    )
-    rows = {}
-    for m in pattern.finditer(text):
-        date = f"{int(m.group(1)):04d}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
-        nav = int(m.group(4).replace(",", ""))
-        change = int(m.group(5).replace(",", "").replace("−", "-"))
-        assets = int(m.group(6).replace(",", ""))
-        if 1000 <= nav <= 100000 and assets >= 0:
-            rows[date] = {
-                "date": date,
-                "nav_yen": nav,
-                "change_yen": change,
-                "net_assets_million_yen": assets,
-            }
-    return [rows[k] for k in sorted(rows)]
+def parse_yahoo_rows(text):
+    pattern = re.compile(r"(20\d{2})/(\d{1,2})/(\d{1,2})\s+([0-9][0-9,]*)\s+([+\-−]?[0-9][0-9,]*)\s+([0-9][0-9,]*)")
+    return [{"date": date(int(m[1]), int(m[2]), int(m[3])).isoformat(),
+             "nav_yen": int(m[4].replace(",", "")), "change_yen": int(m[5].replace(",", "").replace("−", "-")),
+             "net_assets_million_yen": int(m[6].replace(",", ""))} for m in pattern.finditer(text)]
 
 
-def fetch_yahoo_history(now, pages=5):
-    """Fetch up to ~100 recent fund observations for MA75/RSI/MACD."""
-    start = (now - timedelta(days=800)).strftime("%Y%m%d")
-    end = now.strftime("%Y%m%d")
+def valid_rows(rows, today):
+    """Reject malformed/future/conflicting observations; never fill missing days."""
+    if not isinstance(rows, list):
+        raise ValueError("history records must be a list")
+    result = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("history row must be an object")
+        d = date.fromisoformat(row["date"])
+        if d > today or d < date(2022, 7, 29):
+            raise ValueError("fund date outside observed lifetime")
+        for key in ("nav_yen", "change_yen", "net_assets_million_yen"):
+            v = row.get(key)
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+                raise ValueError("invalid numeric field: " + key)
+        if not 1000 <= row["nav_yen"] <= 100000 or row["net_assets_million_yen"] < 0:
+            raise ValueError("fund observation out of range")
+        prior = result.get(row["date"])
+        if prior and prior["nav_yen"] != row["nav_yen"]:
+            raise ValueError("conflicting duplicate date")
+        result[row["date"]] = dict(row)
+    return [result[k] for k in sorted(result)]
+
+
+def fetch_yahoo_history(now, pages=5, fetcher=fetch_text):
     merged = {}
-    last_signature = None
     for page in range(1, pages + 1):
-        params = urllib.parse.urlencode({
-            "from": start,
-            "to": end,
-            "timeFrame": "d",
-            "page": page,
-        })
-        text = strip_html(fetch_text(f"{YAHOO_HISTORY_URL}?{params}"))
-        rows = parse_yahoo_rows(text)
-        if not rows:
+        params = urllib.parse.urlencode({"from": (now - timedelta(days=800)).strftime("%Y%m%d"),
+                                        "to": now.strftime("%Y%m%d"), "timeFrame": "d", "page": page})
+        rows = valid_rows(parse_yahoo_rows(strip_html(fetcher(f"{YAHOO_HISTORY_URL}?{params}"))), now.date())
+        for r in rows:
+            if r["date"] in merged and merged[r["date"]]["nav_yen"] != r["nav_yen"]:
+                raise ValueError("Yahoo pages disagree on NAV")
+        if not rows or not ({r["date"] for r in rows} - set(merged)):
             break
-        signature = tuple((r["date"], r["nav_yen"]) for r in rows)
-        if signature == last_signature:
-            break
-        last_signature = signature
-        for row in rows:
-            merged[row["date"]] = row
-        if len(rows) < 20:
-            break
-    out = [merged[k] for k in sorted(merged)]
-    if len(out) < 26:
-        raise RuntimeError(f"Yahoo fund history too short: {len(out)} rows")
-    return out
+        for r in rows:
+            merged[r["date"]] = r
+        # A short page is NOT end-of-history evidence (e.g. 18 observations).
+    return [merged[k] for k in sorted(merged)]
 
 
 def sma(values, period):
-    if len(values) < period:
-        return None
-    return sum(values[-period:]) / period
+    return sum(values[-period:]) / period if len(values) >= period else None
 
 
 def ema_series(values, period):
     if not values:
         return []
-    alpha = 2.0 / (period + 1.0)
-    out = [float(values[0])]
+    alpha, out = 2.0 / (period + 1.0), [float(values[0])]
     for value in values[1:]:
         out.append(alpha * float(value) + (1.0 - alpha) * out[-1])
     return out
@@ -175,161 +142,162 @@ def ema_series(values, period):
 def rsi14(values, period=14):
     if len(values) < period + 1:
         return None
-    gains, losses = [], []
-    for a, b in zip(values[-(period + 1):-1], values[-period:]):
-        d = float(b) - float(a)
-        gains.append(max(d, 0.0))
-        losses.append(max(-d, 0.0))
-    avg_gain = sum(gains) / period
-    avg_loss = sum(losses) / period
-    if avg_loss == 0:
-        return 100.0 if avg_gain > 0 else 50.0
-    rs = avg_gain / avg_loss
-    return 100.0 - 100.0 / (1.0 + rs)
+    diffs = [b - a for a, b in zip(values[-(period + 1):-1], values[-period:])]
+    gain, loss = sum(max(d, 0) for d in diffs) / period, sum(max(-d, 0) for d in diffs) / period
+    return (100.0 if gain else 50.0) if loss == 0 else 100.0 - 100.0 / (1.0 + gain / loss)
 
 
-def build_technical(rows):
+def build_technical(rows, basis_date=None):
+    """Existing SMA/EMA/rolling-RSI arithmetic; readiness is checked separately."""
     values = [float(r["nav_yen"]) for r in rows]
-    ema12 = ema_series(values, 12)
-    ema26 = ema_series(values, 26)
-    macd_series = [a - b for a, b in zip(ema12, ema26)]
-    signal_series = ema_series(macd_series, 9)
-    macd = macd_series[-1] if macd_series else None
-    signal = signal_series[-1] if signal_series else None
-    ma25 = sma(values, 25)
-    ma75 = sma(values, 75)
-    rsi = rsi14(values)
-    gc_dc = "GC" if ma25 is not None and ma75 is not None and ma25 >= ma75 else ("DC" if ma25 is not None and ma75 is not None else None)
-    return {
-        "available": len(values) >= 26,
-        "method_version": "fund-tech-1",
-        "basis_date": rows[-1]["date"] if rows else None,
-        "history_count": len(values),
-        "ma25": round(ma25, 2) if ma25 is not None else None,
-        "ma75": round(ma75, 2) if ma75 is not None else None,
-        "macd": round(macd, 3) if macd is not None else None,
-        "macd_signal": round(signal, 3) if signal is not None else None,
-        "macd_hist": round(macd - signal, 3) if macd is not None and signal is not None else None,
-        "rsi14": round(rsi, 2) if rsi is not None else None,
-        "gc_dc": gc_dc,
-        "note": "基準価額履歴から25/75日線、EMA12/26、Signal9、RSI14を再計算。",
-    }
+    a, b = ema_series(values, 12), ema_series(values, 26)
+    macds = [x - y for x, y in zip(a, b)]
+    signals = ema_series(macds, 9)
+    macd, signal = (macds[-1], signals[-1]) if len(values) >= 35 else (None, None)
+    ma25, ma75, rsi = sma(values, 25), sma(values, 75), rsi14(values)
+    observed = rows[-1]["date"] if rows else None
+    aligned = basis_date is None or observed == basis_date
+    out = {"available": len(values) >= 75 and aligned, "method_version": "fund-tech-1-readiness-2",
+           "basis_date": observed, "history_count": len(values), "ma25": ma25, "ma75": ma75,
+           "rsi14": rsi, "macd": macd, "macd_signal": signal,
+           "macd_hist": None if macd is None else macd - signal,
+           "gc_dc": ("GC" if ma25 >= ma75 else "DC") if ma75 is not None else None,
+           "basis_consistent": aligned, "rsi_method": "simple rolling mean 14 (unchanged)",
+           "note": "計算式は従来通り。全指標の利用可は履歴75件以上・基準日一致。GC/DCは位置関係で発生日ではありません。"}
+    for key, digits in (("ma25", 2), ("ma75", 2), ("rsi14", 2), ("macd", 3), ("macd_signal", 3), ("macd_hist", 3)):
+        if out[key] is not None:
+            out[key] = round(out[key], digits)
+    return out
 
 
-def load_old():
-    try:
-        return json.loads(OUT.read_text(encoding="utf-8"))
-    except Exception:
+def load_document(path):
+    if not path.exists():
         return {}
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or value.get("fund_key") not in (None, FUND_KEY):
+        raise ValueError("invalid saved fund document")
+    return value
+
+
+def merge_history(cached, sources, official, today):
+    rows = {r["date"]: r for r in valid_rows(cached, today)}
+    for label, incoming in sources:
+        for r in valid_rows(incoming, today):
+            prev = rows.get(r["date"])
+            if prev and prev["nav_yen"] != r["nav_yen"]:
+                # Only the independently obtained official current observation can resolve a conflict.
+                if not official or official["date"] != r["date"]:
+                    raise ValueError("history NAV disagreement: " + r["date"])
+                continue
+            if prev and prev.get("source") == OFFICIAL:
+                continue
+            rows[r["date"]] = {**r, "source": label}
+    if official:
+        rows[official["date"]] = {**official, "source": OFFICIAL}
+    return [rows[k] for k in sorted(rows)]
+
+
+def collect(now, old, saved_history, fetcher=fetch_text):
+    reports, official, sbi, yahoo = [], None, [], []
+    # Official NAV must never depend on SBI/Yahoo availability.
+    for label, get in ((OFFICIAL, lambda: [parse_official_snapshot(strip_html(fetcher(OFFICIAL_URL)))]),
+                       (SBI, lambda: parse_rows(strip_html(fetcher(SBI_URL)))),
+                       (YAHOO, lambda: fetch_yahoo_history(now, fetcher=fetcher))):
+        try:
+            rows = valid_rows(get(), now.date())
+            reports.append({"source": label, "status": "ok" if rows else "empty", "count": len(rows)})
+            if label == OFFICIAL:
+                official = rows[-1] if rows else None
+            elif label == SBI:
+                sbi = rows
+            else:
+                yahoo = rows
+        except Exception as e:
+            reports.append({"source": label, "status": "error", "error": type(e).__name__ + ": " + str(e)[:180]})
+    # Yahoo is a history provider, not an unconfirmed replacement for current NAV.
+    candidates = [(sbi[-1], SBI, SBI_URL)] if sbi else []
+    if official:
+        candidates.append((official, OFFICIAL, OFFICIAL_URL))
+    candidates.sort(key=lambda x: (x[0]["date"], x[1] == OFFICIAL))
+    latest = candidates[-1] if candidates else None
+    attempted = now.isoformat(timespec="seconds")
+    if not latest or old.get("as_of_date", "") > latest[0]["date"]:
+        return {**old, "status": "fallback" if old.get("nav_yen") else "error",
+                "attempted_at_jst": attempted, "source_reports": reports,
+                "error": "current source unavailable or older; saved value retained"}, None
+    row, source, url = latest
+    history_error, merged = None, []
+    try:
+        if saved_history.get("_load_error"):
+            raise ValueError("saved history unreadable; file retained")
+        merged = merge_history(saved_history.get("records", []), [(YAHOO, yahoo), (SBI, sbi)], official, now.date())
+        eligible = [r for r in merged if r["date"] <= row["date"]]
+        technical = build_technical(eligible, row["date"])
+        tail = eligible[-76:]
+        breaks = [{"previous_date": a["date"], "date": b["date"]}
+                  for a, b in zip(tail, tail[1:])
+                  if abs((b["nav_yen"] - b["change_yen"]) - a["nav_yen"]) > 0.01]
+        technical["continuity_breaks"] = breaks
+        if breaks:
+            technical["available"] = False
+            technical["error"] = "reported NAV changes do not join; gap/revision requires verification"
+            for key in ("ma25", "ma75", "rsi14", "macd", "macd_signal", "macd_hist", "gc_dc"):
+                technical[key] = None
+    except Exception as e:
+        history_error = str(e)
+        technical = {**build_technical([], row["date"]), "error": history_error}
+    nav, change = row["nav_yen"], row["change_yen"]
+    if nav - change <= 0:
+        raise ValueError("invalid previous NAV")
+    data = {"schema_version": 3, "fund_key": FUND_KEY, "fund_name": FUND_NAME, "short_name": "インド・コア",
+            "source": source, "source_url": url, "official_source_url": OFFICIAL_URL,
+            "official_status": "ok" if source == OFFICIAL else "older_than_sbi" if official else "unavailable",
+            "fund_sec_code": "83311227", "as_of_date": row["date"], "nav_yen": nav,
+            "change_yen": change, "change_pct": round(change / (nav - change) * 100, 4),
+            "net_assets_million_yen": row["net_assets_million_yen"],
+            "net_assets_oku_yen": round(row["net_assets_million_yen"] / 100, 2),
+            "fetched_at_jst": attempted, "attempted_at_jst": attempted, "status": "ok",
+            "history_source": "保存履歴＋Yahoo/SBI＋公式最新値", "history_source_url": YAHOO_HISTORY_URL,
+            "history_status": "error" if history_error else "inconsistent" if technical.get("continuity_breaks") else "ok" if technical["available"] else "insufficient",
+            "history_error": history_error, "source_reports": reports, "technical": technical,
+            "note": "公式最新値を独立取得。保存履歴は削減せず重複排除して保持。市場の売買条件には使用しません。"}
+    history = None if history_error else {"schema_version": 2, "fund_key": FUND_KEY,
+               "source": data["history_source"], "source_url": YAHOO_HISTORY_URL,
+               "updated_at_jst": attempted, "records": merged}
+    return data, history
+
+
+def write_json(path, value):
+    payload = json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(payload, encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def main():
+    args = argparse.ArgumentParser()
+    args.add_argument("--dry-run", action="store_true", help="Fetch and report only; do not write data")
+    dry_run = args.parse_args().dry_run
     now = datetime.now(JST)
-    old = load_old()
     try:
-        sbi_page = strip_html(fetch_text(SBI_URL))
-        sbi_rows = parse_rows(sbi_page)
-        sbi_latest = sbi_rows[-1]
-
-        history_source = "SBI証券（基準価額履歴）"
-        history_source_url = SBI_URL
-        history_error = None
-        try:
-            yahoo_rows = fetch_yahoo_history(now)
-            rows = yahoo_rows if len(yahoo_rows) >= len(sbi_rows) else sbi_rows
-            if rows is yahoo_rows:
-                history_source = "Yahoo!ファイナンス（基準価額時系列）"
-                history_source_url = YAHOO_HISTORY_URL
-        except Exception as e:
-            history_error = str(e)
-            rows = sbi_rows
-
-        official = None
-        official_error = None
-        try:
-            official = parse_official_snapshot(strip_html(fetch_text(OFFICIAL_URL)))
-        except Exception as e:
-            official_error = str(e)
-
-        # Use the official current snapshot when it is at least as recent as SBI.
-        # SBI remains the history source for reproducible technical indicators.
-        use_official = bool(official and official["date"] >= sbi_latest["date"])
-        latest = official if use_official else sbi_latest
-        if use_official:
-            row_map = {r["date"]: dict(r) for r in rows}
-            row_map[official["date"]] = {
-                "date": official["date"],
-                "nav_yen": official["nav_yen"],
-                "change_yen": official["change_yen"],
-                "net_assets_million_yen": official["net_assets_million_yen"],
-            }
-            rows = [row_map[k] for k in sorted(row_map)]
-
-        date = latest["date"]
-        nav = latest["nav_yen"]
-        change = latest["change_yen"]
-        assets = latest["net_assets_million_yen"]
-        previous_nav = nav - change
-        change_pct = (change / previous_nav * 100.0) if previous_nav else None
-        technical = build_technical(rows)
-        history_doc = {
-            "schema_version": 2,
-            "fund_key": "eastspring_india_core",
-            "source": history_source,
-            "source_url": history_source_url,
-            "updated_at_jst": now.isoformat(timespec="seconds"),
-            "records": rows[-520:],
-        }
-        HISTORY_OUT.write_text(json.dumps(history_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        data = {
-            "schema_version": 3,
-            "fund_key": "eastspring_india_core",
-            "fund_name": "イーストスプリング・インド・コア株式ファンド",
-            "short_name": "インド・コア",
-            "source": "イーストスプリング公式" if use_official else "SBI証券",
-            "source_url": OFFICIAL_URL if use_official else SBI_URL,
-            "official_source_url": OFFICIAL_URL,
-            "history_source": history_source,
-            "history_source_url": history_source_url,
-            "history_error": history_error,
-            "official_status": "ok" if use_official else ("older_than_sbi" if official else "unavailable"),
-            "official_error": official_error,
-            "fund_sec_code": "83311227",
-            "as_of_date": date,
-            "nav_yen": nav,
-            "change_yen": change,
-            "change_pct": round(change_pct, 4) if change_pct is not None else None,
-            "net_assets_million_yen": assets,
-            "net_assets_oku_yen": round(assets / 100.0, 2),
-            "fetched_at_jst": now.isoformat(timespec="seconds"),
-            "status": "ok",
-            "technical": technical,
-            "note": "最新値は運用会社公式を優先し、テクニカルはYahoo/SBIの基準価額履歴から再計算します。NIFTYの3分割判定ロジックには混在させません。",
-        }
-    except Exception as e:
-        data = dict(old) if isinstance(old, dict) else {}
-        data.update({
-            "schema_version": 1,
-            "fund_key": "eastspring_india_core",
-            "fund_name": "イーストスプリング・インド・コア株式ファンド",
-            "short_name": "インド・コア",
-            "source": "SBI証券",
-            "source_url": old.get("source_url") or OFFICIAL_URL,
-            "fund_sec_code": "83311227",
-            "fetched_at_jst": now.isoformat(timespec="seconds"),
-            "status": "fallback" if old else "error",
-            "error": str(e),
-            "note": "今回取得に失敗したため、保存済みの最新値がある場合は参考表示します。NIFTY売買判定には使用しません。",
-        })
-    OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({
-        "status": data.get("status"),
-        "as_of_date": data.get("as_of_date"),
-        "nav_yen": data.get("nav_yen"),
-        "change_yen": data.get("change_yen"),
-        "net_assets_million_yen": data.get("net_assets_million_yen"),
-    }, ensure_ascii=False))
+        old = load_document(OUT)
+    except (ValueError, OSError):
+        old = {}
+    try:
+        saved = load_document(HISTORY_OUT)
+    except (ValueError, OSError):
+        saved = {"_load_error": True}
+    data, history = collect(now, old, saved)
+    if not dry_run:
+        if history is not None:
+            write_json(HISTORY_OUT, history)
+        write_json(OUT, data)
+    summary = {k: data.get(k) for k in ("status", "as_of_date", "nav_yen", "change_yen", "official_status", "history_status")}
+    summary.update(history_count=(data.get("technical") or {}).get("history_count"),
+                   technical_available=(data.get("technical") or {}).get("available"), dry_run=dry_run)
+    print(json.dumps(summary, ensure_ascii=False))
+    return 1 if data.get("status") == "error" else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
