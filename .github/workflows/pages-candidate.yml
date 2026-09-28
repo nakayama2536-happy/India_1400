@@ -28,6 +28,20 @@ jobs:
         run: |
           python scripts/public_delivery_gate.py
           python -m unittest tests.test_public_delivery_gate tests.test_pages_candidate_contract
+      - name: Prove unsafe fixture is rejected
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys, tempfile
+          from pathlib import Path
+          source = Path("scripts/public_delivery_gate.py").resolve()
+          with tempfile.TemporaryDirectory() as d:
+              root = Path(d)
+              (root / "market.json").write_text(json.dumps({"x":{"average_cost":1}}), encoding="utf-8")
+              proc = subprocess.run([sys.executable, str(source)], cwd=root, text=True, capture_output=True)
+              if proc.returncode == 0:
+                  raise SystemExit("unsafe fixture unexpectedly passed public delivery gate")
+              print("EXPECTED REJECTION:", (proc.stderr or proc.stdout).strip())
+          PY
 
   build-pages-artifact:
     needs: validate-public-delivery
