@@ -30,6 +30,27 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Record actual acquisition start
+        env:
+          ACQUISITION_EVENT: ${{ github.event_name }}
+          ACQUISITION_CRON: ${{ github.event.schedule }}
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import json
+          import os
+          from pathlib import Path
+          evidence = {
+              "event": os.environ.get("ACQUISITION_EVENT"),
+              "schedule_expression": os.environ.get("ACQUISITION_CRON"),
+              "worker_step_started_at": datetime.now(timezone.utc).isoformat(),
+              "nominal_occurrence": "not supplied by schedule context; do not infer as fact"
+          }
+          print(json.dumps(evidence))
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as out:
+              out.write("## Fund acquisition timing\n```json\n" + json.dumps(evidence, indent=2) + "\n```\n")
+          PY
+
       - name: Update India Core latest NAV
         run: python update_india_core.py
 
@@ -37,17 +58,32 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import os
           import sys
+          from pathlib import Path
 
           data = json.load(open("india_core.json", encoding="utf-8"))
           status = data.get("status")
           as_of = data.get("as_of_date")
+          tech = data.get("technical") or {}
+          report = {
+              "nav_status": status,
+              "nav_date": as_of,
+              "official_status": data.get("official_status"),
+              "history_status": data.get("history_status"),
+              "history_count": tech.get("history_count"),
+              "technical_ready": tech.get("available") is True
+          }
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as out:
+              out.write("## NAV and history are separate outcomes\n```json\n" + json.dumps(report, indent=2) + "\n```\n")
           if status == "ok":
-              print(f"India Core NAV OK: {as_of}")
+              print(f"India Core NAV fetched: {as_of}; this alone is not full technical acceptance.")
+              if not tech.get("available"):
+                  print("::warning::Fund NAV is available, but technical history is incomplete or inconsistent.")
           elif status == "fallback":
-              print(f"::warning::India Core NAV fetch fell back to the previous saved value ({as_of or 'unknown date'}).")
+              print(f"::warning::India Core NAV uses a saved reference ({as_of or 'unknown date'}).")
           else:
-              print(f"::error::India Core NAV is unavailable: {data.get('error') or 'unknown error'}")
+              print("::error::India Core NAV is unavailable.")
               sys.exit(1)
           PY
 
@@ -55,7 +91,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add india_core.json india_core_history.json india_core_history.json
+          git add india_core.json india_core_history.json
           if git diff --cached --quiet; then
             echo "No changes"
           else

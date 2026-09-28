@@ -1,0 +1,68 @@
+name: Fund Recovery Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'update_india_core.py'
+      - 'fund_history_csv.py'
+      - 'tests/test_fund*.py'
+      - '.github/workflows/fund-recovery-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'update_india_core.py'
+      - 'fund_history_csv.py'
+      - 'tests/test_fund*.py'
+      - '.github/workflows/fund-recovery-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  fund-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Offline regression tests
+        run: python -m unittest discover -s tests -p 'test_fund*.py' -v
+      - name: Read-only live source probe (not acceptance)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: python update_india_core.py --dry-run
+      - name: Read-only primary CSV format probe (not acceptance)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import csv
+          import hashlib
+          import io
+          import json
+          from urllib.request import Request, urlopen
+          url = 'https://fs.bk.mufg.jp/webasp/mufg/fund/detail/chart/csv/m08320920.csv'
+          with urlopen(Request(url, headers={'User-Agent': 'Mozilla/5.0'}), timeout=20) as response:
+              raw = response.read(4000001)
+          assert len(raw) <= 4000000
+          for encoding in ('utf-8-sig', 'cp932', 'shift_jis'):
+              try:
+                  text = raw.decode(encoding)
+                  break
+              except UnicodeError:
+                  continue
+          else:
+              raise ValueError('unsupported encoding')
+          rows = list(csv.reader(io.StringIO(text)))
+          print(json.dumps({'source': url, 'encoding': encoding, 'bytes': len(raw),
+                            'sha256': hashlib.sha256(raw).hexdigest(), 'csv_rows': len(rows),
+                            'first_rows': rows[:3], 'last_rows': rows[-2:]}, ensure_ascii=False))
+          PY
+      - name: Verify probe did not alter stored data
+        if: always()
+        run: git diff --exit-code -- india_core.json india_core_history.json
