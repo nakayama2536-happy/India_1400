@@ -1,0 +1,39 @@
+name: Fund Recovery Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'update_india_core.py'
+      - 'tests/test_fund_recovery.py'
+      - '.github/workflows/fund-recovery-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'update_india_core.py'
+      - 'tests/test_fund_recovery.py'
+      - '.github/workflows/fund-recovery-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  fund-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Offline regression tests
+        run: python -m unittest discover -s tests -p test_fund_recovery.py -v
+      - name: Read-only live source probe (not acceptance)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: python update_india_core.py --dry-run
+      - name: Verify probe did not alter stored data
+        if: always()
+        run: git diff --exit-code -- india_core.json india_core_history.json
