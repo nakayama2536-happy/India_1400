@@ -21,5 +21,9 @@ class PagesCandidateContract(unittest.TestCase):
         for forbidden in ("update_market.py", "v48_enhance.py", "PUBLIC_REPO_TOKEN", "git push", "force push"):
             self.assertNotIn(forbidden, self.text)
 
+    def test_artifact_job_has_no_always_override(self):
+        block = self.text.split("build-pages-artifact:", 1)[1].split("deploy-pages:", 1)[0]
+        self.assertNotIn("always()", block)
+
 if __name__ == "__main__":
     unittest.main()
