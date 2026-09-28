@@ -1,15 +1,117 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "fund_key": "eastspring_india_core",
-  "source": "SBI証券",
+  "source": "SBI証券（基準価額履歴）",
   "source_url": "https://site0.sbisec.co.jp/marble/fund/history/standardprice.do?fund_sec_code=83311227",
-  "updated_at_jst": "2026-09-26T02:57:22+09:00",
+  "updated_at_jst": "2026-09-29T03:10:47+09:00",
   "records": [
+    {
+      "date": "2026-08-31",
+      "nav_yen": 16377,
+      "change_yen": 39,
+      "net_assets_million_yen": 15628
+    },
+    {
+      "date": "2026-09-01",
+      "nav_yen": 16357,
+      "change_yen": -20,
+      "net_assets_million_yen": 15599
+    },
+    {
+      "date": "2026-09-02",
+      "nav_yen": 16418,
+      "change_yen": 61,
+      "net_assets_million_yen": 15458
+    },
+    {
+      "date": "2026-09-03",
+      "nav_yen": 16172,
+      "change_yen": -246,
+      "net_assets_million_yen": 15212
+    },
+    {
+      "date": "2026-09-04",
+      "nav_yen": 15979,
+      "change_yen": -193,
+      "net_assets_million_yen": 15027
+    },
+    {
+      "date": "2026-09-07",
+      "nav_yen": 15997,
+      "change_yen": 18,
+      "net_assets_million_yen": 15037
+    },
+    {
+      "date": "2026-09-08",
+      "nav_yen": 15742,
+      "change_yen": -255,
+      "net_assets_million_yen": 14798
+    },
+    {
+      "date": "2026-09-09",
+      "nav_yen": 15649,
+      "change_yen": -93,
+      "net_assets_million_yen": 14712
+    },
+    {
+      "date": "2026-09-10",
+      "nav_yen": 15525,
+      "change_yen": -124,
+      "net_assets_million_yen": 14594
+    },
+    {
+      "date": "2026-09-11",
+      "nav_yen": 15593,
+      "change_yen": 68,
+      "net_assets_million_yen": 14650
+    },
+    {
+      "date": "2026-09-14",
+      "nav_yen": 15348,
+      "change_yen": -245,
+      "net_assets_million_yen": 14419
+    },
+    {
+      "date": "2026-09-15",
+      "nav_yen": 15449,
+      "change_yen": 101,
+      "net_assets_million_yen": 14510
+    },
+    {
+      "date": "2026-09-16",
+      "nav_yen": 15518,
+      "change_yen": 69,
+      "net_assets_million_yen": 14576
+    },
+    {
+      "date": "2026-09-17",
+      "nav_yen": 15388,
+      "change_yen": -130,
+      "net_assets_million_yen": 14453
+    },
+    {
+      "date": "2026-09-18",
+      "nav_yen": 15475,
+      "change_yen": 87,
+      "net_assets_million_yen": 14522
+    },
+    {
+      "date": "2026-09-24",
+      "nav_yen": 15821,
+      "change_yen": 346,
+      "net_assets_million_yen": 14848
+    },
     {
       "date": "2026-09-25",
       "nav_yen": 15679,
       "change_yen": -142,
       "net_assets_million_yen": 14716
+    },
+    {
+      "date": "2026-09-28",
+      "nav_yen": 15625,
+      "change_yen": -54,
+      "net_assets_million_yen": 14670
     }
   ]
 }
