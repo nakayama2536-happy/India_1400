@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_jst": "2026-09-28T23:57:33+09:00",
+  "updated_at_jst": "2026-09-29T03:15:41+09:00",
   "series": {
     "usdinr": [
       {
@@ -49,6 +49,12 @@
         "date": "2026-09-28",
         "value": 96.0058,
         "as_of_jst": "2026-09-28T23:50+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-09-29",
+        "value": 95.943,
+        "as_of_jst": "2026-09-29T03:11+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -99,6 +105,12 @@
         "date": "2026-09-28",
         "value": 99.76,
         "as_of_jst": "2026-09-28T23:40+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-09-29",
+        "value": 97.73,
+        "as_of_jst": "2026-09-29T03:04+09:00",
         "provider": "Google Finance"
       }
     ],
