@@ -1,4 +1,4 @@
-# India 14:00 Check PWA v5.19
+# India 14:00 Check PWA v5.24
 
 ## 目的
 
@@ -11,6 +11,10 @@ iPhoneで14:00頃に開き、NIFTY 50、インド・コア、USD/INR、USD/JPY�
 `Private core → public-safe validation → India_1400 → GitHub Pages / PWA`
 
 Public側にはAPIキー、個人の保有数量・取得単価・口座情報、Private側の計算コードを置きません。
+
+## 14:00取得状態
+
+判断画面の14:00ステータスは、公開データの `acquisition_status` を優先表示します。取得済み・取得待ち・欠測・対象外を区別し、取得済みの場合は主系統／監視回復などの由来も表示します。この状態は運用監視用で、売買条件やデータ品質ゲートを変更しません。
 
 ## 自動更新
 
