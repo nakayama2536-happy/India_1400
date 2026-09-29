@@ -6,33 +6,59 @@
   "source": "イーストスプリング公式",
   "source_url": "https://www.eastspring.co.jp/funds/fund-listings/fund-details?isincode=200027",
   "official_source_url": "https://www.eastspring.co.jp/funds/fund-listings/fund-details?isincode=200027",
-  "history_source": "SBI証券（基準価額履歴）",
-  "history_source_url": "https://site0.sbisec.co.jp/marble/fund/history/standardprice.do?fund_sec_code=83311227",
-  "history_error": "Yahoo fund history too short: 18 rows",
   "official_status": "ok",
-  "official_error": null,
   "fund_sec_code": "83311227",
-  "as_of_date": "2026-09-28",
-  "nav_yen": 15625,
-  "change_yen": -54,
-  "change_pct": -0.3444,
-  "net_assets_million_yen": 14670,
-  "net_assets_oku_yen": 146.7,
-  "fetched_at_jst": "2026-09-29T05:49:38+09:00",
+  "as_of_date": "2026-09-29",
+  "nav_yen": 15385,
+  "change_yen": -240,
+  "change_pct": -1.536,
+  "net_assets_million_yen": 14450,
+  "net_assets_oku_yen": 144.5,
+  "fetched_at_jst": "2026-09-30T01:32:02+09:00",
+  "attempted_at_jst": "2026-09-30T01:32:02+09:00",
   "status": "ok",
+  "history_source": "保存履歴＋銀行CSV/Yahoo/SBI＋公式最新値",
+  "history_source_url": "https://fs.bk.mufg.jp/webasp/mufg/fund/detail/chart/csv/m08320920.csv",
+  "history_status": "ok",
+  "history_error": null,
+  "source_reports": [
+    {
+      "source": "イーストスプリング公式",
+      "status": "ok",
+      "count": 1
+    },
+    {
+      "source": "SBI証券",
+      "status": "ok",
+      "count": 19
+    },
+    {
+      "source": "三菱UFJ銀行（基準価額CSV）",
+      "status": "ok",
+      "count": 1018
+    },
+    {
+      "source": "Yahoo!ファイナンス",
+      "status": "empty",
+      "count": 0
+    }
+  ],
   "technical": {
-    "available": false,
-    "method_version": "fund-tech-1",
-    "basis_date": "2026-09-28",
-    "history_count": 18,
-    "ma25": null,
-    "ma75": null,
-    "macd": -192.179,
-    "macd_signal": -199.443,
-    "macd_hist": 7.265,
-    "rsi14": 35.79,
-    "gc_dc": null,
-    "note": "基準価額履歴から25/75日線、EMA12/26、Signal9、RSI14を再計算。"
+    "available": true,
+    "method_version": "fund-tech-1-readiness-2",
+    "basis_date": "2026-09-29",
+    "history_count": 1018,
+    "ma25": 15894.48,
+    "ma75": 16211.32,
+    "rsi14": 34.94,
+    "macd": -194.871,
+    "macd_signal": -193.709,
+    "macd_hist": -1.163,
+    "gc_dc": "DC",
+    "basis_consistent": true,
+    "rsi_method": "simple rolling mean 14 (unchanged)",
+    "note": "計算式は従来通り。全指標の利用可は履歴75件以上・基準日一致。GC/DCは位置関係で発生日ではありません。",
+    "continuity_breaks": []
   },
-  "note": "最新値は運用会社公式を優先し、テクニカルはYahoo/SBIの基準価額履歴から再計算します。NIFTYの3分割判定ロジックには混在させません。"
+  "note": "公式最新値を独立取得。保存履歴は削減せず保持。CSVの騰落額は隣接観測差分であり営業日の完全性の証明ではありません。売買条件には使用しません。"
 }
