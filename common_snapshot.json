@@ -19,13 +19,13 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": null,
+    "phase": "POSTCHECK",
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "WAIT",
     "reason_summary": [
-      "○ 調整・低位：RSI 26.7 / 25日線乖離 -3.6%",
-      "△ MACD悪化：Hist -36.86 → -48.96",
-      "△ 5日線割れ：22716 / MA5 23029",
+      "○ 調整・低位：RSI 25.3 / 25日線乖離 -3.7%",
+      "△ MACD悪化：Hist -48.96 → -57.83",
+      "△ 5日線割れ：22620 / MA5 22864",
       "○ 14営業日予測が上向き"
     ],
     "passed_conditions": [
@@ -35,7 +35,7 @@
         "label": "調整・低位",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "RSI 26.7 / 25日線乖離 -3.6%",
+        "observed": "RSI 25.3 / 25日線乖離 -3.7%",
         "source_group": "buy_condition"
       }
     ],
@@ -46,7 +46,7 @@
         "label": "RSI改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "27.7 → 26.7",
+        "observed": "26.7 → 25.3",
         "source_group": "buy_condition"
       },
       {
@@ -55,7 +55,7 @@
         "label": "MACD改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "Hist -36.86 → -48.96",
+        "observed": "Hist -48.96 → -57.83",
         "source_group": "buy_condition"
       },
       {
@@ -64,7 +64,7 @@
         "label": "5日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22716 / MA5 23029",
+        "observed": "22620 / MA5 22864",
         "source_group": "buy_condition"
       },
       {
@@ -73,7 +73,7 @@
         "label": "25日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22716 / MA25 23568",
+        "observed": "22620 / MA25 23499",
         "source_group": "buy_condition"
       }
     ],
@@ -84,7 +84,7 @@
         "label": "MACD悪化",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "Hist -36.86 → -48.96",
+        "observed": "Hist -48.96 → -57.83",
         "source_group": "sell_condition"
       },
       {
@@ -93,7 +93,7 @@
         "label": "5日線割れ",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "22716 / MA5 23029",
+        "observed": "22620 / MA5 22864",
         "source_group": "sell_condition"
       }
     ],
@@ -101,9 +101,9 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-09-29T19:01+09:00",
-    "fetched_at": "2026-09-30T01:38:00+09:00",
-    "calculated_at": "2026-09-30T01:38:00+09:00"
+    "market_as_of": "2026-09-30T19:01+09:00",
+    "fetched_at": "2026-09-30T19:46:31+09:00",
+    "calculated_at": "2026-09-30T19:46:31+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
