@@ -1,11 +1,13 @@
-name: Pages Candidate - COM-PUB-001
+name: Deploy India 14:00 Check Pages
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
     paths:
-      - '.github/workflows/pages-candidate.yml'
+      - '.github/workflows/deploy-pages.yml'
       - 'scripts/public_delivery_gate.py'
       - 'tests/test_public_delivery_gate.py'
       - 'tests/test_pages_candidate_contract.py'
@@ -13,15 +15,19 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   validate-public-delivery:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12'
       - name: Existing public delivery gate
@@ -48,15 +54,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Build exact static tree candidate
+      - name: Build static Pages tree
         run: |
           mkdir -p _site
           git ls-files -z | while IFS= read -r -d '' path; do
             case "$path" in
-              .git*|tests/*|scripts/*|CACHE_OPERATIONS.md|CHANGELOG.md|README.md|SECURITY.md|update_india_core.py|fund_history_csv.py) continue ;;
+              .git*|tests/*|scripts/*|docs/*|CACHE_OPERATIONS.md|CHANGELOG.md|README.md|SECURITY.md|update_india_core.py|fund_history_csv.py) continue ;;
             esac
             mkdir -p "_site/$(dirname "$path")"
             cp -p "$path" "_site/$path"
@@ -73,20 +79,24 @@ jobs:
           cmp -s sw.js _site/sw.js
           cmp -s market.json _site/market.json
           cmp -s common_snapshot.json _site/common_snapshot.json
-      - name: Upload candidate artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: _site
 
   deploy-pages:
-    if: false
+    if: github.event_name != 'pull_request'
     needs: [validate-public-delivery, build-pages-artifact]
     permissions:
       pages: write
       id-token: write
     environment:
       name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Deployment intentionally disabled
-        run: echo "Candidate verified; Pages source has not been switched."
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
