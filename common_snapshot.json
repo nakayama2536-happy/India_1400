@@ -102,8 +102,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-01T19:01+09:00",
-    "fetched_at": "2026-10-02T06:32:57+09:00",
-    "calculated_at": "2026-10-02T06:32:57+09:00"
+    "fetched_at": "2026-10-02T19:45:27+09:00",
+    "calculated_at": "2026-10-02T19:45:27+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
