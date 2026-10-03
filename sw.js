@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "india1400-v";
-const CACHE = "india1400-v5-24-20260929-acquisition-status";
-const SHELL = ["./?v=5.24", "index.html", "deep-dive.js", "deep-dive-bundle.js", "review-history.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v5-25-20261004-forecast-layout";
+const SHELL = ["./?v=5.25", "index.html", "deep-dive.js", "deep-dive-bundle.js", "review-history.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const DYNAMIC_JSON = new Set([
   "market.json",
   "history.json",
