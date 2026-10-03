@@ -176,6 +176,9 @@ jobs:
           assert "h.current_date_has_record" in index, "14:00 status must use actual snapshot evidence"
           assert "market?.acquisition_status" in index, "14:00 UI must prefer explicit acquisition status when available"
           assert "acquisition_status:m.acquisition_status" in deep, "deep-dive summary must include acquisition status"
+          assert index.count('id="forecastCards"') == 1, "forecastCards must be unique"
+          assert index.index('id="actionLabel"') < index.index('id="forecastCards"') < index.index('id="marketStage"'), "business-day forecast must be directly under the decision"
+          assert "<h2>1・3・14営業日予測</h2>" not in index, "standalone forecast card must be removed after moving forecast under decision"
           assert "DYNAMIC_JSON" in sw and "canonicalKey" in sw, "dynamic JSON cache must use bounded canonical keys"
 
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
