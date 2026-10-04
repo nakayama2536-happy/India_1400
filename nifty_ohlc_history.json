@@ -1658,19 +1658,32 @@
       "close": 22716.2,
       "volume": 0.0,
       "source": "Tickjournal NIFTY 50 daily YTD"
+    },
+    {
+      "date": "2026-09-30",
+      "open": 22665.0,
+      "high": 22809.35,
+      "low": 22595.2,
+      "close": 22620.45,
+      "volume": 0.0,
+      "source": "Tickjournal NIFTY 50 daily YTD"
+    },
+    {
+      "date": "2026-10-01",
+      "open": 22543.7,
+      "high": 22610.6,
+      "low": 22217.3,
+      "close": 22421.95,
+      "volume": 0.0,
+      "source": "Tickjournal NIFTY 50 daily YTD"
     }
   ],
   "source_reports": [
     {
       "source": "Tickjournal",
       "status": "ok",
-      "rows": 184,
-      "last_date": "2026-09-29"
-    },
-    {
-      "source": "Yahoo Finance",
-      "status": "error",
-      "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "rows": 186,
+      "last_date": "2026-10-01"
     }
   ]
 }
