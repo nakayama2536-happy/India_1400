@@ -82,13 +82,15 @@ jobs:
           assert not exposed, f"private calculation/update files exposed publicly: {exposed}"
 
           common_ui_markers = [
-              'id="commonDigestCard"',
-              'id="commonPhase"',
-              'id="commonEligibility"',
-              'id="commonDataState"',
-              'id="commonQcState"',
+              'id="qualityTopSummary"',
+              'id="globalReferenceTimes"',
+              'id="page-quality"',
+              'data-page="quality"',
               'fetchJson("common_snapshot.json").catch(()=>null)',
-              'function renderCommonDigest()',
+              'function renderQualityOverview()',
+              'function fundBasisHealth(',
+              'function referenceHealth(',
+              'function forecastArrow(',
           ]
           missing_common = [x for x in common_ui_markers if x not in index]
           assert not missing_common, f"missing Common Schema fallback UI markers: {missing_common}"
@@ -179,6 +181,15 @@ jobs:
           assert index.count('id="forecastCards"') == 1, "forecastCards must be unique"
           assert index.index('id="actionLabel"') < index.index('id="forecastCards"') < index.index('id="marketStage"'), "business-day forecast must be directly under the decision"
           assert "<h2>1・3・14営業日予測</h2>" not in index, "standalone forecast card must be removed after moving forecast under decision"
+          assert 'id="commonDigestCard"' not in index and "10秒ダイジェスト" not in index, "redundant digest must stay removed"
+          assert index.count('id="globalReferenceTimes"') == 1, "shared reference time strip must be unique"
+          assert index.index('id="globalReferenceTimes"') < index.index('id="page-decision"'), "reference time strip must be common to all tabs"
+          assert 'id="decisionDataTimes"' not in index, "decision-only reference time card must stay removed"
+          assert index.index('id="page-quality"') < index.index('id="page-detail"'), "quality must have a dedicated tab before management"
+          assert 'basis-${basisHealth.ok?"good":"bad"}' in index, "India Core basis date health coloring missing"
+          assert all(x in index for x in ("↑↑","↑","→","↓","↓↓")), "five-level forecast arrow vocabulary missing"
+          assert 'h2,.card-title{font-size:20px' in index, "card title hierarchy contract missing"
+          assert "ref-compact-grid" in index and "ref-compact-item" in index, "compact reference time UI missing"
           assert "DYNAMIC_JSON" in sw and "canonicalKey" in sw, "dynamic JSON cache must use bounded canonical keys"
 
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
