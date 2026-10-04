@@ -185,11 +185,21 @@ jobs:
           assert index.count('id="globalReferenceTimes"') == 1, "shared reference time strip must be unique"
           assert index.index('id="globalReferenceTimes"') < index.index('id="page-decision"'), "reference time strip must be common to all tabs"
           assert 'id="decisionDataTimes"' not in index, "decision-only reference time card must stay removed"
-          assert index.index('id="page-quality"') < index.index('id="page-detail"'), "quality must have a dedicated tab before management"
-          assert 'basis-${basisHealth.ok?"good":"bad"}' in index, "India Core basis date health coloring missing"
+          assert index.index('id="page-quality"') < index.index('id="qualityTopSummary"') < index.index('id="page-detail"'), "quality summary must live inside the dedicated quality tab"
+          global_status = index[index.index('class="card global-status-card"'):index.index('id="page-decision"')]
+          assert "データ品質" not in global_status and 'id="qualityTopSummary"' not in global_status, "data quality must not remain in the global strip"
+          assert 'basis-${basisHealth.ok?"good":"bad"}' not in index, "legacy India Core single-field coloring should be replaced by seven status tiles"
+          for label in ("基準日","純資産総額","MA25","MA75","RSI14","MACD","25/75日線"):
+              assert f'statusTileHtml("{label}"' in index, f"India Core status tile missing: {label}"
+          assert 'class="status-tile-grid fund-status-grid"' in index, "India Core seven-tile grid missing"
+          assert 'class="deep-trigger-cats status-tile-grid"' in index, "GPT four-category color grid missing"
+          assert 'status=!x.active?"OFF / 正常":x.severity>=2?"優先":"推奨"' in index, "GPT trigger green/yellow/red mapping missing"
+          assert 'class="status-tile-grid yen-status-grid"' in index, "yen status tile grid missing"
+          assert all(x in index for x in ("円換算 追い風","円換算 逆風","円換算 中立")), "yen contribution color semantics missing"
           assert all(x in index for x in ("↑↑","↑","→","↓","↓↓")), "five-level forecast arrow vocabulary missing"
           assert 'h2,.card-title{font-size:20px' in index, "card title hierarchy contract missing"
           assert "ref-compact-grid" in index and "ref-compact-item" in index, "compact reference time UI missing"
+          assert "status-tile-grid" in index and "status-tile.good" in index and "status-tile.bad" in index, "shared colored tile graphic missing"
           assert "DYNAMIC_JSON" in sw and "canonicalKey" in sw, "dynamic JSON cache must use bounded canonical keys"
 
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
