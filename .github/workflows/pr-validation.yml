@@ -182,9 +182,12 @@ jobs:
           assert index.index('id="actionLabel"') < index.index('id="forecastCards"') < index.index('id="marketStage"'), "business-day forecast must be directly under the decision"
           assert "<h2>1・3・14営業日予測</h2>" not in index, "standalone forecast card must be removed after moving forecast under decision"
           assert 'id="commonDigestCard"' not in index and "10秒ダイジェスト" not in index, "redundant digest must stay removed"
-          assert index.count('id="globalReferenceTimes"') == 1, "shared reference time strip must be unique"
-          assert index.index('id="globalReferenceTimes"') < index.index('id="page-decision"'), "reference time strip must be common to all tabs"
-          assert 'id="decisionDataTimes"' not in index, "decision-only reference time card must stay removed"
+          assert index.count('id="globalReferenceTimes"') == 1, "reference time strip must be unique"
+          decision_start = index.index('id="page-decision"')
+          indicators_start = index.index('id="page-indicators"')
+          reference_pos = index.index('id="globalReferenceTimes"')
+          assert decision_start < reference_pos < indicators_start, "reference time strip must live only inside the decision tab"
+          assert 'id="decisionDataTimes"' not in index, "legacy decision reference time card must stay removed"
           assert index.index('id="page-quality"') < index.index('id="qualityTopSummary"') < index.index('id="page-detail"'), "quality summary must live inside the dedicated quality tab"
           global_status = index[index.index('class="card global-status-card"'):index.index('id="page-decision"')]
           assert "データ品質" not in global_status and 'id="qualityTopSummary"' not in global_status, "data quality must not remain in the global strip"
@@ -200,6 +203,12 @@ jobs:
           assert 'h2,.card-title{font-size:20px' in index, "card title hierarchy contract missing"
           assert "ref-compact-grid" in index and "ref-compact-item" in index, "compact reference time UI missing"
           assert "status-tile-grid" in index and "status-tile.good" in index and "status-tile.bad" in index, "shared colored tile graphic missing"
+          assert "function signClass(" in index and "function signedHtml(" in index, "signed-value color helpers missing"
+          assert ".sign-pos{color:var(--ok)!important}" in index and ".sign-neg{color:var(--ng)!important}" in index, "signed-value color CSS missing"
+          for marker in ("signedHtml(h.median_return_pct","signClass(mhist)","signClass(fii.net_value_crore)","signClass(contribution)"):
+              assert marker in index, f"signed-value color use missing: {marker}"
+          assert ".tabs{position:fixed" in index and "bottom:0" in index and "z-index:100" in index, "bottom tab selector must remain fixed above content"
+          assert "calc(112px + env(safe-area-inset-bottom))" in index, "content must clear the fixed bottom tabs"
           assert "DYNAMIC_JSON" in sw and "canonicalKey" in sw, "dynamic JSON cache must use bounded canonical keys"
 
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
