@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "market": "INDIA",
-  "publication_id": "in-5a1270850f341b024d57",
+  "publication_id": "in-a99ddc48a3f3171037d2",
   "source_state": "READY",
   "bundle_contract": "deep-dive/0.1",
   "files": [
@@ -102,10 +102,10 @@
       "purpose": "インド・コア最新情報",
       "type": "json",
       "status": "OK",
-      "sha256": "b4e55368c87ca191f5b6fa37d59bc036f81385f50460a55e81bfeaf7cafab3d0",
+      "sha256": "b4531970f47b918fb8bbbc801e8b45b56165cdbf2a1638e3ecc7d05d3c32beb9",
       "bytes": 2234,
       "required_for_bundle": true,
-      "as_of": "2026-10-02",
+      "as_of": "2026-10-05",
       "rows": null,
       "revision": null
     },
@@ -115,11 +115,11 @@
       "purpose": "インド・コア基準価額履歴",
       "type": "json",
       "status": "OK",
-      "sha256": "0033e60390514520097321b9317296ef646f83a2a103318f5d41ae808a3ec09e",
-      "bytes": 318159,
+      "sha256": "b1176d60f0b7ea968063e7ec49cabffe0001b4387f1d016f9dc61172b349063e",
+      "bytes": 318656,
       "required_for_bundle": true,
-      "as_of": "2026-10-03T04:31:55+09:00",
-      "rows": 1021,
+      "as_of": "2026-10-06T00:59:53+09:00",
+      "rows": 1022,
       "revision": null
     },
     {
