@@ -1684,6 +1684,11 @@
       "status": "ok",
       "rows": 186,
       "last_date": "2026-10-01"
+    },
+    {
+      "source": "Yahoo Finance",
+      "status": "error",
+      "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
     }
   ]
 }
