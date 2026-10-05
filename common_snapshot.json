@@ -19,7 +19,7 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "POSTCHECK",
+    "phase": null,
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "TRANCHE1",
     "reason_summary": [
@@ -94,8 +94,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-05T19:01+09:00",
-    "fetched_at": "2026-10-05T21:09:44+09:00",
-    "calculated_at": "2026-10-05T21:09:44+09:00"
+    "fetched_at": "2026-10-06T00:36:37+09:00",
+    "calculated_at": "2026-10-06T00:36:37+09:00"
   },
   "market_specific": {
     "strategy_stage": "TRANCHE1",
