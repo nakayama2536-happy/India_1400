@@ -1,16 +1,16 @@
 {
-  "generated_at_utc": "2026-10-04T05:04:31+00:00",
-  "generated_at_jst": "2026-10-04T14:04:31+09:00",
+  "generated_at_utc": "2026-10-05T05:04:31+00:00",
+  "generated_at_jst": "2026-10-05T14:04:31+09:00",
   "status": "ok",
   "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=persistent local cache seeded from public GitHub mirrors + Tickjournal recent bridge, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
   "nifty": {
     "symbol": "^NSEI",
     "provider_symbol": "NIFTY_50:INDEXNSE",
     "provider": "Google Finance + NSE Indices",
-    "price": 22421.95,
-    "as_of_jst": "2026-10-01T19:01+09:00",
-    "previous_close": 22620.45,
-    "change_pct": -0.878,
+    "price": 22530.6,
+    "as_of_jst": "2026-10-05T13:53+09:00",
+    "previous_close": 22421.95,
+    "change_pct": 0.485,
     "technical_close": 22421.95,
     "technical_date": "2026-10-01",
     "ma5": 22735.87,
@@ -25,30 +25,45 @@
     "ret5_pct": -2.78,
     "ret20_pct": -6.24,
     "vol20_annualized_pct": 10.03,
-    "price_vs_ma5_pct": -1.38,
-    "price_vs_ma25_pct": -4.29,
-    "price_vs_ma75_pct": -6.37,
+    "price_vs_ma5_pct": -0.9,
+    "price_vs_ma25_pct": -3.83,
+    "price_vs_ma75_pct": -5.92,
     "technical_basis": "前営業日までの確定日足",
     "provisional": {
-      "available": false,
-      "basis": "休場・時間外のため14:00暫定テクニカルは使用しません。確定日足を参照します。",
-      "date": "2026-10-01"
+      "available": true,
+      "basis": "14:00時点価格を当日終値と仮定した暫定計算",
+      "date": "2026-10-05",
+      "price": 22530.6,
+      "ma5": 22613.89,
+      "ma25": 23365.42,
+      "ma75": 23927.17,
+      "rsi14": 27.17,
+      "rsi14_prev": 22.57,
+      "macd": -361.989,
+      "macd_signal": -296.523,
+      "macd_hist": -65.466,
+      "macd_hist_prev": -70.633,
+      "ret5_pct": -2.64,
+      "vol20_annualized_pct": 10.4,
+      "price_vs_ma5_pct": -0.37,
+      "price_vs_ma25_pct": -3.57,
+      "price_vs_ma75_pct": -5.84
     }
   },
   "usdinr": {
     "symbol": "INR=X",
     "provider_symbol": "USD-INR",
     "provider": "Google Finance",
-    "price": 96.3255,
-    "as_of_jst": "2026-10-04T12:37+09:00",
+    "price": 96.2395,
+    "as_of_jst": "2026-10-05T13:50+09:00",
     "change_5d_pct": null
   },
   "brent": {
     "symbol": "BZ=F",
     "provider_symbol": "BZW00:NYMEX",
     "provider": "Google Finance",
-    "price": 102.7,
-    "as_of_jst": "2026-10-03T06:50+09:00",
+    "price": 101.68,
+    "as_of_jst": "2026-10-05T13:46+09:00",
     "change_5d_pct": null
   },
   "errors": [],
@@ -56,69 +71,71 @@
   "india_vix": {
     "symbol": "^INDIAVIX",
     "provider": "Google Finance",
-    "price": 14.45,
-    "as_of_jst": "2026-10-01T19:13+09:00",
+    "price": 14.53,
+    "as_of_jst": "2026-10-05T14:04+09:00",
     "change_5d_pct": null,
     "data_status": "fresh"
   },
   "crosscheck": {
     "available": false,
-    "skipped": true,
-    "source": "NSE Indices Live Indices Watch",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "source": "NSE Indices Live Indices Watch"
   },
   "breadth": {
     "available": false,
-    "skipped": true,
-    "source": "NSE India NIFTY 50 constituent live data",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "source": "NSE India NIFTY 50 constituent live data"
   },
   "fii_dii": {
     "available": false,
-    "skipped": true,
-    "source": "NSE India FII/FPI & DII activity",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "source": "NSE India FII/FPI & DII activity"
   },
   "schema_version": 4,
-  "optional_errors": [],
+  "optional_errors": [
+    "NIFTY official cross-check: <urlopen error [Errno -2] Name or service not known>",
+    "NSE session: HTTP Error 403: Forbidden"
+  ],
   "signals": {
-    "buy_setup_score": 30,
-    "sell_setup_score": 22,
-    "technical_buy_score": 30,
-    "technical_sell_score": 22,
-    "buy_setup_label": "弱い",
+    "buy_setup_score": 54,
+    "sell_setup_score": 8,
+    "technical_buy_score": 54,
+    "technical_sell_score": 8,
+    "buy_setup_label": "中立〜前兆",
     "sell_setup_label": "弱い",
     "buy_factors": [
       {
         "points": 22,
         "label": "RSI売られ過ぎ圏",
-        "detail": "RSI 22.6"
+        "detail": "RSI 27.2"
+      },
+      {
+        "points": 14,
+        "label": "MACDヒストグラム改善",
+        "detail": "-70.63 → -65.47"
+      },
+      {
+        "points": 10,
+        "label": "RSI改善",
+        "detail": "22.6 → 27.2"
       },
       {
         "points": 8,
         "label": "25日線から下方乖離",
-        "detail": "乖離 -4.3%"
+        "detail": "乖離 -3.6%"
       }
     ],
     "sell_factors": [
       {
-        "points": 14,
-        "label": "MACDヒストグラム悪化",
-        "detail": "-57.83 → -70.63"
-      },
-      {
         "points": 8,
         "label": "5日線を下回る",
-        "detail": "価格 22422 / 5日線 22736"
+        "detail": "価格 22531 / 5日線 22614"
       }
     ],
-    "technical_basis_used": "確定日足テクニカル",
+    "technical_basis_used": "14:00暫定テクニカル",
     "definition": "0〜100は条件一致度であり、将来の上昇・下落確率ではありません。",
     "backtest_scope": "検証タブはNIFTY日足だけで再現できるテクニカル中核スコアを検証します。",
     "available": true,
-    "decision_eligible": false,
+    "decision_eligible": true,
     "status": "fresh",
-    "display_note": "参考表示。データ品質ゲートにより売買判断は保留。"
+    "display_note": "最新判断に使用可能"
   },
   "outlook_1m": {
     "available": true,
@@ -699,14 +716,14 @@
     "_data_status": "fresh"
   },
   "data_quality": {
-    "freshness": "EXPECTED_NONLIVE",
+    "freshness": "FRESH",
     "decision_gate": {
-      "code": "HOLD",
-      "label": "売買ルール判定保留",
-      "allow_rule": false
+      "code": "READY",
+      "label": "売買ルール判定可",
+      "allow_rule": true
     },
     "reasons": [
-      "通常取引時間中ではないため、第1弾購入ルールは自動確定しません。"
+      "NIFTY判断データは最新状態です。"
     ],
     "core_sources": {
       "nifty": {
@@ -715,8 +732,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
-        "as_of_jst": "2026-10-01T19:01+09:00",
-        "age_minutes": 4023.5,
+        "as_of_jst": "2026-10-05T13:53+09:00",
+        "age_minutes": 11.5,
         "error": null
       },
       "usdinr": {
@@ -725,8 +742,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance",
         "provider_symbol": "USD-INR",
-        "as_of_jst": "2026-10-04T12:37+09:00",
-        "age_minutes": 87.5,
+        "as_of_jst": "2026-10-05T13:50+09:00",
+        "age_minutes": 14.5,
         "error": null
       },
       "brent": {
@@ -735,8 +752,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
-        "as_of_jst": "2026-10-03T06:50+09:00",
-        "age_minutes": 1874.5,
+        "as_of_jst": "2026-10-05T13:46+09:00",
+        "age_minutes": 18.5,
         "error": null
       }
     },
@@ -753,11 +770,11 @@
     "basis": "前回14:00保存値",
     "message": "14:00履歴を蓄積中です。異なる営業日の保存値が2回分以上あると比較できます。"
   },
-  "summary": "短期は5日線を下回っています。25日線・75日線より下です。RSIは22.6で低位です。過去類似局面の20営業日見通しは「やや上向き」です。データ判定は「売買ルール判定保留」です。",
+  "summary": "短期は5日線を下回っています。25日線・75日線より下です。RSIは27.2で低位です。過去類似局面の20営業日見通しは「やや上向き」です。データ判定は「判断データ良好」です。",
   "market_state": {
-    "code": "CLOSED",
-    "label": "休場",
-    "detail": "週末。NIFTY価格は 2026/10/01 19:01 JST 時点です。",
+    "code": "LIVE",
+    "label": "取引中",
+    "detail": "NIFTY最新取得値は 13:53 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
   "app_version": "5.7",
@@ -765,13 +782,13 @@
     "nifty": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-01T19:01+09:00",
+      "as_of_jst": "2026-10-05T13:53+09:00",
       "provider": "Google Finance + NSE Indices",
       "provider_symbol": "NIFTY_50:INDEXNSE",
       "technical_status": "fresh",
       "technical_date": "2026-10-01",
       "technical_error": null,
-      "history_source": "Tickjournal recent-history bridge + self-maintained Google close",
+      "history_source": "Tickjournal recent-history bridge",
       "history_cache_rows": 6499,
       "history_cache_first_date": "2000-01-03",
       "history_cache_last_date": "2026-10-01",
@@ -784,21 +801,15 @@
       },
       "history_yahoo_html_report": {
         "status": "error",
-        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: Yahoo history HTML too short (0 rows); ca.finance.yahoo.com: Yahoo history HTML too short (0 rows)"
+        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: HTTP Error 404: Not Found; ca.finance.yahoo.com: HTTP Error 404: Not Found"
       },
       "history_recent_contiguous": true,
       "history_continuity": {
         "latest": "2026-10-01",
-        "rows_120d": 85,
+        "rows_120d": 82,
         "max_gap_days": 4
       },
-      "history_self_updates": [
-        {
-          "date": "2026-10-01",
-          "close": 22421.95,
-          "basis": "Google Finance post-close quote"
-        }
-      ],
+      "history_self_updates": [],
       "history_direct_error": null,
       "history_archive_errors": [
         "NSE Archives probe failed for recent trading days"
@@ -808,7 +819,7 @@
     "usdinr": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-04T12:37+09:00",
+      "as_of_jst": "2026-10-05T13:50+09:00",
       "provider": "Google Finance",
       "provider_symbol": "USD-INR",
       "error": null
@@ -816,7 +827,7 @@
     "usdjpy": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-04T13:59+09:00",
+      "as_of_jst": "2026-10-05T13:57+09:00",
       "provider": "Google Finance",
       "provider_symbol": "USD-JPY",
       "error": null
@@ -824,7 +835,7 @@
     "brent": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-03T06:50+09:00",
+      "as_of_jst": "2026-10-05T13:46+09:00",
       "provider": "Google Finance",
       "provider_symbol": "BZW00:NYMEX",
       "error": null
@@ -847,19 +858,19 @@
       "series": {
         "usdinr": {
           "label": "USD/INR",
-          "observation_count": 14,
+          "observation_count": 15,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-20",
-          "latest_date": "2026-10-04",
-          "latest_as_of_jst": "2026-10-04T12:37:00+09:00",
-          "observed_reference_change_5obs_pct": 0.4401,
+          "latest_date": "2026-10-05",
+          "latest_as_of_jst": "2026-10-05T13:50:00+09:00",
+          "observed_reference_change_5obs_pct": 0.3819,
           "reference_window": {
-            "start_date": "2026-09-29",
-            "start_as_of_jst": "2026-09-29T20:06:00+09:00",
-            "start_value": 95.9034,
-            "end_date": "2026-10-04",
-            "end_as_of_jst": "2026-10-04T12:37:00+09:00",
-            "end_value": 96.3255,
+            "start_date": "2026-09-30",
+            "start_as_of_jst": "2026-09-30T19:56:00+09:00",
+            "start_value": 95.8734,
+            "end_date": "2026-10-05",
+            "end_as_of_jst": "2026-10-05T13:50:00+09:00",
+            "end_value": 96.2395,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -869,19 +880,19 @@
         },
         "usdjpy": {
           "label": "USD/JPY",
-          "observation_count": 6,
+          "observation_count": 7,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-29",
-          "latest_date": "2026-10-04",
-          "latest_as_of_jst": "2026-10-04T13:59:00+09:00",
-          "observed_reference_change_5obs_pct": 0.3404,
+          "latest_date": "2026-10-05",
+          "latest_as_of_jst": "2026-10-05T13:57:00+09:00",
+          "observed_reference_change_5obs_pct": 0.6245,
           "reference_window": {
-            "start_date": "2026-09-29",
-            "start_as_of_jst": "2026-09-29T20:01:00+09:00",
-            "start_value": 157.3045,
-            "end_date": "2026-10-04",
-            "end_as_of_jst": "2026-10-04T13:59:00+09:00",
-            "end_value": 157.84,
+            "start_date": "2026-09-30",
+            "start_as_of_jst": "2026-09-30T19:54:00+09:00",
+            "start_value": 157.0755,
+            "end_date": "2026-10-05",
+            "end_as_of_jst": "2026-10-05T13:57:00+09:00",
+            "end_value": 158.0565,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -891,19 +902,19 @@
         },
         "brent": {
           "label": "Brent",
-          "observation_count": 13,
+          "observation_count": 14,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-19",
-          "latest_date": "2026-10-03",
-          "latest_as_of_jst": "2026-10-03T06:50:00+09:00",
-          "observed_reference_change_5obs_pct": 2.9471,
+          "latest_date": "2026-10-05",
+          "latest_as_of_jst": "2026-10-05T13:46:00+09:00",
+          "observed_reference_change_5obs_pct": 4.7923,
           "reference_window": {
-            "start_date": "2026-09-28",
-            "start_as_of_jst": "2026-09-28T23:40:00+09:00",
-            "start_value": 99.76,
-            "end_date": "2026-10-03",
-            "end_as_of_jst": "2026-10-03T06:50:00+09:00",
-            "end_value": 102.7,
+            "start_date": "2026-09-29",
+            "start_as_of_jst": "2026-09-29T19:51:00+09:00",
+            "start_value": 97.03,
+            "end_date": "2026-10-05",
+            "end_as_of_jst": "2026-10-05T13:46:00+09:00",
+            "end_value": 101.68,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -913,19 +924,19 @@
         },
         "india_vix": {
           "label": "India VIX",
-          "observation_count": 10,
+          "observation_count": 11,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-18",
-          "latest_date": "2026-10-01",
-          "latest_as_of_jst": "2026-10-01T19:13:00+09:00",
-          "observed_reference_change_5obs_pct": 13.8692,
+          "latest_date": "2026-10-05",
+          "latest_as_of_jst": "2026-10-05T14:04:00+09:00",
+          "observed_reference_change_5obs_pct": 19.4901,
           "reference_window": {
-            "start_date": "2026-09-24",
-            "start_as_of_jst": "2026-09-24T19:13:00+09:00",
-            "start_value": 12.69,
-            "end_date": "2026-10-01",
-            "end_as_of_jst": "2026-10-01T19:13:00+09:00",
-            "end_value": 14.45,
+            "start_date": "2026-09-25",
+            "start_as_of_jst": "2026-09-25T19:12:00+09:00",
+            "start_value": 12.16,
+            "end_date": "2026-10-05",
+            "end_as_of_jst": "2026-10-05T14:04:00+09:00",
+            "end_value": 14.53,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -947,9 +958,9 @@
     "execution_plan_version": "5.8-execution-1"
   },
   "data_lineage": {
-    "fetched_at_jst": "2026-10-04T14:04:31+09:00",
-    "market_open": false,
-    "market_state": "CLOSED",
+    "fetched_at_jst": "2026-10-05T14:04:31+09:00",
+    "market_open": true,
+    "market_state": "LIVE",
     "calendar_source": "NSE 2026 holiday calendar",
     "analytics_method_version": "4.8-stat-1",
     "analytics_window_years": 10,
@@ -957,52 +968,52 @@
       "nifty": {
         "source": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
-        "quote_time_jst": "2026-10-01T19:01+09:00",
-        "fetched_at_jst": "2026-10-04T14:04:31+09:00",
-        "data_age_minutes": 4023.5,
+        "quote_time_jst": "2026-10-05T13:53+09:00",
+        "fetched_at_jst": "2026-10-05T14:04:31+09:00",
+        "data_age_minutes": 11.5,
         "status": "fresh",
         "fallback_used": false,
-        "provisional": false,
-        "market_open": false
+        "provisional": true,
+        "market_open": true
       },
       "usdinr": {
         "source": "Google Finance",
         "provider_symbol": "USD-INR",
-        "quote_time_jst": "2026-10-04T12:37+09:00",
-        "fetched_at_jst": "2026-10-04T14:04:31+09:00",
-        "data_age_minutes": 87.5,
+        "quote_time_jst": "2026-10-05T13:50+09:00",
+        "fetched_at_jst": "2026-10-05T14:04:31+09:00",
+        "data_age_minutes": 14.5,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
-        "market_open": false
+        "market_open": true
       },
       "brent": {
         "source": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
-        "quote_time_jst": "2026-10-03T06:50+09:00",
-        "fetched_at_jst": "2026-10-04T14:04:31+09:00",
-        "data_age_minutes": 1874.5,
+        "quote_time_jst": "2026-10-05T13:46+09:00",
+        "fetched_at_jst": "2026-10-05T14:04:31+09:00",
+        "data_age_minutes": 18.5,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
-        "market_open": false
+        "market_open": true
       }
     },
     "nifty_technicals": {
       "technical_date": "2026-10-01",
       "technical_status": "fresh",
       "technical_basis": "前営業日までの確定日足",
-      "provisional_available": false
+      "provisional_available": true
     },
     "history": {
-      "source": "Tickjournal recent-history bridge + self-maintained Google close",
+      "source": "Tickjournal recent-history bridge",
       "rows": 6499,
       "first_date": "2000-01-03",
       "last_date": "2026-10-01",
       "recent_contiguous": true,
       "continuity": {
         "latest": "2026-10-01",
-        "rows_120d": 85,
+        "rows_120d": 82,
         "max_gap_days": 4
       },
       "ready_for_current_technicals": true
@@ -1012,11 +1023,11 @@
     "available": true,
     "method_version": "4.8-stat-1",
     "window_years": 10,
-    "basis_date": "2026-10-01",
-    "basis_price": 22421.95,
-    "basis": "確定日足テクニカル（同一時点）",
+    "basis_date": "2026-10-05",
+    "basis_price": 22530.6,
+    "basis": "当日暫定テクニカル（同一時点）",
     "analog_count": 40,
-    "median_similarity_distance": 1.2,
+    "median_similarity_distance": 0.98,
     "consensus": "上向き一致",
     "horizons": {
       "1": {
@@ -1025,15 +1036,15 @@
         "sample_count": 40,
         "sample_adequacy": "中",
         "statistical_reference": "中",
-        "median_return_pct": 0.61,
-        "mean_return_pct": 0.38,
-        "q25_return_pct": 0.13,
-        "q75_return_pct": 0.94,
-        "historical_up_share_pct": 77.5,
-        "median_price": 22558.27,
-        "q25_price": 22451.53,
-        "q75_price": 22633.36,
-        "median_max_drawdown_pct": 0.61
+        "median_return_pct": 0.54,
+        "mean_return_pct": 0.37,
+        "q25_return_pct": -0.17,
+        "q75_return_pct": 1.06,
+        "historical_up_share_pct": 70.0,
+        "median_price": 22651.84,
+        "q25_price": 22492.32,
+        "q75_price": 22769.24,
+        "median_max_drawdown_pct": 0.54
       },
       "3": {
         "trading_days": 3,
@@ -1041,15 +1052,15 @@
         "sample_count": 40,
         "sample_adequacy": "中",
         "statistical_reference": "中",
-        "median_return_pct": 0.91,
-        "mean_return_pct": 0.57,
-        "q25_return_pct": -0.41,
-        "q75_return_pct": 1.84,
-        "historical_up_share_pct": 72.5,
-        "median_price": 22626.94,
-        "q25_price": 22329.44,
-        "q75_price": 22834.8,
-        "median_max_drawdown_pct": 0.28
+        "median_return_pct": 0.85,
+        "mean_return_pct": 0.54,
+        "q25_return_pct": -1.1,
+        "q75_return_pct": 1.8,
+        "historical_up_share_pct": 70.0,
+        "median_price": 22721.21,
+        "q25_price": 22282.67,
+        "q75_price": 22936.08,
+        "median_max_drawdown_pct": 0.15
       },
       "14": {
         "trading_days": 14,
@@ -1057,15 +1068,15 @@
         "sample_count": 40,
         "sample_adequacy": "中",
         "statistical_reference": "中",
-        "median_return_pct": 0.96,
-        "mean_return_pct": -0.02,
-        "q25_return_pct": -1.5,
-        "q75_return_pct": 3.56,
-        "historical_up_share_pct": 65.0,
-        "median_price": 22637.61,
-        "q25_price": 22084.77,
-        "q75_price": 23220.24,
-        "median_max_drawdown_pct": -0.78
+        "median_return_pct": 1.17,
+        "mean_return_pct": 0.15,
+        "q25_return_pct": -1.64,
+        "q75_return_pct": 3.76,
+        "historical_up_share_pct": 62.5,
+        "median_price": 22794.39,
+        "q25_price": 22160.4,
+        "q75_price": 23377.47,
+        "median_max_drawdown_pct": -0.97
       }
     },
     "method": "直近10年の類似テクニカル局面を使い、1・3・14営業日後の分布を集計。",
@@ -1073,50 +1084,50 @@
     "_data_status": "fresh",
     "basis_consistency": "OK",
     "basis_snapshot_version": "5.2-basis-1",
-    "basis_source": "Tickjournal recent-history bridge + self-maintained Google close"
+    "basis_source": "NIFTY現在値＋確定日足"
   },
   "trade_guide": {
     "available": true,
-    "decision_eligible": false,
-    "action_code": "HOLD",
-    "action_label": "判定保留",
-    "market_stage_code": "WAIT",
-    "market_stage_label": "待機",
-    "technical_basis_used": "確定日足テクニカル（同一時点）",
-    "buy_condition_count": 1,
+    "decision_eligible": true,
+    "action_code": "TRANCHE1",
+    "action_label": "第1弾候補",
+    "market_stage_code": "TRANCHE1",
+    "market_stage_label": "第1弾相当・反転初期",
+    "technical_basis_used": "当日暫定テクニカル（同一時点）",
+    "buy_condition_count": 3,
     "buy_condition_total": 5,
-    "sell_condition_count": 2,
+    "sell_condition_count": 1,
     "sell_condition_total": 4,
     "buy_conditions": [
       {
         "key": "low_zone",
         "label": "調整・低位",
         "met": true,
-        "detail": "RSI 22.6 / 25日線乖離 -4.3%"
+        "detail": "RSI 27.2 / 25日線乖離 -3.6%"
       },
       {
         "key": "rsi_improving",
         "label": "RSI改善",
-        "met": false,
-        "detail": "25.3 → 22.6"
+        "met": true,
+        "detail": "22.6 → 27.2"
       },
       {
         "key": "macd_improving",
         "label": "MACD改善",
-        "met": false,
-        "detail": "Hist -57.83 → -70.63"
+        "met": true,
+        "detail": "Hist -70.63 → -65.47"
       },
       {
         "key": "above_ma5",
         "label": "5日線回復",
         "met": false,
-        "detail": "22422 / MA5 22736"
+        "detail": "22531 / MA5 22614"
       },
       {
         "key": "above_ma25",
         "label": "25日線回復",
         "met": false,
-        "detail": "22422 / MA25 23428"
+        "detail": "22531 / MA25 23365"
       }
     ],
     "sell_conditions": [
@@ -1124,25 +1135,25 @@
         "key": "rsi_high",
         "label": "RSI高位",
         "met": false,
-        "detail": "RSI 22.6"
+        "detail": "RSI 27.2"
       },
       {
         "key": "ma25_extended",
         "label": "25日線上方乖離",
         "met": false,
-        "detail": "-4.3%"
+        "detail": "-3.6%"
       },
       {
         "key": "macd_worsening",
         "label": "MACD悪化",
-        "met": true,
-        "detail": "Hist -57.83 → -70.63"
+        "met": false,
+        "detail": "Hist -70.63 → -65.47"
       },
       {
         "key": "below_ma5",
         "label": "5日線割れ",
         "met": true,
-        "detail": "22422 / MA5 22736"
+        "detail": "22531 / MA5 22614"
       }
     ],
     "external_risk": "NORMAL",
@@ -1151,14 +1162,15 @@
     "forecast_14d_label": "上向き",
     "caution": false,
     "reasons": [
-      "○ 調整・低位：RSI 22.6 / 25日線乖離 -4.3%",
-      "△ MACD悪化：Hist -57.83 → -70.63",
-      "△ 5日線割れ：22422 / MA5 22736",
+      "○ 調整・低位：RSI 27.2 / 25日線乖離 -3.6%",
+      "○ RSI改善：22.6 → 27.2",
+      "○ MACD改善：Hist -70.63 → -65.47",
+      "△ 5日線割れ：22531 / MA5 22614",
       "○ 14営業日予測が上向き"
     ],
     "rule_note": "3分割の市場段階を示す目安です。実際の注文は、既に実施した購入段階・資金配分・投信締切を確認して決定してください。",
-    "basis_date": "2026-10-01",
-    "basis_price": 22421.95,
+    "basis_date": "2026-10-05",
+    "basis_price": 22530.6,
     "basis_consistency": "OK",
     "basis_snapshot_version": "5.2-basis-1",
     "external_data_state": "OK",
@@ -1713,6 +1725,12 @@
           "value": 96.3255,
           "as_of_jst": "2026-10-04T12:37+09:00",
           "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-05",
+          "value": 96.2395,
+          "as_of_jst": "2026-10-05T13:50+09:00",
+          "provider": "Google Finance"
         }
       ],
       "brent": [
@@ -1793,6 +1811,12 @@
           "value": 102.7,
           "as_of_jst": "2026-10-03T06:50+09:00",
           "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-05",
+          "value": 101.68,
+          "as_of_jst": "2026-10-05T13:46+09:00",
+          "provider": "Google Finance"
         }
       ],
       "india_vix": [
@@ -1855,6 +1879,12 @@
           "value": 14.45,
           "as_of_jst": "2026-10-01T19:13+09:00",
           "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-05",
+          "value": 14.53,
+          "as_of_jst": "2026-10-05T14:04+09:00",
+          "provider": "Google Finance"
         }
       ]
     },
@@ -1863,23 +1893,23 @@
   "source_summary": {
     "nifty_current": {
       "provider": "Google Finance + NSE Indices",
-      "as_of_jst": "2026-10-01T19:01+09:00"
+      "as_of_jst": "2026-10-05T13:53+09:00"
     },
     "nifty_history": {
-      "provider": "Tickjournal recent-history bridge + self-maintained Google close",
+      "provider": "Tickjournal recent-history bridge",
       "last_date": "2026-10-01",
       "rows": 6499
     }
   },
   "reference_data": {
     "version": "5.1-ref-2",
-    "generated_at_jst": "2026-10-04T14:04:31+09:00",
+    "generated_at_jst": "2026-10-05T14:04:31+09:00",
     "items": [
       {
         "key": "generated",
         "label": "判定生成",
         "role": "生成時刻",
-        "as_of_jst": "2026-10-04T14:04:31+09:00",
+        "as_of_jst": "2026-10-05T14:04:31+09:00",
         "date": null,
         "provider": "GitHub Actions",
         "age_minutes": 0,
@@ -1892,14 +1922,27 @@
         "key": "nifty_current",
         "label": "NIFTY現在値",
         "role": "判断主体",
-        "as_of_jst": "2026-10-01T19:01+09:00",
+        "as_of_jst": "2026-10-05T13:53+09:00",
         "date": null,
         "provider": "Google Finance + NSE Indices",
-        "age_minutes": 4023,
-        "freshness": "参考",
+        "age_minutes": 11,
+        "freshness": "最新",
         "basis": "現在値",
-        "freshness_code": "REFERENCE",
-        "status_note": "直近セッションの取得値"
+        "freshness_code": "LATEST",
+        "status_note": "取引中の判断主体"
+      },
+      {
+        "key": "nifty_provisional",
+        "label": "本日テクニカル",
+        "role": "判断主体",
+        "as_of_jst": "2026-10-05T13:53+09:00",
+        "date": "2026-10-05",
+        "provider": "NIFTY現在値＋確定日足",
+        "age_minutes": 11,
+        "freshness": "最新",
+        "basis": "本日価格を終値と仮定した暫定計算",
+        "freshness_code": "LATEST",
+        "status_note": "当日暫定テクニカル"
       },
       {
         "key": "nifty_confirmed",
@@ -1907,7 +1950,7 @@
         "role": "基準履歴",
         "as_of_jst": null,
         "date": "2026-10-01",
-        "provider": "Tickjournal recent-history bridge + self-maintained Google close",
+        "provider": "Tickjournal recent-history bridge",
         "age_minutes": null,
         "freshness": "最新",
         "basis": "移動平均・RSI・MACDの確定基準",
@@ -1918,76 +1961,76 @@
         "key": "usdinr",
         "label": "USD/INR",
         "role": "外部参考",
-        "as_of_jst": "2026-10-04T12:37+09:00",
+        "as_of_jst": "2026-10-05T13:50+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 87,
-        "freshness": "参考",
+        "age_minutes": 14,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近取得値"
+        "freshness_code": "LATEST",
+        "status_note": "14分前"
       },
       {
         "key": "usdjpy",
         "label": "USD/JPY",
         "role": "円換算参考",
-        "as_of_jst": "2026-10-04T13:59+09:00",
+        "as_of_jst": "2026-10-05T13:57+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 5,
-        "freshness": "参考",
+        "age_minutes": 7,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近取得値"
+        "freshness_code": "LATEST",
+        "status_note": "7分前"
       },
       {
         "key": "inrjpy",
         "label": "INR/JPY",
         "role": "円換算参考",
-        "as_of_jst": "2026-10-04T12:37+09:00",
+        "as_of_jst": "2026-10-05T13:50+09:00",
         "date": null,
         "provider": "Derived: USD/JPY ÷ USD/INR",
-        "age_minutes": 87,
-        "freshness": "参考",
+        "age_minutes": 14,
+        "freshness": "最新",
         "basis": "円換算参考。2つの為替レートのうち古い時刻を基準時刻として表示。",
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の為替参考値から算出"
+        "freshness_code": "LATEST",
+        "status_note": "USD/JPY ÷ USD/INR"
       },
       {
         "key": "brent",
         "label": "Brent",
         "role": "外部参考",
-        "as_of_jst": "2026-10-03T06:50+09:00",
+        "as_of_jst": "2026-10-05T13:46+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 1874,
-        "freshness": "参考",
+        "age_minutes": 18,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近取得値"
+        "freshness_code": "LATEST",
+        "status_note": "18分前"
       },
       {
         "key": "india_vix",
         "label": "India VIX",
         "role": "外部参考",
-        "as_of_jst": "2026-10-01T19:13+09:00",
+        "as_of_jst": "2026-10-05T14:04+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 4011,
-        "freshness": "参考",
+        "age_minutes": 0,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近セッション値"
+        "freshness_code": "LATEST",
+        "status_note": "0分前"
       }
     ],
     "note": "時刻はすべてJST。NIFTYを判断主体、USD/JPY・INR/JPYを円換算参考、USD/INR・原油・VIXを外部参考として表示します。",
     "prediction_basis": {
-      "date": "2026-10-01",
-      "price": 22421.95,
-      "type": "confirmed",
-      "label": "確定日足テクニカル（同一時点）",
-      "source": "Tickjournal recent-history bridge + self-maintained Google close",
-      "quote_as_of_jst": null,
+      "date": "2026-10-05",
+      "price": 22530.6,
+      "type": "provisional",
+      "label": "当日暫定テクニカル（同一時点）",
+      "source": "NIFTY現在値＋確定日足",
+      "quote_as_of_jst": "2026-10-05T13:53+09:00",
       "consistency": "OK"
     },
     "status_version": "5.4-status-2",
@@ -2001,50 +2044,53 @@
   "technical_basis_snapshot": {
     "available": true,
     "version": "5.2-basis-1",
-    "type": "confirmed",
-    "label": "確定日足テクニカル（同一時点）",
-    "date": "2026-10-01",
-    "price": 22421.95,
-    "quote_as_of_jst": null,
-    "source": "Tickjournal recent-history bridge + self-maintained Google close",
-    "ma5": 22735.87,
-    "ma25": 23427.83,
-    "ma75": 23947.91,
-    "rsi14": 22.57,
-    "macd_hist": -70.633,
-    "ret5_pct": -2.78,
-    "vol20_annualized_pct": 10.03,
+    "type": "provisional",
+    "label": "当日暫定テクニカル（同一時点）",
+    "date": "2026-10-05",
+    "price": 22530.6,
+    "quote_as_of_jst": "2026-10-05T13:53+09:00",
+    "source": "NIFTY現在値＋確定日足",
+    "ma5": 22613.89,
+    "ma25": 23365.42,
+    "ma75": 23927.17,
+    "rsi14": 27.17,
+    "macd_hist": -65.466,
+    "ret5_pct": -2.64,
+    "vol20_annualized_pct": 10.4,
     "consistency": "price / MA / RSI / MACD / forecast all use this snapshot"
   },
   "history_1400": {
     "version": "5.3-history-1",
     "saved": false,
     "replaced_existing": false,
-    "record_count": 0,
-    "date_jst": "2026-10-04",
-    "current_date_has_record": false,
-    "current_date_selected_price_as_of_jst": null,
-    "message": "NSE通常営業日ではないため14:00履歴は保存しません。"
+    "record_count": 1,
+    "date_jst": "2026-10-05",
+    "current_date_has_record": true,
+    "current_date_selected_price_as_of_jst": "2026-10-05T13:53+09:00",
+    "message": "既存の同日14:00代表値の方が14:00に近いため保持しました。",
+    "selected_price_as_of_jst": "2026-10-05T13:53+09:00",
+    "distance_from_1400_seconds": 420,
+    "selection_quality": null
   },
   "operational_state": {
     "version": "5.4-status-2",
-    "code": "CLOSED",
-    "label": "休場",
-    "detail": "週末。NIFTY価格は 2026/10/01 19:01 JST 時点です。",
-    "raw_code": "CLOSED",
-    "raw_label": "休場",
-    "regular_trading_day": false,
+    "code": "LIVE",
+    "label": "取引中",
+    "detail": "NIFTY最新取得値は 13:53 JST 時点です。",
+    "raw_code": "LIVE",
+    "raw_label": "取引中",
+    "regular_trading_day": true,
     "technical_date": "2026-10-01"
   },
   "quality_state": {
     "version": "5.4-status-2",
-    "code": "PARTIAL",
-    "label": "一部参考",
+    "code": "OK",
+    "label": "正常",
     "data": {
       "nifty_current": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "直近セッションの取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "取引中の判断主体"
       },
       "nifty_confirmed": {
         "code": "LATEST",
@@ -2052,34 +2098,34 @@
         "note": "最新確定日足 2026-10-01"
       },
       "nifty_provisional": {
-        "code": "UNAVAILABLE",
-        "label": "利用不可",
-        "note": "取引時間外は暫定値を使用しません。"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "当日暫定テクニカル"
       },
       "usdinr": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "14分前"
       },
       "usdjpy": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "7分前"
       },
       "brent": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "18分前"
       },
       "inrjpy": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の為替参考値から算出"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "USD/JPY ÷ USD/INR"
       },
       "india_vix": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近セッション値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "0分前"
       }
     },
     "principle": "NIFTY判断主体、円換算FX、その他外部参考を分離し、最新・参考・古い・利用不可の4分類で表示。"
@@ -2804,15 +2850,15 @@
     "symbol": "JPY=X",
     "provider_symbol": "USD-JPY",
     "provider": "Google Finance",
-    "price": 157.84,
-    "as_of_jst": "2026-10-04T13:59+09:00",
+    "price": 158.0565,
+    "as_of_jst": "2026-10-05T13:57+09:00",
     "change_5d_pct": null
   },
   "inrjpy": {
     "symbol": "INR/JPY",
     "provider": "Derived: USD/JPY ÷ USD/INR",
-    "price": 1.63861,
-    "as_of_jst": "2026-10-04T12:37+09:00",
+    "price": 1.64232,
+    "as_of_jst": "2026-10-05T13:50+09:00",
     "change_5d_pct": null,
     "basis": "円換算参考。2つの為替レートのうち古い時刻を基準時刻として表示。"
   },
@@ -2828,32 +2874,31 @@
   },
   "sector_context": {
     "available": false,
-    "skipped": true,
     "source": "NSE Indices Live Indices Watch",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "reason": "公式指数データを取得できませんでした。"
   },
   "execution_plan": {
     "version": "5.8-execution-1",
-    "basis_date": "2026-10-01",
-    "generated_at_jst": "2026-10-04T14:04:31+09:00",
-    "market_stage_code": "WAIT",
-    "market_stage_label": "待機",
-    "decision_gate_allow_rule": false,
+    "basis_date": "2026-10-05",
+    "generated_at_jst": "2026-10-05T14:04:31+09:00",
+    "market_stage_code": "TRANCHE1",
+    "market_stage_label": "第1弾相当・反転初期",
+    "decision_gate_allow_rule": true,
     "mode": "decision_support",
     "tranches": [
       {
         "stage": 1,
         "label": "第1弾・反転初期",
         "status": "WAIT",
-        "next_condition": "NIFTY 22,700～22,800 回復",
-        "hold_reason": "未達：NIFTY 22,700～22,800 回復 / USD/INR 96未満 / 未確認：Brent低下",
+        "next_condition": "NIFTY 22,600～22,700 回復",
+        "hold_reason": "未達：NIFTY 22,600～22,700 回復 / USD/INR 96未満 / 未確認：Brent低下",
         "conditions": [
           {
             "key": "nifty_recovery_zone",
-            "label": "NIFTY 22,700～22,800 回復",
+            "label": "NIFTY 22,600～22,700 回復",
             "state": "pending",
             "met": false,
-            "detail": "現在 22,422 / MA5 22,736を100pt幅で丸めた回復ゾーン",
+            "detail": "現在 22,531 / MA5 22,614を100pt幅で丸めた回復ゾーン",
             "source": "NIFTY/MA5"
           },
           {
@@ -2861,7 +2906,7 @@
             "label": "USD/INR 96未満",
             "state": "pending",
             "met": false,
-            "detail": "現在 96.3255",
+            "detail": "現在 96.2395",
             "source": "USD/INR"
           },
           {
@@ -2879,30 +2924,30 @@
         "label": "第2弾・短期反転",
         "status": "WAIT",
         "next_condition": "5日線回復",
-        "hold_reason": "未達：5日線回復 / RSI改善 / MACD改善",
+        "hold_reason": "未達：5日線回復",
         "conditions": [
           {
             "key": "above_ma5",
             "label": "5日線回復",
             "state": "pending",
             "met": false,
-            "detail": "現在 22,422 / MA5 22,736",
+            "detail": "現在 22,531 / MA5 22,614",
             "source": "NIFTY technical"
           },
           {
             "key": "rsi_improving",
             "label": "RSI改善",
-            "state": "pending",
-            "met": false,
-            "detail": "25.3 → 22.6",
+            "state": "met",
+            "met": true,
+            "detail": "22.6 → 27.2",
             "source": "NIFTY RSI14"
           },
           {
             "key": "macd_improving",
             "label": "MACD改善",
-            "state": "pending",
-            "met": false,
-            "detail": "Hist -57.83 → -70.63",
+            "state": "met",
+            "met": true,
+            "detail": "Hist -70.63 → -65.47",
             "source": "NIFTY MACD histogram"
           }
         ]
@@ -2919,7 +2964,7 @@
             "label": "25日線回復",
             "state": "pending",
             "met": false,
-            "detail": "現在 22,422 / MA25 23,428",
+            "detail": "現在 22,531 / MA25 23,365",
             "source": "NIFTY technical"
           },
           {
@@ -2927,7 +2972,7 @@
             "label": "5日線維持",
             "state": "pending",
             "met": false,
-            "detail": "現在 22,422 / MA5 22,736",
+            "detail": "現在 22,531 / MA5 22,614",
             "source": "NIFTY technical"
           },
           {
@@ -2935,7 +2980,7 @@
             "label": "MACDヒストグラム0以上",
             "state": "pending",
             "met": false,
-            "detail": "Hist -70.63",
+            "detail": "Hist -65.47",
             "source": "NIFTY MACD histogram"
           }
         ]
@@ -2952,15 +2997,15 @@
   },
   "acquisition_status": {
     "version": "acquisition-status-1",
-    "date_jst": "2026-10-04",
-    "code": "NOT_APPLICABLE",
-    "label": "対象外",
-    "detail": "週末",
+    "date_jst": "2026-10-05",
+    "code": "CAPTURED",
+    "label": "取得済み",
+    "detail": "14:00代表値を保存済み（由来不明）。",
     "window_jst": "13:45-14:20",
-    "record_count": 0,
-    "same_date_row_count": 0,
-    "selected_price_as_of_jst": null,
-    "selected_generated_at_jst": null,
+    "record_count": 1,
+    "same_date_row_count": 1,
+    "selected_price_as_of_jst": "2026-10-05T13:53+09:00",
+    "selected_generated_at_jst": "2026-10-05T14:04:31+09:00",
     "selection_quality": null,
     "capture_origin": null,
     "synthetic_backfill": false,

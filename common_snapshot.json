@@ -4,28 +4,29 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "CLOSED",
-    "legacy_code": "CLOSED"
+    "state": "OPEN",
+    "legacy_code": "LIVE"
   },
   "incident": {
-    "level": "WARNING",
+    "level": "NORMAL",
     "error_codes": []
   },
   "data_quality": {
-    "data_state": "PARTIAL",
-    "qc_state": "WARN",
+    "data_state": "FRESH",
+    "qc_state": "PASS",
     "completeness_pct": null,
-    "legacy_quality_code": "PARTIAL"
+    "legacy_quality_code": "OK"
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": null,
-    "eligibility": "NOT_ELIGIBLE",
-    "strategy_action": "WAIT",
+    "phase": "PREVIEW",
+    "eligibility": "ELIGIBLE",
+    "strategy_action": "TRANCHE1",
     "reason_summary": [
-      "○ 調整・低位：RSI 22.6 / 25日線乖離 -4.3%",
-      "△ MACD悪化：Hist -57.83 → -70.63",
-      "△ 5日線割れ：22422 / MA5 22736",
+      "○ 調整・低位：RSI 27.2 / 25日線乖離 -3.6%",
+      "○ RSI改善：22.6 → 27.2",
+      "○ MACD改善：Hist -70.63 → -65.47",
+      "△ 5日線割れ：22531 / MA5 22614",
       "○ 14営業日予測が上向き"
     ],
     "passed_conditions": [
@@ -35,36 +36,36 @@
         "label": "調整・低位",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "RSI 22.6 / 25日線乖離 -4.3%",
+        "observed": "RSI 27.2 / 25日線乖離 -3.6%",
         "source_group": "buy_condition"
-      }
-    ],
-    "pending_conditions": [
+      },
       {
         "id": "rsi_improving",
         "category": "TECHNICAL",
         "label": "RSI改善",
-        "status": "PENDING",
-        "impact": "NEUTRAL",
-        "observed": "25.3 → 22.6",
+        "status": "PASS",
+        "impact": "POSITIVE",
+        "observed": "22.6 → 27.2",
         "source_group": "buy_condition"
       },
       {
         "id": "macd_improving",
         "category": "TECHNICAL",
         "label": "MACD改善",
-        "status": "PENDING",
-        "impact": "NEUTRAL",
-        "observed": "Hist -57.83 → -70.63",
+        "status": "PASS",
+        "impact": "POSITIVE",
+        "observed": "Hist -70.63 → -65.47",
         "source_group": "buy_condition"
-      },
+      }
+    ],
+    "pending_conditions": [
       {
         "id": "above_ma5",
         "category": "TECHNICAL",
         "label": "5日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22422 / MA5 22736",
+        "observed": "22531 / MA5 22614",
         "source_group": "buy_condition"
       },
       {
@@ -73,27 +74,18 @@
         "label": "25日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22422 / MA25 23428",
+        "observed": "22531 / MA25 23365",
         "source_group": "buy_condition"
       }
     ],
     "risk_conditions": [
-      {
-        "id": "macd_worsening",
-        "category": "TECHNICAL",
-        "label": "MACD悪化",
-        "status": "WARN",
-        "impact": "NEGATIVE",
-        "observed": "Hist -57.83 → -70.63",
-        "source_group": "sell_condition"
-      },
       {
         "id": "below_ma5",
         "category": "TECHNICAL",
         "label": "5日線割れ",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "22422 / MA5 22736",
+        "observed": "22531 / MA5 22614",
         "source_group": "sell_condition"
       }
     ],
@@ -101,17 +93,17 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-10-01T19:01+09:00",
-    "fetched_at": "2026-10-04T14:04:31+09:00",
-    "calculated_at": "2026-10-04T14:04:31+09:00"
+    "market_as_of": "2026-10-05T13:53+09:00",
+    "fetched_at": "2026-10-05T14:04:31+09:00",
+    "calculated_at": "2026-10-05T14:04:31+09:00"
   },
   "market_specific": {
-    "strategy_stage": "WAIT",
-    "strategy_stage_label": "待機",
-    "decision_gate": "HOLD",
-    "buy_condition_count": 1,
+    "strategy_stage": "TRANCHE1",
+    "strategy_stage_label": "第1弾相当・反転初期",
+    "decision_gate": "READY",
+    "buy_condition_count": 3,
     "buy_condition_total": 5,
-    "sell_condition_count": 2,
+    "sell_condition_count": 1,
     "sell_condition_total": 4,
     "external_data_state": "OK"
   }
