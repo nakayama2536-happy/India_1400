@@ -219,7 +219,11 @@ jobs:
           assert nifty_tech < nifty_detail < external_env < forecast_start, "NIFTY detail chart must sit below NIFTY technicals in Indicators"
           assert "NIFTY 詳細チャートを見る" not in index[forecast_start:index.index('id="page-quality"')], "NIFTY detail chart must not remain in Forecast tab"
           assert "良否は最終データ生成時に判定" in index, "reference-data judgement timing must be explicit"
-          assert "PWAはその保存済み分類を優先" in index, "reference-data display semantics must be explicit"
+          assert "通常取引中は現在時刻からの経過時間でも表示色を再評価" in index, "live freshness display semantics must be explicit"
+          assert '["nifty_current","nifty_provisional"].includes(x?.key))limit=20' in index, "NIFTY live display freshness limit missing"
+          assert '["usdinr","usdjpy","inrjpy","brent","india_vix"].includes(x?.key))limit=30' in index, "external live display freshness limit missing"
+          assert 'age<=120?"参考":"更新推奨"' in index, "live display stale threshold missing"
+          assert 'if(closed)' in index and '"参考","確定日足"' in index, "closed-market reference acceptance missing"
           assert "DYNAMIC_JSON" in sw and "canonicalKey" in sw, "dynamic JSON cache must use bounded canonical keys"
 
           print(f"VALIDATION PASS: India data v{appv} / UI v{uiv}")
