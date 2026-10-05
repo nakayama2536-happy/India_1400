@@ -2,6 +2,10 @@ name: Deploy India 14:00 Check Pages
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Update India Core fund NAV']
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
   pull_request:
@@ -16,24 +20,33 @@ permissions:
   contents: read
 
 concurrency:
-  group: pages
+  # Rejected completion events must not cancel an active/pending publication.
+  group: ${{ (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'workflow_dispatch'))) && 'pages' || format('pages-ignored-{0}', github.run_id) }}
   cancel-in-progress: true
 
 jobs:
   validate-public-delivery:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'workflow_dispatch'))
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Fund head_sha predates its data commit. Resolve current main once.
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || github.sha }}
+      - name: Pin validated publication source
+        id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12'
       - name: Existing public delivery gate
         run: |
           python scripts/public_delivery_gate.py
-          python -m unittest tests.test_public_delivery_gate tests.test_pages_candidate_contract
+          python -m unittest tests.test_public_delivery_gate tests.test_pages_candidate_contract tests.test_publication_manifest
       - name: Prove unsafe fixture is rejected
         run: |
           python - <<'PY'
@@ -57,6 +70,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: ${{ needs.validate-public-delivery.outputs.source_sha }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
       - name: Build static Pages tree
         run: |
           mkdir -p _site
@@ -67,6 +84,19 @@ jobs:
             mkdir -p "_site/$(dirname "$path")"
             cp -p "$path" "_site/$path"
           done
+      - name: Build manifest from exact publication bytes
+        run: |
+          python scripts/build_publication_manifest.py --root _site --output _site/publication_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.build_publication_manifest import build
+          from scripts.public_delivery_gate import validate
+          root = Path('_site')
+          validate(root)
+          assert json.loads((root / 'publication_manifest.json').read_text()) == build(root)
+          print('ARTIFACT MANIFEST AND PUBLIC SAFETY PASS')
+          PY
       - name: Verify compatibility-critical files preserved
         run: |
           test -f _site/index.html

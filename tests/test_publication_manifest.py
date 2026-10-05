@@ -1,4 +1,5 @@
 import json
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -57,6 +58,22 @@ class PublicationManifestTests(unittest.TestCase):
             (root/"common_snapshot.json").unlink()
             with self.assertRaises(FileNotFoundError):
                 mod.build(root)
+        finally: td.cleanup()
+
+    def test_fund_update_rebuilds_stale_manifest_without_changing_source_bytes(self):
+        td, root = self.fixture()
+        try:
+            stale = mod.build(root)
+            (root / 'publication_manifest.json').write_text(json.dumps(stale))
+            (root / 'india_core.json').write_text(json.dumps({'as_of_date': '2026-10-05', 'nav_yen': 15139}))
+            (root / 'india_core_history.json').write_text(json.dumps({'records': [{'date': '2026-10-05', 'nav': 15139}]}))
+            before = {x[0]: (root / x[0]).read_bytes() for x in mod.SOURCES}
+            rebuilt = mod.build(root)
+            self.assertNotEqual(stale['publication_id'], rebuilt['publication_id'])
+            for item in rebuilt['files']:
+                self.assertEqual(item['sha256'], hashlib.sha256(before[item['path']]).hexdigest())
+                self.assertEqual(item['bytes'], len(before[item['path']]))
+                self.assertEqual((root / item['path']).read_bytes(), before[item['path']])
         finally: td.cleanup()
 
     def test_invalid_json_fails_closed(self):
