@@ -63,8 +63,9 @@ class PagesCandidateContract(unittest.TestCase):
                 self.assertEqual(self.completion_result(**case), (False, 'pages-ignored-123'))
 
     def test_existing_triggers_remain_supported(self):
-        for event in ('push', 'pull_request', 'workflow_dispatch'):
+        for event in ('push', 'workflow_dispatch'):
             self.assertEqual(self.completion_result(event=event), (True, 'pages'))
+        self.assertEqual(self.completion_result(event='pull_request'), (True, 'pages-pr-123'))
 
     def test_validated_commit_is_reused_without_upstream_artifacts(self):
         self.assertIn("ref: ${{ github.event_name == 'workflow_run' && 'main' || github.sha }}", self.text)
