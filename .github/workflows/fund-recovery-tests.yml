@@ -6,6 +6,8 @@ on:
     paths:
       - 'update_india_core.py'
       - 'fund_history_csv.py'
+      - 'scripts/fund_refresh_gate.py'
+      - '.github/workflows/update-india-core.yml'
       - 'tests/test_fund*.py'
       - '.github/workflows/fund-recovery-tests.yml'
   push:
@@ -13,6 +15,8 @@ on:
     paths:
       - 'update_india_core.py'
       - 'fund_history_csv.py'
+      - 'scripts/fund_refresh_gate.py'
+      - '.github/workflows/update-india-core.yml'
       - 'tests/test_fund*.py'
       - '.github/workflows/fund-recovery-tests.yml'
 

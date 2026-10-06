@@ -2,6 +2,9 @@ name: Update India Core fund NAV
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['market.json']
   schedule:
     # App-only migration: check several times in the evening so the PWA can
     # replace the recurring narrative report without guessing publication time.
@@ -15,7 +18,7 @@ permissions:
 
 concurrency:
   group: india-core-nav-update
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -24,6 +27,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -51,10 +56,18 @@ jobs:
               out.write("## Fund acquisition timing\n```json\n" + json.dumps(evidence, indent=2) + "\n```\n")
           PY
 
+      - name: Bound evening market-publication retry
+        id: refresh
+        env:
+          ACQUISITION_EVENT: ${{ github.event_name }}
+        run: python scripts/fund_refresh_gate.py
+
       - name: Update India Core latest NAV
+        if: steps.refresh.outputs.run == 'true'
         run: python update_india_core.py
 
       - name: Check India Core update status
+        if: steps.refresh.outputs.run == 'true'
         run: |
           python - <<'PY'
           import json
@@ -88,6 +101,7 @@ jobs:
           PY
 
       - name: Commit fund data
+        if: steps.refresh.outputs.run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -51,13 +51,13 @@ class PagesCandidateContract(unittest.TestCase):
 
     def test_fund_completion_trigger_is_narrow(self):
         self.assertRegex(self.text, r"workflow_run:\n\s+workflows: \['Update India Core fund NAV'\]\n\s+types: \[completed\]\n\s+branches: \[main\]")
-        for event in ('schedule', 'workflow_dispatch'):
+        for event in ('schedule', 'workflow_dispatch', 'push'):
             self.assertEqual(self.completion_result(upstream_event=event), (True, 'pages'))
 
     def test_untrusted_or_failed_completions_cannot_publish_or_cancel_pages(self):
         cases = [dict(conclusion=x) for x in ('failure', 'cancelled', 'skipped', '')]
         cases += [dict(branch='feature/test'), dict(repo='fork/repo'),
-                  dict(upstream_event='pull_request'), dict(upstream_event='push')]
+                  dict(upstream_event='pull_request'), dict(upstream_event='repository_dispatch')]
         for case in cases:
             with self.subTest(case=case):
                 self.assertEqual(self.completion_result(**case), (False, 'pages-ignored-123'))
