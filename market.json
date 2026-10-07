@@ -2207,6 +2207,21 @@
       }
     },
     "note": "誤差・レンジ内率・方向一致率は過去予測の検証指標であり、将来の上昇確率ではありません。",
+    "history_record_count": 3,
+    "excluded_history_records": [
+      {
+        "snapshot_date_jst": "2026-10-05",
+        "reason": "MISSING_SAVED_FORECAST_BASIS"
+      },
+      {
+        "snapshot_date_jst": "2026-10-06",
+        "reason": "MISSING_SAVED_FORECAST_BASIS"
+      },
+      {
+        "snapshot_date_jst": "2026-10-07",
+        "reason": "MISSING_SAVED_FORECAST_BASIS"
+      }
+    ],
     "latest_evaluated": null
   },
   "detail_chart": {
