@@ -2,7 +2,7 @@
   "schema_version": 3,
   "basis": "One representative valid NIFTY snapshot closest to 14:00 JST on regular NSE trading days",
   "policy": {
-    "version": "5.3-history-1",
+    "version": "5.3-history-2",
     "window_jst": "13:45-14:20",
     "selection": "smallest absolute NIFTY quote-time distance from 14:00; later quote wins an exact tie",
     "required": "regular NSE trading day + LIVE market state + fresh same-day NIFTY quote <=20 minutes old",
