@@ -4,28 +4,28 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "OPEN",
-    "legacy_code": "LIVE"
+    "state": "CONFIRMED",
+    "legacy_code": "CONFIRMED"
   },
   "incident": {
-    "level": "NORMAL",
+    "level": "WARNING",
     "error_codes": []
   },
   "data_quality": {
-    "data_state": "FRESH",
-    "qc_state": "PASS",
+    "data_state": "PARTIAL",
+    "qc_state": "WARN",
     "completeness_pct": null,
-    "legacy_quality_code": "OK"
+    "legacy_quality_code": "PARTIAL"
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "PREVIEW",
-    "eligibility": "ELIGIBLE",
-    "strategy_action": "TRANCHE1",
+    "phase": "POSTCHECK",
+    "eligibility": "NOT_ELIGIBLE",
+    "strategy_action": "WAIT",
     "reason_summary": [
-      "○ 調整・低位：RSI 30.5 / 25日線乖離 -3.2%",
-      "○ MACD改善：Hist -30.43 → -30.42",
-      "△ 5日線割れ：22444 / MA5 22560",
+      "○ 調整・低位：RSI 27.6 / 25日線乖離 -4.1%",
+      "△ MACD悪化：Hist -30.43 → -43.97",
+      "△ 5日線割れ：22232 / MA5 22518",
       "○ 14営業日予測が上向き"
     ],
     "passed_conditions": [
@@ -35,16 +35,7 @@
         "label": "調整・低位",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "RSI 30.5 / 25日線乖離 -3.2%",
-        "source_group": "buy_condition"
-      },
-      {
-        "id": "macd_improving",
-        "category": "TECHNICAL",
-        "label": "MACD改善",
-        "status": "PASS",
-        "impact": "POSITIVE",
-        "observed": "Hist -30.43 → -30.42",
+        "observed": "RSI 27.6 / 25日線乖離 -4.1%",
         "source_group": "buy_condition"
       }
     ],
@@ -55,7 +46,16 @@
         "label": "RSI改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "33.1 → 30.5",
+        "observed": "33.1 → 27.6",
+        "source_group": "buy_condition"
+      },
+      {
+        "id": "macd_improving",
+        "category": "TECHNICAL",
+        "label": "MACD改善",
+        "status": "PENDING",
+        "impact": "NEUTRAL",
+        "observed": "Hist -30.43 → -43.97",
         "source_group": "buy_condition"
       },
       {
@@ -64,7 +64,7 @@
         "label": "5日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22444 / MA5 22560",
+        "observed": "22232 / MA5 22518",
         "source_group": "buy_condition"
       },
       {
@@ -73,18 +73,27 @@
         "label": "25日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22444 / MA25 23187",
+        "observed": "22232 / MA25 23178",
         "source_group": "buy_condition"
       }
     ],
     "risk_conditions": [
+      {
+        "id": "macd_worsening",
+        "category": "TECHNICAL",
+        "label": "MACD悪化",
+        "status": "WARN",
+        "impact": "NEGATIVE",
+        "observed": "Hist -30.43 → -43.97",
+        "source_group": "sell_condition"
+      },
       {
         "id": "below_ma5",
         "category": "TECHNICAL",
         "label": "5日線割れ",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "22444 / MA5 22560",
+        "observed": "22232 / MA5 22518",
         "source_group": "sell_condition"
       }
     ],
@@ -92,17 +101,17 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-10-08T13:56+09:00",
-    "fetched_at": "2026-10-08T14:04:30+09:00",
-    "calculated_at": "2026-10-08T14:04:30+09:00"
+    "market_as_of": "2026-10-08T19:01+09:00",
+    "fetched_at": "2026-10-08T20:38:32+09:00",
+    "calculated_at": "2026-10-08T20:38:32+09:00"
   },
   "market_specific": {
-    "strategy_stage": "TRANCHE1",
-    "strategy_stage_label": "第1弾相当・反転初期",
-    "decision_gate": "READY",
-    "buy_condition_count": 2,
+    "strategy_stage": "WAIT",
+    "strategy_stage_label": "待機",
+    "decision_gate": "HOLD",
+    "buy_condition_count": 1,
     "buy_condition_total": 5,
-    "sell_condition_count": 1,
+    "sell_condition_count": 2,
     "sell_condition_total": 4,
     "external_data_state": "OK"
   }
