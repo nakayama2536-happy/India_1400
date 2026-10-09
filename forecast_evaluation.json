@@ -60,9 +60,17 @@
       },
       "results": {
         "1": {
-          "status": "PENDING",
-          "target_date": null,
-          "message": "1営業日後の確定日足待ち"
+          "status": "EVALUATED",
+          "target_date": "2026-10-09",
+          "actual_close": 22520.45,
+          "actual_return_pct": 0.34,
+          "actual_direction": "上向き",
+          "forecast_direction": "上向き",
+          "direction_match": true,
+          "median_return_error_pct": -0.2,
+          "absolute_median_return_error_pct": 0.2,
+          "median_price_error_pct": 0.201,
+          "range_25_75_hit": true
         },
         "3": {
           "status": "PENDING",
@@ -83,13 +91,13 @@
     "pending_count": 1,
     "horizons": {
       "1": {
-        "evaluated_count": 0,
+        "evaluated_count": 1,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": null,
-        "mean_absolute_return_error_pct": null,
-        "median_price_error_pct": null,
-        "range_25_75_hit_pct": null,
-        "direction_match_pct": null
+        "median_absolute_return_error_pct": 0.2,
+        "mean_absolute_return_error_pct": 0.2,
+        "median_price_error_pct": 0.201,
+        "range_25_75_hit_pct": 100.0,
+        "direction_match_pct": 100.0
       },
       "3": {
         "evaluated_count": 0,
