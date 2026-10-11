@@ -94,8 +94,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-09T19:01+09:00",
-    "fetched_at": "2026-10-10T02:10:51+09:00",
-    "calculated_at": "2026-10-10T02:10:51+09:00"
+    "fetched_at": "2026-10-11T14:04:30+09:00",
+    "calculated_at": "2026-10-11T14:04:30+09:00"
   },
   "market_specific": {
     "strategy_stage": "TRANCHE1",
