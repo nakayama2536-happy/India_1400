@@ -150,12 +150,79 @@
           "message": "14営業日後の確定日足待ち"
         }
       }
+    },
+    {
+      "forecast_id": "2026-10-13",
+      "snapshot_date_jst": "2026-10-13",
+      "generated_at_jst": "2026-10-13T14:04:29+09:00",
+      "price_as_of_jst": "2026-10-13T14:02:00+09:00",
+      "basis_date": "2026-10-13",
+      "basis_price": 22515.7,
+      "basis": "当日暫定テクニカル（同一時点）",
+      "basis_consistency": "OK",
+      "source_history_method_version": "5.3-history-2",
+      "source_forecast_method_version": "4.8-stat-1",
+      "forecast": {
+        "1": {
+          "label": "上向き",
+          "median_return_pct": 0.35,
+          "q25_return_pct": -0.17,
+          "q75_return_pct": 0.9,
+          "median_price": 22595.05,
+          "q25_price": 22476.63,
+          "q75_price": 22717.59,
+          "historical_up_share_pct": 67.5,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        },
+        "3": {
+          "label": "上向き",
+          "median_return_pct": 0.48,
+          "q25_return_pct": -0.87,
+          "q75_return_pct": 1.73,
+          "median_price": 22624.57,
+          "q25_price": 22319.09,
+          "q75_price": 22905.49,
+          "historical_up_share_pct": 60.0,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        },
+        "14": {
+          "label": "上向き",
+          "median_return_pct": 1.77,
+          "q25_return_pct": -1.41,
+          "q75_return_pct": 3.57,
+          "median_price": 22913.41,
+          "q25_price": 22197.24,
+          "q75_price": 23318.79,
+          "historical_up_share_pct": 67.5,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        }
+      },
+      "results": {
+        "1": {
+          "status": "PENDING",
+          "target_date": null,
+          "message": "1営業日後の確定日足待ち"
+        },
+        "3": {
+          "status": "PENDING",
+          "target_date": null,
+          "message": "3営業日後の確定日足待ち"
+        },
+        "14": {
+          "status": "PENDING",
+          "target_date": null,
+          "message": "14営業日後の確定日足待ち"
+        }
+      }
     }
   ],
   "summary": {
     "method_version": "5.6-eval-1",
-    "forecast_count": 2,
-    "pending_count": 2,
+    "forecast_count": 3,
+    "pending_count": 3,
     "horizons": {
       "1": {
         "evaluated_count": 1,
@@ -186,7 +253,7 @@
       }
     },
     "note": "誤差・レンジ内率・方向一致率は過去予測の検証指標であり、将来の上昇確率ではありません。",
-    "history_record_count": 5,
+    "history_record_count": 6,
     "excluded_history_records": [
       {
         "snapshot_date_jst": "2026-10-05",
