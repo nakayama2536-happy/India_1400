@@ -234,6 +234,9 @@ jobs:
           python scripts/public_delivery_gate.py
           python -m unittest tests.test_public_delivery_gate
 
+      - name: Quality and purchase presentation regression
+        run: node --test tests/quality-presentation.test.cjs tests/purchase-compact.test.cjs
+
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
 
