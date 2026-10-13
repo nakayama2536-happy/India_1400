@@ -73,9 +73,17 @@
           "range_25_75_hit": true
         },
         "3": {
-          "status": "PENDING",
-          "target_date": null,
-          "message": "3営業日後の確定日足待ち"
+          "status": "EVALUATED",
+          "target_date": "2026-10-13",
+          "actual_close": 22721.95,
+          "actual_return_pct": 1.238,
+          "actual_direction": "上向き",
+          "forecast_direction": "上向き",
+          "direction_match": true,
+          "median_return_error_pct": 0.498,
+          "absolute_median_return_error_pct": 0.498,
+          "median_price_error_pct": 0.497,
+          "range_25_75_hit": true
         },
         "14": {
           "status": "PENDING",
@@ -135,9 +143,17 @@
       },
       "results": {
         "1": {
-          "status": "PENDING",
-          "target_date": null,
-          "message": "1営業日後の確定日足待ち"
+          "status": "EVALUATED",
+          "target_date": "2026-10-13",
+          "actual_close": 22721.95,
+          "actual_return_pct": 1.118,
+          "actual_direction": "上向き",
+          "forecast_direction": "上向き",
+          "direction_match": true,
+          "median_return_error_pct": 0.708,
+          "absolute_median_return_error_pct": 0.708,
+          "median_price_error_pct": 0.707,
+          "range_25_75_hit": false
         },
         "3": {
           "status": "PENDING",
@@ -225,22 +241,22 @@
     "pending_count": 3,
     "horizons": {
       "1": {
-        "evaluated_count": 1,
+        "evaluated_count": 2,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": 0.2,
-        "mean_absolute_return_error_pct": 0.2,
-        "median_price_error_pct": 0.201,
-        "range_25_75_hit_pct": 100.0,
+        "median_absolute_return_error_pct": 0.454,
+        "mean_absolute_return_error_pct": 0.454,
+        "median_price_error_pct": 0.454,
+        "range_25_75_hit_pct": 50.0,
         "direction_match_pct": 100.0
       },
       "3": {
-        "evaluated_count": 0,
+        "evaluated_count": 1,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": null,
-        "mean_absolute_return_error_pct": null,
-        "median_price_error_pct": null,
-        "range_25_75_hit_pct": null,
-        "direction_match_pct": null
+        "median_absolute_return_error_pct": 0.498,
+        "mean_absolute_return_error_pct": 0.498,
+        "median_price_error_pct": 0.497,
+        "range_25_75_hit_pct": 100.0,
+        "direction_match_pct": 100.0
       },
       "14": {
         "evaluated_count": 0,
