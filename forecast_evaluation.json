@@ -380,9 +380,17 @@
       },
       "results": {
         "1": {
-          "status": "MISSING_DATA",
+          "status": "EVALUATED",
           "target_date": "2026-10-14",
-          "reason": "TARGET_CONFIRMED_CLOSE_MISSING_OR_CONFLICTING"
+          "actual_close": 22622.7,
+          "actual_return_pct": 0.475,
+          "actual_direction": "上向き",
+          "forecast_direction": "上向き",
+          "direction_match": true,
+          "median_return_error_pct": 0.125,
+          "absolute_median_return_error_pct": 0.125,
+          "median_price_error_pct": 0.123,
+          "range_25_75_hit": true
         },
         "3": {
           "status": "PENDING",
@@ -470,12 +478,12 @@
     "pending_count": 4,
     "horizons": {
       "1": {
-        "evaluated_count": 2,
+        "evaluated_count": 3,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": 0.454,
-        "mean_absolute_return_error_pct": 0.454,
-        "median_price_error_pct": 0.454,
-        "range_25_75_hit_pct": 50.0,
+        "median_absolute_return_error_pct": 0.2,
+        "mean_absolute_return_error_pct": 0.344,
+        "median_price_error_pct": 0.201,
+        "range_25_75_hit_pct": 66.7,
         "direction_match_pct": 100.0
       },
       "3": {
@@ -500,9 +508,9 @@
     "note": "誤差・レンジ内率・方向一致率は過去予測の検証指標であり、将来の上昇確率ではありません。",
     "evaluation_states": {
       "1": {
-        "EVALUATED": 2,
+        "EVALUATED": 3,
         "PENDING": 1,
-        "MISSING_DATA": 1,
+        "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       },
       "3": {

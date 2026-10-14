@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_jst": "2026-10-14T19:00:12+09:00",
+  "updated_at_jst": "2026-10-15T00:29:07+09:00",
   "series": {
     "usdinr": [
       {
@@ -140,6 +140,12 @@
         "value": 95.1492,
         "as_of_jst": "2026-10-14T18:54+09:00",
         "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 95.1594,
+        "as_of_jst": "2026-10-15T00:22+09:00",
+        "provider": "Google Finance"
       }
     ],
     "brent": [
@@ -274,6 +280,12 @@
         "value": 105.88,
         "as_of_jst": "2026-10-14T18:47+09:00",
         "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 105.84,
+        "as_of_jst": "2026-10-15T00:07+09:00",
+        "provider": "Google Finance"
       }
     ],
     "india_vix": [
@@ -382,7 +394,7 @@
       {
         "date": "2026-10-14",
         "value": 14.62,
-        "as_of_jst": "2026-10-14T19:00+09:00",
+        "as_of_jst": "2026-10-14T19:13+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -513,6 +525,14 @@
         "as_of_jst": "2026-10-14T18:56+09:00",
         "provider": "Google Finance",
         "recorded_at_jst": "2026-10-14T19:00:12+09:00",
+        "basis": "observed_reference_quote_not_session_close"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 158.854,
+        "as_of_jst": "2026-10-15T00:26+09:00",
+        "provider": "Google Finance",
+        "recorded_at_jst": "2026-10-15T00:29:07+09:00",
         "basis": "observed_reference_quote_not_session_close"
       }
     ]
