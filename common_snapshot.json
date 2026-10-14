@@ -4,36 +4,46 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "OPEN",
-    "legacy_code": "LIVE"
+    "state": "POST_CLOSE_PENDING",
+    "legacy_code": "POST_CLOSE_PENDING"
   },
   "incident": {
-    "level": "NORMAL",
+    "level": "WARNING",
     "error_codes": []
   },
   "data_quality": {
-    "data_state": "FRESH",
-    "qc_state": "PASS",
+    "data_state": "PARTIAL",
+    "qc_state": "WARN",
     "completeness_pct": null,
-    "legacy_quality_code": "OK"
+    "legacy_quality_code": "PARTIAL"
   },
   "decision": {
     "mode": "SHADOW",
     "phase": "POSTCHECK",
     "eligibility": "NOT_ELIGIBLE",
-    "strategy_action": "WAIT",
+    "strategy_action": "TRANCHE2",
     "reason_summary": [
-      "○ MACD改善：Hist +5.05 → +20.34",
-      "○ 5日線回復：22625 / MA5 22493"
+      "○ RSI改善：34.0 → 43.4",
+      "○ MACD改善：Hist -24.74 → +5.05",
+      "○ 5日線回復：22722 / MA5 22488"
     ],
     "passed_conditions": [
+      {
+        "id": "rsi_improving",
+        "category": "TECHNICAL",
+        "label": "RSI改善",
+        "status": "PASS",
+        "impact": "POSITIVE",
+        "observed": "34.0 → 43.4",
+        "source_group": "buy_condition"
+      },
       {
         "id": "macd_improving",
         "category": "TECHNICAL",
         "label": "MACD改善",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "Hist +5.05 → +20.34",
+        "observed": "Hist -24.74 → +5.05",
         "source_group": "buy_condition"
       },
       {
@@ -42,7 +52,7 @@
         "label": "5日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "22625 / MA5 22493",
+        "observed": "22722 / MA5 22488",
         "source_group": "buy_condition"
       }
     ],
@@ -53,16 +63,7 @@
         "label": "調整・低位",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "RSI 41.7 / 25日線乖離 -1.5%",
-        "source_group": "buy_condition"
-      },
-      {
-        "id": "rsi_improving",
-        "category": "TECHNICAL",
-        "label": "RSI改善",
-        "status": "PENDING",
-        "impact": "NEUTRAL",
-        "observed": "43.4 → 41.7",
+        "observed": "RSI 43.4 / 25日線乖離 -1.3%",
         "source_group": "buy_condition"
       },
       {
@@ -71,7 +72,7 @@
         "label": "25日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22625 / MA25 22969",
+        "observed": "22722 / MA25 23015",
         "source_group": "buy_condition"
       }
     ],
@@ -80,15 +81,15 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-10-14T18:33+09:00",
-    "fetched_at": "2026-10-14T18:48:05+09:00",
-    "calculated_at": "2026-10-14T18:48:05+09:00"
+    "market_as_of": "2026-10-14T18:50+09:00",
+    "fetched_at": "2026-10-14T19:00:12+09:00",
+    "calculated_at": "2026-10-14T19:00:12+09:00"
   },
   "market_specific": {
-    "strategy_stage": "WAIT",
-    "strategy_stage_label": "待機",
-    "decision_gate": "READY",
-    "buy_condition_count": 2,
+    "strategy_stage": "TRANCHE2",
+    "strategy_stage_label": "第2弾相当・短期反転",
+    "decision_gate": "HOLD",
+    "buy_condition_count": 3,
     "buy_condition_total": 5,
     "sell_condition_count": 0,
     "sell_condition_total": 4,

@@ -380,9 +380,9 @@
       },
       "results": {
         "1": {
-          "status": "PENDING",
+          "status": "MISSING_DATA",
           "target_date": "2026-10-14",
-          "reason": "NOT_DUE"
+          "reason": "TARGET_CONFIRMED_CLOSE_MISSING_OR_CONFLICTING"
         },
         "3": {
           "status": "PENDING",
@@ -501,8 +501,8 @@
     "evaluation_states": {
       "1": {
         "EVALUATED": 2,
-        "PENDING": 2,
-        "MISSING_DATA": 0,
+        "PENDING": 1,
+        "MISSING_DATA": 1,
         "UNEVALUABLE": 0
       },
       "3": {
