@@ -2304,9 +2304,8 @@
       "close": 22363.35,
       "volume": null,
       "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
       "volume_usable_for_analysis": false,
-      "source": "NSE official daily index CSV",
-      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_12102026.csv",
       "close_consistency": "MATCH"
     },
     {
@@ -2317,9 +2316,8 @@
       "close": 22721.95,
       "volume": null,
       "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
       "volume_usable_for_analysis": false,
-      "source": "NSE official daily index CSV",
-      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_13102026.csv",
       "close_consistency": "MATCH"
     }
   ],
@@ -2327,19 +2325,7 @@
     {
       "source": "Tickjournal",
       "status": "ok",
-      "rows": 191,
-      "last_date": "2026-10-09"
-    },
-    {
-      "source": "NSE official daily index CSV",
-      "status": "ok",
-      "rows": 1,
-      "last_date": "2026-10-12"
-    },
-    {
-      "source": "NSE official daily index CSV",
-      "status": "ok",
-      "rows": 1,
+      "rows": 193,
       "last_date": "2026-10-13"
     }
   ]
