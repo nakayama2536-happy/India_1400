@@ -3,18 +3,46 @@ const html=fs.readFileSync('index.html','utf8');
 function fn(name){const start=html.indexOf('function '+name+'(');assert.ok(start>=0,name);const tail=html.slice(start),end=tail.search(/\n(?:function|const|async function) /);return end<0?tail:tail.slice(0,end);}
 const NOW=Date.parse('2026-10-13T14:05:00+09:00');
 class Clock extends Date{static now(){return NOW}}
-function harness(m={}){
+function harness(m={},common={}){
  const nodes={},records=new Map();let writes=0;
- const c=vm.createContext({market:m,Date:Clock,console,Number,JSON,
-  $:id=>nodes[id]||(nodes[id]={innerHTML:''}),
+ const c=vm.createContext({market:m,commonSnapshot:common,Date:Clock,console,Number,JSON,
+  $:id=>nodes[id]||(nodes[id]={innerHTML:'',className:''}),
   localStorage:{getItem:k=>records.get(k)??null,setItem:()=>writes++},
   setText:()=>{},currentAgeMinutes:t=>(NOW-Date.parse(t))/60000,
   fundBasisHealth:()=>({ok:false}),planConditionRows:()=>'',
  });
  vm.runInContext('const PURCHASE_STATE_KEY="india1400.purchaseProgress.v1";',c);
- for(const n of ['jstNowInfo','localTsParts','liveFreshness','referenceHealth','purchaseRecordKnowledge','decisionDisplayEligible','defaultPurchaseState','loadPurchaseState','renderTranchePlan'])vm.runInContext(fn(n),c);
+ for(const n of ['jstNowInfo','localTsParts','runtimeSnapshotFreshness','qualityTone','renderQualityOverview','liveFreshness','referenceHealth','purchaseRecordKnowledge','decisionDisplayEligible','defaultPurchaseState','loadPurchaseState','renderTranchePlan'])vm.runInContext(fn(n),c);
  return{run:s=>vm.runInContext(s,c),nodes,records,writes:()=>writes};
 }
+
+test('generation-time FRESH is downgraded when a LIVE snapshot is stale at display time',()=>{
+ const h=harness(
+  {generated_at_jst:'2026-10-13T11:00:00+09:00',nifty:{as_of_jst:'2026-10-13T10:59:00+09:00'},operational_state:{code:'LIVE',regular_trading_day:true},data_quality:{},quality_state:{},acquisition_status:{code:'MISSED'}},
+  {data_quality:{data_state:'FRESH',qc_state:'PASS'}}
+ );
+ assert.equal(h.run('runtimeSnapshotFreshness().stale'),true);
+ h.run('renderQualityOverview()');
+ assert.match(h.nodes.qualityTopSummary.innerHTML,/更新要確認/);
+ assert.doesNotMatch(h.nodes.qualityTopSummary.innerHTML,/データ最新/);
+});
+test('fresh LIVE snapshot retains generation-time FRESH presentation',()=>{
+ const h=harness(
+  {generated_at_jst:'2026-10-13T14:04:00+09:00',nifty:{as_of_jst:'2026-10-13T14:03:00+09:00'},operational_state:{code:'LIVE',regular_trading_day:true},data_quality:{},quality_state:{},acquisition_status:{code:'CAPTURED'}},
+  {data_quality:{data_state:'FRESH',qc_state:'PASS'}}
+ );
+ assert.equal(h.run('runtimeSnapshotFreshness().stale'),false);
+ h.run('renderQualityOverview()');
+ assert.match(h.nodes.qualityTopSummary.innerHTML,/データ最新/);
+ assert.doesNotMatch(h.nodes.qualityTopSummary.innerHTML,/更新要確認/);
+});
+test('decision pills use the same runtime stale guard without changing purchase state',()=>{
+ const src=fn('renderDecision');
+ assert.match(src,/runtimeSnapshotFreshness\(\)\.stale/);
+ assert.match(src,/保存時：/);
+ assert.match(src,/判定保留（時刻確認）/);
+});
+
 test('saved unavailable cannot become latest from a recent timestamp',()=>{
  const h=harness({generated_at_jst:'2026-10-13T14:04:00+09:00'});
  assert.equal(h.run('referenceHealth({key:"brent",as_of_jst:"2026-10-13T14:04:00+09:00",freshness_code:"UNAVAILABLE",freshness:"利用不可"}).ok'),false);
