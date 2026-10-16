@@ -43,6 +43,46 @@ test('decision pills use the same runtime stale guard without changing purchase 
  assert.match(src,/判定保留（時刻確認）/);
 });
 
+test('minute clock transition refreshes stale status and purchase gating exactly once',()=>{
+ const time={now:NOW},calls=[],writes=[];
+ class VariableClock extends Date{static now(){return time.now}}
+ const c=vm.createContext({
+  Date:VariableClock,Number,JSON,
+  market:{
+   generated_at_jst:'2026-10-13T14:04:00+09:00',
+   nifty:{as_of_jst:'2026-10-13T14:04:00+09:00'},
+   operational_state:{code:'LIVE'},
+   core_fetch:{nifty:{status:'fresh',fetched_this_run:true}},
+   data_quality:{decision_gate:{allow_rule:true}},
+   trade_guide:{decision_eligible:true},
+   execution_plan:{decision_gate_allow_rule:true}
+  },
+  renderClockDependent:()=>calls.push('clock'),
+  renderDecision:()=>calls.push('decision'),
+  renderQualityOverview:()=>calls.push('quality'),
+  renderPurchaseProgress:()=>calls.push('purchase'),
+  localStorage:{setItem:(...args)=>writes.push(args)}
+ });
+ vm.runInContext('let lastClockPresentationKey=null;',c);
+ for(const n of ['runtimeSnapshotFreshness','decisionDisplayEligible','clockPresentationKey'])
+  vm.runInContext(fn(n),c);
+ const tick=html.slice(html.indexOf('function renderClockTick(')).split('\nrefreshData(true);')[0];
+ assert.match(tick,/function renderClockTick/);
+ vm.runInContext(tick,c);
+ assert.equal(vm.runInContext('decisionDisplayEligible(market.trade_guide,market.data_quality,market.execution_plan)',c),true);
+ vm.runInContext('lastClockPresentationKey=clockPresentationKey();renderClockTick()',c);
+ assert.deepEqual(calls,['clock']);
+ time.now+=21*60000;
+ assert.equal(vm.runInContext('decisionDisplayEligible(market.trade_guide,market.data_quality,market.execution_plan)',c),false);
+ vm.runInContext('renderClockTick()',c);
+ assert.deepEqual(calls,['clock','clock','decision','quality','purchase']);
+ vm.runInContext('renderClockTick()',c);
+ assert.deepEqual(calls,['clock','clock','decision','quality','purchase','clock']);
+ assert.equal(writes.length,0);
+ assert.match(html,/lastClockPresentationKey=clockPresentationKey\(\)/);
+ assert.match(html,/setInterval\(renderClockTick,60000\)/);
+});
+
 test('saved unavailable cannot become latest from a recent timestamp',()=>{
  const h=harness({generated_at_jst:'2026-10-13T14:04:00+09:00'});
  assert.equal(h.run('referenceHealth({key:"brent",as_of_jst:"2026-10-13T14:04:00+09:00",freshness_code:"UNAVAILABLE",freshness:"利用不可"}).ok'),false);
