@@ -731,8 +731,21 @@ $("diagnosticBuildBtn").addEventListener("click",investigateUpdate);
 $("diagnosticCopyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(updateDiagnosticText);toast("調査結果・対策依頼をコピーしました")}catch(e){setText("diagnosticStatus","コピーできません。以下を選択してコピーしてください。\n"+updateDiagnosticText)}});
 $("diagnosticWorkflowBtn").addEventListener("click",()=>window.open(REPO_WORKFLOW_URL,"_blank","noopener"));
 $("diagnosticReloadBtn").addEventListener("click",()=>refreshData(false));
-function renderAll(){renderDecision();renderQualityOverview();renderReferenceTimes();renderMarketSupplement();renderPurchaseProgress();renderIndicators();renderForecast();renderForecastVerification();renderDetailChart();renderDetail();renderDeepDiveTrigger();renderDeepDiveReview()}
-$("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);$("resetPurchaseBtn").addEventListener("click",resetPurchaseState);$("deepDiveBuildBtn").addEventListener("click",async()=>{await buildDeepDiveArtifact();renderDeepDiveReview()});$("deepDiveShareBtn").addEventListener("click",shareDeepDiveArtifact);$("deepDiveSaveBtn").addEventListener("click",saveDeepDiveArtifact);$("deepDiveCopyBtn").addEventListener("click",copyDeepDiveArtifact);$("deepDiveTriggerOpenBtn").addEventListener("click",openDeepDivePanel);document.querySelectorAll("[data-review-utility]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-review-utility]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected")}));$("deepDiveReviewSaveBtn").addEventListener("click",saveDeepDiveReview);$("deepDiveReviewCopyBtn").addEventListener("click",copyDeepDiveReviewHistory);$("deepDiveReviewBackupBtn").addEventListener("click",backupDeepDiveReviews);$("deepDiveReviewImportBtn").addEventListener("click",()=>$("deepDiveReviewImportFile").click());$("deepDiveReviewImportFile").addEventListener("change",async e=>{const file=e.target.files?.[0];e.target.value="";if(file)await importDeepDiveReviews(file)});refreshData(true);setInterval(()=>{if(market)renderClockDependent()},60000);
+function renderAll(){renderDecision();renderQualityOverview();renderReferenceTimes();renderMarketSupplement();renderPurchaseProgress();renderIndicators();renderForecast();renderForecastVerification();renderDetailChart();renderDetail();renderDeepDiveTrigger();renderDeepDiveReview();lastClockPresentationKey=clockPresentationKey()}
+$("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);$("resetPurchaseBtn").addEventListener("click",resetPurchaseState);$("deepDiveBuildBtn").addEventListener("click",async()=>{await buildDeepDiveArtifact();renderDeepDiveReview()});$("deepDiveShareBtn").addEventListener("click",shareDeepDiveArtifact);$("deepDiveSaveBtn").addEventListener("click",saveDeepDiveArtifact);$("deepDiveCopyBtn").addEventListener("click",copyDeepDiveArtifact);$("deepDiveTriggerOpenBtn").addEventListener("click",openDeepDivePanel);document.querySelectorAll("[data-review-utility]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-review-utility]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected")}));$("deepDiveReviewSaveBtn").addEventListener("click",saveDeepDiveReview);$("deepDiveReviewCopyBtn").addEventListener("click",copyDeepDiveReviewHistory);$("deepDiveReviewBackupBtn").addEventListener("click",backupDeepDiveReviews);$("deepDiveReviewImportBtn").addEventListener("click",()=>$("deepDiveReviewImportFile").click());$("deepDiveReviewImportFile").addEventListener("change",async e=>{const file=e.target.files?.[0];e.target.value="";if(file)await importDeepDiveReviews(file)});let lastClockPresentationKey=null;
+function clockPresentationKey(){return(runtimeSnapshotFreshness().stale?"STALE":"CURRENT")+"|"+(decisionDisplayEligible(market?.trade_guide,market?.data_quality,market?.execution_plan)?"ELIGIBLE":"HOLD")}
+function renderClockTick(){
+ if(!market)return;
+ renderClockDependent();
+ const key=clockPresentationKey();
+ if(lastClockPresentationKey===null){lastClockPresentationKey=key;return}
+ if(key===lastClockPresentationKey)return;
+ lastClockPresentationKey=key;
+ renderDecision();
+ renderQualityOverview();
+ renderPurchaseProgress();
+}
+refreshData(true);setInterval(renderClockTick,60000);
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!sessionStorage.getItem("india1400.swReloaded")){sessionStorage.setItem("india1400.swReloaded","1");location.reload()}})}
 </script>
 </body>
