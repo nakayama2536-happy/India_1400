@@ -23,10 +23,10 @@
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "TRANCHE3",
     "reason_summary": [
-      "○ RSI改善：49.9 → 52.1",
-      "○ MACD改善：Hist +55.55 → +84.89",
-      "○ 5日線回復：23110 / MA5 22763",
-      "○ 25日線回復：23110 / MA25 22931"
+      "○ RSI改善：49.9 → 52.0",
+      "○ MACD改善：Hist +55.55 → +84.41",
+      "○ 5日線回復：23102 / MA5 22762",
+      "○ 25日線回復：23102 / MA25 22930"
     ],
     "passed_conditions": [
       {
@@ -35,7 +35,7 @@
         "label": "RSI改善",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "49.9 → 52.1",
+        "observed": "49.9 → 52.0",
         "source_group": "buy_condition"
       },
       {
@@ -44,7 +44,7 @@
         "label": "MACD改善",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "Hist +55.55 → +84.89",
+        "observed": "Hist +55.55 → +84.41",
         "source_group": "buy_condition"
       },
       {
@@ -53,7 +53,7 @@
         "label": "5日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "23110 / MA5 22763",
+        "observed": "23102 / MA5 22762",
         "source_group": "buy_condition"
       },
       {
@@ -62,7 +62,7 @@
         "label": "25日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "23110 / MA25 22931",
+        "observed": "23102 / MA25 22930",
         "source_group": "buy_condition"
       }
     ],
@@ -73,7 +73,7 @@
         "label": "調整・低位",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "RSI 52.1 / 25日線乖離 +0.8%",
+        "observed": "RSI 52.0 / 25日線乖離 +0.8%",
         "source_group": "buy_condition"
       }
     ],
@@ -82,9 +82,9 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-10-16T18:08+09:00",
-    "fetched_at": "2026-10-16T18:21:16+09:00",
-    "calculated_at": "2026-10-16T18:21:16+09:00"
+    "market_as_of": "2026-10-16T18:21+09:00",
+    "fetched_at": "2026-10-16T18:36:00+09:00",
+    "calculated_at": "2026-10-16T18:36:00+09:00"
   },
   "market_specific": {
     "strategy_stage": "TRANCHE3",
