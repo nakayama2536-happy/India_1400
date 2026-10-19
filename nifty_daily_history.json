@@ -2,8 +2,8 @@
   "schema_version": 1,
   "index": "NIFTY 50",
   "basis": "Official NSE price-index daily close cache for technicals/backtests",
-  "source": "Tickjournal recent-history bridge",
-  "updated_at_jst": "2026-10-19T14:04:46+09:00",
+  "source": "Tickjournal recent-history bridge + self-maintained Google close",
+  "updated_at_jst": "2026-10-19T19:21:11+09:00",
   "records": [
     {
       "date": "2000-01-03",
@@ -26040,6 +26040,10 @@
     {
       "date": "2026-10-16",
       "close": 23146.15
+    },
+    {
+      "date": "2026-10-19",
+      "close": 22888.95
     }
   ]
 }
