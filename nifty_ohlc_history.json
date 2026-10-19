@@ -2352,9 +2352,8 @@
       "close": 23146.15,
       "volume": null,
       "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
       "volume_usable_for_analysis": false,
-      "source": "NSE official daily index CSV",
-      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_16102026.csv",
       "close_consistency": "MATCH"
     }
   ],
@@ -2362,13 +2361,7 @@
     {
       "source": "Tickjournal",
       "status": "ok",
-      "rows": 195,
-      "last_date": "2026-10-15"
-    },
-    {
-      "source": "NSE official daily index CSV",
-      "status": "ok",
-      "rows": 1,
+      "rows": 196,
       "last_date": "2026-10-16"
     }
   ]
