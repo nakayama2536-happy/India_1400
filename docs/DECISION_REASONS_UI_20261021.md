@@ -1,7 +1,7 @@
 # 判断理由 UI v5.46 / decision-reasons 1.0
 
-Issue: #87
-Status: IMPLEMENTED CANDIDATE / main・Pages・iPhone受入は未実施
+Issue: #87 / PR: #88
+Status: VERIFIED CANDIDATE / main・Pages・iPhone受入は未実施
 
 ## 参照と適用範囲
 
@@ -25,11 +25,16 @@ Status: IMPLEMENTED CANDIDATE / main・Pages・iPhone受入は未実施
 - SHADOWと保存条件は現在の正式判断・購入可否ではないことを表示。既存の実行時鮮度判定を参照し、判断ロジックへ書き戻さない。
 - 再描画で利用者の折りたたみ開閉状態とフォーカスを保持。保存領域・購入記録へアクセスしない。
 
-## 検証
+## 検証結果（2026-10-21 JST）
 
-新規Nodeテスト：`tests/decision-reasons.test.cjs` 16件、`tests/decision-reasons-integration.test.cjs` 6件。
-ローカルでは新規表示部品の16件とChromiumで320/375/393/430/768pxを確認。5条件の初期表示・売り非該当の折りたたみ・注意の常時表示・開閉状態保持・横はみ出しなしを確認。これは表示部品の検証であり、iPhone Safari実機合格ではない。
-GitHubでは既存を含む全Nodeテスト、構文、PR Validation、Security、Cache/Publication契約を確認する。実行結果と最終headはPR/Issueへ記録する。
+検証済みコードhead: `08847eb9b0b9648a2fd3ecf5eedf194d7702ae41`。本記録の更新は文書だけで、コード差分はない。
+新規Nodeテストは `tests/decision-reasons.test.cjs` 16件、`tests/decision-reasons-integration.test.cjs` 6件。既存143件と合わせた全165件が成功し、失敗・skipは0件。
+PR #88のDecision Reasons Contract run `39503714014` / job `118907275345` で、JavaScript構文および `node --test tests/*.test.cjs` の165件成功をログ確認した。テスト対象merge-refは `48179f0680ef3abf7b48162573eef6c53b9f1eec`（上記headとbaseの検証用統合）であり、mainへの実マージではない。
+同headのPR起動9ワークフロー（PR Validation、Security、Decision Reasons、Technical Chart、Purchase UI、Publication Manifest、Cache、Review History、Deep Dive Manifest）がすべて成功。
+候補組込run `39503503435` は元index blob・保護対象の判定/購入関数・全市場JSON不変・インラインJS構文・全Node回帰を検証した。一時組込用スクリプトと書込みworkflowは最終差分から除去済み。恒久CIはcontents:readのみ。
+
+ローカルChromiumでは表示部品を320/375/393/430/768pxで確認。5条件の初期表示・売り非該当の折りたたみ・注意の常時表示・開閉状態保持・横はみ出しなしを確認した。ローカルの新規JSはGitHub blob `52936df494ce29860cd2c3cb483b1d23be939fbc` と一致する。
+これは表示部品とアプリ統合テストの検証であり、公開ページ全体のブラウザ検証やiPhone Safari/PWA実機合格ではない。実データの現在時点での有効性を認定するものでもない。
 
 ## 配信・復旧・残件
 
