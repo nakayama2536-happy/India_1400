@@ -84,8 +84,8 @@ jobs:
           common_ui_markers = [
               'id="qualityTopSummary"',
               'id="globalReferenceTimes"',
-              'id="page-quality"',
-              'data-page="quality"',
+              'id="qualityPanel"',
+              'id="qualityDetailsBtn"',
               'fetchJson("common_snapshot.json").catch(()=>null)',
               'function renderQualityOverview()',
               'function fundBasisHealth(',
@@ -188,7 +188,8 @@ jobs:
           reference_pos = index.index('id="globalReferenceTimes"')
           assert decision_start < reference_pos < indicators_start, "reference time strip must live only inside the decision tab"
           assert 'id="decisionDataTimes"' not in index, "legacy decision reference time card must stay removed"
-          assert index.index('id="page-quality"') < index.index('id="qualityTopSummary"') < index.index('id="page-detail"'), "quality summary must live inside the dedicated quality tab"
+          assert 'id="page-quality"' not in index and 'data-page="quality"' not in index, "quality must be consolidated into Management"
+          assert index.index('id="page-detail"') < index.index('id="qualityPanel"') < index.index('id="qualityTopSummary"') < index.index('id="deepDivePanel"'), "quality summary must remain in Management with a direct access button"
           global_status = index[index.index('class="card global-status-card"'):index.index('id="page-decision"')]
           assert "データ品質" not in global_status and 'id="qualityTopSummary"' not in global_status, "data quality must not remain in the global strip"
           assert 'basis-${basisHealth.ok?"good":"bad"}' not in index, "legacy India Core single-field coloring should be replaced by seven status tiles"
@@ -219,7 +220,7 @@ jobs:
           external_env = index.index("<h2>外部環境</h2>", indicator_start)
           forecast_start = index.index('id="page-forecast"')
           assert nifty_tech < nifty_detail < external_env < forecast_start, "NIFTY detail chart must sit below NIFTY technicals in Indicators"
-          assert "NIFTY 詳細チャートを見る" not in index[forecast_start:index.index('id="page-quality"')], "NIFTY detail chart must not remain in Forecast tab"
+          assert "NIFTY 詳細チャートを見る" not in index[forecast_start:index.index('id="page-detail"')], "NIFTY detail chart must not remain in Forecast tab"
           assert "表示時点で経過時間を再確認" in index, "reference-data judgement timing must be explicit"
           assert "緑でも購入可能という意味ではありません" in index, "data quality must not imply purchase permission"
           assert "function referencePresentation(" in index and "休場・取得省略" in index, "reference color reasons missing"
