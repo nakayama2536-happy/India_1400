@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "india1400-v";
-const CACHE = "india1400-v5-31-20261014-quality";
-const SHELL = ["./?v=5.31", "index.html", "deep-dive.js", "deep-dive-bundle.js", "review-history.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
+const CACHE = "india1400-v5-33-20261020-reference";
+const SHELL = ["./?v=5.33", "index.html", "deep-dive.js", "deep-dive-bundle.js", "review-history.js", "VERSION", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const DYNAMIC_JSON = new Set([
   "market.json",
   "history.json",
@@ -81,3 +81,4 @@ self.addEventListener("fetch", event => {
     event.respondWith(shellFirst(request));
   }
 });
+

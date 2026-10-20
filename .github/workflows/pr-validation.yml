@@ -218,8 +218,10 @@ jobs:
           forecast_start = index.index('id="page-forecast"')
           assert nifty_tech < nifty_detail < external_env < forecast_start, "NIFTY detail chart must sit below NIFTY technicals in Indicators"
           assert "NIFTY 詳細チャートを見る" not in index[forecast_start:index.index('id="page-quality"')], "NIFTY detail chart must not remain in Forecast tab"
-          assert "良否は最終データ生成時に判定" in index, "reference-data judgement timing must be explicit"
-          assert "通常取引中は現在時刻からの経過時間でも表示色を再評価" in index, "live freshness display semantics must be explicit"
+          assert "表示時点で経過時間を再確認" in index, "reference-data judgement timing must be explicit"
+          assert "緑でも購入可能という意味ではありません" in index, "data quality must not imply purchase permission"
+          assert "function referencePresentation(" in index and "休場・取得省略" in index, "reference color reasons missing"
+          assert "表示時点でも経過時間を確認" in index, "live freshness display semantics must be explicit"
           assert '["nifty_current","nifty_provisional"].includes(x?.key))limit=20' in index, "NIFTY live display freshness limit missing"
           assert '["usdinr","usdjpy","inrjpy","brent","india_vix"].includes(x?.key))limit=30' in index, "external live display freshness limit missing"
           assert 'age<=120?"参考":"更新推奨"' in index, "live display stale threshold missing"
@@ -235,7 +237,7 @@ jobs:
           python -m unittest tests.test_public_delivery_gate
 
       - name: Quality and purchase presentation regression
-        run: node --test tests/quality-presentation.test.cjs tests/purchase-compact.test.cjs
+        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs
 
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
@@ -254,3 +256,4 @@ jobs:
           node --check deep-dive.js
           node --check deep-dive-bundle.js
           node --check review-history.js
+
