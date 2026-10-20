@@ -1,5 +1,13 @@
 # Changelog
 
+## UI v5.46 candidate — 2026-10-21
+
+- Issue #87: compact saved decision conditions; remove exact duplicate reasons.
+- Buy conditions always visible; sell cautions and unknowns always visible, only known non-matches folded.
+- Preserve QC/freshness/blocking warnings and SHADOW/reference meaning. No trade/purchase/data changes.
+- Add decision-reasons JS/CSS, regression tests and own-cache shell entries.
+- Candidate only: main, Pages and iPhone acceptance remain separate. Details: docs/DECISION_REASONS_UI_20261021.md.
+
 ## 2026-10-20 — UI v5.45 mobile chart polish
 
 - 指標グループの外枠とローソク足の二重枠を整理し、描画に使える横幅を拡大。
