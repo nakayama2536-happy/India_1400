@@ -16,6 +16,49 @@ test('SVG width/viewBox match host pixels and never use nonuniform scaling',()=>
   assert.match(x,new RegExp('viewBox="0 0 '+width+'\\.00 '));assert.match(x,/preserveAspectRatio="xMinYMin meet"/);assert.doesNotMatch(x,/preserveAspectRatio="none"/);
  }
 });
+test('price, RSI and MACD align each date while retaining complete edge bars',()=>{
+ for(const width of [180,240,313,350,680]){
+  const source=rows([12,30,25,45,42]);
+  const price=charts.lineChart(source,[{key:'close',cls:'line-main'}],[],{kind:'nifty',width});
+  const rsi=charts.lineChart(source,[{key:'value',cls:'line-rsi'}],[],{kind:'rsi',width});
+  const macd=charts.lineChart(source,[{key:'value',cls:'line-macd'}],[],{kind:'macd',width});
+  const points=svg=>[...svg.match(/<path [^>]* d="([^"]+)"/)[1].matchAll(/[ML]([\d.]+),/g)].map(m=>Number(m[1]));
+  const dates=svg=>[...svg.matchAll(/<text x="([^"]+)" [^>]+>(\d{2}\/\d{2})<\/text>/g)].map(m=>[Number(m[1]),m[2]]);
+  assert.deepEqual(points(price),points(rsi));assert.deepEqual(dates(price),dates(rsi));assert.deepEqual(dates(price),dates(macd));
+  const bars=[...macd.matchAll(/<rect [^>]*x="([^"]+)" [^>]*width="([^"]+)"/g)].map(m=>({x:Number(m[1]),w:Number(m[2])}));
+  assert.equal(bars.length,source.length);
+  bars.forEach((bar,i)=>assert.ok(Math.abs(bar.x+bar.w/2-points(price)[i])<.011));
+  const bounds=macd.match(/<line class="gridline" x1="([^"]+)" [^>]*x2="([^"]+)"/);
+  assert.ok(bars[0].x>=Number(bounds[1]));assert.ok(bars.at(-1).x+bars.at(-1).w<=Number(bounds[2]));
+ }
+});
+test('support labels retain their meaning and stay inside the plot at narrow widths',()=>{
+ for(const width of [180,240,350])for(const kind of ['support','recent-low'])for(const value of [22.232,22232,1e15]){
+  const source=rows([value*1.1,value,value*1.04,value*1.08]);
+  const svg=charts.lineChart(source,[{key:'close',cls:'line-main'}],[],{kind:'nifty',width,supportLevels:[{kind,value,touches:[{index:1}]}]});
+  assert.match(svg,kind==='support'?/支持線候補/:/安値目安/);
+  assert.equal((svg.match(/class="support-annotation"/g)||[]).length,1);
+  const box=svg.match(/class="support-label-bg" x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/);
+  const [x,y,w,h]=box.slice(1).map(Number);
+  assert.ok(x>=10&&x+w<=width-59+.01);assert.ok(y>=14&&y+h<=191);
+  const link=svg.match(/class="support-label-link" x1="([^"]+)" y1="([^"]+)" x2="([^"]+)" y2="([^"]+)"/).slice(1).map(Number);
+  assert.ok(Math.hypot(link[2]-link[0],link[3]-link[1])<=10,'support connector must stay short');
+  assert.doesNotMatch(svg,/NaN|Infinity/);
+ }
+ const source=rows([22232,22500]);
+ for(const levels of [[],[{kind:'support',value:0,touches:[{index:0}]}],[{kind:'support',value:22232,touches:[{index:99}]}]]){
+  assert.doesNotMatch(charts.lineChart(source,priceSeries,[],{kind:'nifty',supportLevels:levels}),/support-annotation/);
+ }
+});
+test('a recent low with a 16-pixel lower gap gets a nearby label below the line',()=>{
+ const source=rows([23800,23500,23600,22900,23300,22600,22700,22232,22500,22400,23100,22889]);
+ const svg=charts.lineChart(source,priceSeries,[],{kind:'nifty',width:343,supportLevels:[{kind:'recent-low',value:22232,touches:[{index:7}]}]});
+ const sy=Number(svg.match(/class="support-visual" [^>]*y1="([^"]+)"/)[1]);
+ const box=svg.match(/class="support-label-bg" x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/).slice(1).map(Number);
+ assert.ok(box[1]>sy&&box[1]+box[3]<=191);assert.ok(box[0]>150);
+ const link=svg.match(/class="support-label-link" x1="([^"]+)" y1="([^"]+)" x2="([^"]+)" y2="([^"]+)"/).slice(1).map(Number);
+ assert.ok(Math.hypot(link[2]-link[0],link[3]-link[1])<=3);
+});
 test('missing samples leave a gap, never a zero or a bridged line',()=>{
  const x=charts.lineChart(rows([22500,null,22700]),[{key:'close',cls:'line-main'}],[],{kind:'nifty'});
  const d=x.match(/class="line-main" d="([^"]+)"/)[1];assert.equal((d.match(/M/g)||[]).length,2);assert.doesNotMatch(d,/L/);
