@@ -198,14 +198,16 @@ jobs:
           assert 'class="deep-trigger-cats status-tile-grid"' in index, "GPT four-category color grid missing"
           assert 'status=!x.active?"非該当（保存時点）":x.severity>=2?"優先":"推奨"' in index, "GPT saved-time trigger status mapping missing"
           assert 'class="status-tile-grid yen-status-grid"' in index, "yen status tile grid missing"
-          assert all(x in index for x in ("円換算 追い風","円換算 逆風","円換算 中立")), "yen contribution color semantics missing"
+          assert all(x in index for x in ("円換算にプラス","円換算にマイナス","円換算に中立","未算出（履歴不足）")), "yen direction and missing-history semantics missing"
+          assert "function yenContributionPresentation(" in index and "yenContributionPresentation(rates)" in index, "yen data-state evaluation missing"
+          assert ".yen-status-grid .status-tile .status-tile-value{color:var(--text)" in index, "yen values must separate direction from data-quality colors"
           assert all(x in index for x in ("↑↑","↑","→","↓","↓↓")), "five-level forecast arrow vocabulary missing"
           assert 'h2,.card-title{font-size:20px' in index, "card title hierarchy contract missing"
           assert "ref-compact-grid" in index and "ref-compact-item" in index, "compact reference time UI missing"
           assert "status-tile-grid" in index and "status-tile.good" in index and "status-tile.bad" in index, "shared colored tile graphic missing"
           assert "function signClass(" in index and "function signedHtml(" in index, "signed-value color helpers missing"
           assert ".sign-pos{color:var(--ok)!important}" in index and ".sign-neg{color:var(--ng)!important}" in index, "signed-value color CSS missing"
-          for marker in ("signedHtml(h.median_return_pct","signClass(mhist)","signClass(fii.net_value_crore)","signClass(contribution)"):
+          for marker in ("signedHtml(h.median_return_pct","signClass(mhist)","signClass(fii.net_value_crore)"):
               assert marker in index, f"signed-value color use missing: {marker}"
           assert ".tabs{position:fixed" in index and "bottom:0" in index and "z-index:100" in index, "bottom tab selector must remain fixed above content"
           assert "calc(112px + env(safe-area-inset-bottom))" in index, "content must clear the fixed bottom tabs"
@@ -237,7 +239,7 @@ jobs:
           python -m unittest tests.test_public_delivery_gate
 
       - name: Quality and purchase presentation regression
-        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs tests/snapshot-status.test.cjs
+        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs tests/snapshot-status.test.cjs tests/yen-presentation.test.cjs
 
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
