@@ -11,9 +11,10 @@ test('primary NIFTY chart is ahead of metrics, 1.6 times taller, and scoped to i
  assert.ok(part.indexOf('id="niftyChart"')<part.indexOf('id="niftyMetrics"'));
  assert.match(part,/indicator-primary/);
  assert.match(part,/id="niftySupportNote"/);
- assert.match(html,/#page-indicators \.chart\.chart-nifty\{height:214px\}/);
+ assert.match(html,/#page-indicators \.indicators-panel \.chart\.chart-nifty\{height:214px\}/);
  assert.ok(214/132>1.6&&214/132<1.7);
  assert.match(html,/--c-ma75:#8b9ab0/);
+ assert.doesNotMatch(html,/#page-indicators \.chart \.gridline\{/);
 });
 
 test('NIFTY draws final close, four averages and visible price scale with real dates',()=>{
@@ -37,7 +38,7 @@ test('RSI uses a fixed 0-100 scale with a restrained distinguished 50 baseline',
  assert.match(svg,/>50<\/text>/);
  assert.match(svg,/>70<\/text>/);
  assert.doesNotMatch(svg,/>50 基準<\/text>/);
- assert.match(html,/#page-indicators \.chart \.guide\.guide-reference\{stroke:#c0b48c/);
+ assert.match(html,/#page-indicators \.indicators-panel \.chart \.guide\.guide-reference\{stroke:#c0b48c/);
 });
 
 test('MACD histogram is actual rectangles around zero, not a connected line',()=>{
