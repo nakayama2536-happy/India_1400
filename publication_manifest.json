@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "market": "INDIA",
-  "publication_id": "in-985399db42906b501b83",
+  "publication_id": "in-98f38442eb872a5f335f",
   "source_state": "READY",
   "bundle_contract": "deep-dive/0.1",
   "files": [
@@ -128,7 +128,7 @@
       "purpose": "アプリバージョン",
       "type": "text",
       "status": "OK",
-      "sha256": "fe6234a9c84fffdfe1387305bbdedfa37cff5de9d214ff473f300e16664c8cb8",
+      "sha256": "bc8bc4f58c40a96b0dda9fafeafe7d7e349bd9d2928d762066079f8d01b1b235",
       "bytes": 119,
       "required_for_bundle": true,
       "as_of": null,
