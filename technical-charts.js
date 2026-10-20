@@ -43,7 +43,7 @@
   function frame(rows, values, kind, options) {
     const w = Math.max(180, Math.min(1600, finite(options.width) && Number(options.width) > 0 ? Number(options.width) : 360));
     const h = kind === 'nifty' ? 216 : kind === 'candle' ? 294 : kind === 'rsi' ? 142 : 148;
-    const left = 10, right = kind === 'nifty' || kind === 'candle' ? 59 : 43, top = 14, bottom = 25;
+    const left = 10, right = 59, top = 14, bottom = 25;
     let scale = niceScale(values);
     if (kind === 'rsi') scale = {min:0,max:100,ticks:[0,30,50,70,100],step:20};
     if (kind === 'macd' && scale) {
@@ -52,8 +52,10 @@
     }
     if (!scale) return null;
     const plotRight = w - right, plotBottom = h - bottom;
-    const centered = kind === 'macd' || kind === 'candle', count = rows.length;
-    const x = i => left + (i + (centered ? .5 : 0)) * (plotRight - left) / Math.max(1, centered ? count : count - 1);
+    // Share one day-cell axis across price, RSI and MACD. The half-cell inset
+    // also keeps complete end bars inside the plot instead of clipping them.
+    const count = rows.length;
+    const x = i => left + (i + .5) * (plotRight - left) / Math.max(1, count);
     const y = v => top + (scale.max - Number(v)) * (plotBottom - top) / (scale.max - scale.min);
     return {w,h,left,plotRight,top,plotBottom,scale,x,y};
   }
@@ -88,6 +90,37 @@
   function svg(f, kind, contents, label) {
     return `<svg xmlns="http://www.w3.org/2000/svg" class="${kind==='candle'?'candle-chart':'chart chart-'+kind}" data-responsive-chart="true" width="${num(f.w)}" height="${f.h}" viewBox="0 0 ${num(f.w)} ${f.h}" preserveAspectRatio="xMinYMin meet" role="img" aria-label="${esc(label)}">${contents}</svg>`;
   }
+  function supportAnnotation(f, rows, lines, level, first) {
+    const prefix = level.kind === 'support' ? '支持線候補' : '安値目安';
+    const value = axisText(level.value, 1), label = prefix + ' ' + value;
+    const naturalWidth = prefix.length * 11 + 4 + value.length * 7;
+    const width = Math.min(naturalWidth + 12, f.plotRight - f.left - 4), height = 14;
+    const sx = f.x(first), sy = f.y(level.value), end = f.x(rows.length - 1);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const xs = [f.plotRight - width - 2, sx - width - 4, sx + 4];
+    const boxes = xs.flatMap(x => [sy - height - 2, sy + 2].map(y => ({
+      x:clamp(x, f.left + 2, f.plotRight - width - 2),
+      y:clamp(y, f.top, f.plotBottom - height)
+    })));
+    const collisions = box => lines.reduce((score, series) => {
+      let previous = null;
+      for (let i = 0; i < rows.length; i++) {
+        if (!finite(rows[i][series.key])) {previous = null; continue;}
+        const point = {x:f.x(i), y:f.y(rows[i][series.key])};
+        if (previous && Math.max(previous.x,point.x) >= box.x - 1 && Math.min(previous.x,point.x) <= box.x + width + 1 && Math.max(previous.y,point.y) >= box.y - 1 && Math.min(previous.y,point.y) <= box.y + height + 1) score += series.cls === 'line-main' ? 4 : 1;
+        previous = point;
+      }
+      return score;
+    }, 0);
+    // Keep candidates beside the support segment; never escape across the chart.
+    const rank = box => collisions(box) * 10000 + Math.max(0, sx - (box.x + width), box.x - end) + Math.abs(box.y + height / 2 - sy);
+    const box = boxes.reduce((best, candidate) => rank(candidate) < rank(best) ? candidate : best);
+    const anchorX = clamp(box.x + width / 2, sx, end);
+    const labelX = clamp(anchorX, box.x + 4, box.x + width - 4);
+    const labelY = sy >= box.y + height / 2 ? box.y + height : box.y;
+    const fit = naturalWidth > width - 12 ? ` textLength="${num(width - 12)}" lengthAdjust="spacingAndGlyphs"` : '';
+    return `<g class="support-annotation"><title>${esc(label)}（参考表示）</title><line class="support-label-link" x1="${num(labelX)}" y1="${num(labelY)}" x2="${num(anchorX)}" y2="${num(sy)}"/><rect class="support-label-bg" x="${num(box.x)}" y="${num(box.y)}" width="${num(width)}" height="${height}" rx="3"/><text class="support-label" x="${num(box.x+6)}" y="${num(box.y+10.5)}"${fit}>${esc(label)}</text></g>`;
+  }
   function lineChart(rows, series, guides, options = {}) {
     const kind = ['nifty','rsi','macd'].includes(options.kind) ? options.kind : 'nifty';
     if (!validRows(rows)) return wait('履歴の日付に不整合があるため表示を保留しています');
@@ -100,12 +133,13 @@
     if (kind==='macd') values.push(0);
     const f=frame(rows,values,kind,options);
     if (!f) return wait('表示範囲を確認できません');
-    let out=grid(f,rows,kind);
+    let out=grid(f,rows,kind), annotation='';
     if (kind==='nifty') {
       for (const level of (Array.isArray(options.supportLevels)?options.supportLevels:[]).slice(0,1)) {
         const first=level.touches?.[0]?.index;
         if (!finite(level.value)||level.value<f.scale.min||level.value>f.scale.max||!Number.isInteger(first)||first<0||first>=rows.length) continue;
         out+=`<line class="support-visual" x1="${num(f.x(first))}" y1="${num(f.y(level.value))}" x2="${num(f.x(rows.length-1))}" y2="${num(f.y(level.value))}"/>`;
+        annotation=supportAnnotation(f,rows,lines,level,first);
       }
     }
     if (kind==='macd') {
@@ -120,7 +154,7 @@
       for (const s of lines.slice().sort((a,b)=>(a.cls==='line-main')-(b.cls==='line-main'))) out+=`<path class="${s.cls}" d="${path(rows,s.key,f)}" fill="none"/>`;
       if (kind==='nifty'&&finite(rows[rows.length-1].close)) out+=`<circle class="last-nifty-dot" cx="${num(f.x(rows.length-1))}" cy="${num(f.y(rows[rows.length-1].close))}" r="3"/>`;
     }
-    return svg(f,kind,out,kind==='rsi'?'RSI14・0から100、50は中立基準':kind==='macd'?'MACDヒストグラム・ゼロ基準の正負':'NIFTY確定終値・移動平均・参考下値目安');
+    return svg(f,kind,out+annotation,kind==='rsi'?'RSI14・0から100、50は中立基準':kind==='macd'?'MACDヒストグラム・ゼロ基準の正負':'NIFTY確定終値・移動平均・参考下値目安');
   }
   function candlestickChart(rows, options = {}) {
     if (!validRows(rows)) return wait('ローソク足の日付に不整合があるため表示を保留しています');
