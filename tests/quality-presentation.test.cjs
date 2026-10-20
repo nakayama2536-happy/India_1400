@@ -12,7 +12,7 @@ function harness(m={},common={}){
   fundBasisHealth:()=>({ok:false}),planConditionRows:()=>'',
  });
  vm.runInContext('const PURCHASE_STATE_KEY="india1400.purchaseProgress.v1";',c);
- for(const n of ['jstNowInfo','localTsParts','runtimeSnapshotFreshness','qualityTone','renderQualityOverview','liveFreshness','referenceHealth','purchaseRecordKnowledge','decisionDisplayEligible','defaultPurchaseState','loadPurchaseState','renderTranchePlan'])vm.runInContext(fn(n),c);
+ for(const n of ['jstNowInfo','localTsParts','runtimeSnapshotFreshness','qualityTone','renderQualityOverview','liveFreshness','referenceHealth','purchaseRecordKnowledge','decisionDisplayEligible','defaultPurchaseState','loadPurchaseState','trancheDisplayLabel','renderTranchePlan'])vm.runInContext(fn(n),c);
  return{run:s=>vm.runInContext(s,c),nodes,records,writes:()=>writes};
 }
 
@@ -61,6 +61,7 @@ test('minute clock transition refreshes stale status and purchase gating exactly
   renderDecision:()=>calls.push('decision'),
   renderQualityOverview:()=>calls.push('quality'),
   renderPurchaseProgress:()=>calls.push('purchase'),
+  renderDeepDiveTrigger:()=>calls.push('trigger'),
   localStorage:{setItem:(...args)=>writes.push(args)}
  });
  vm.runInContext('let lastClockPresentationKey=null;',c);
@@ -75,9 +76,9 @@ test('minute clock transition refreshes stale status and purchase gating exactly
  time.now+=21*60000;
  assert.equal(vm.runInContext('decisionDisplayEligible(market.trade_guide,market.data_quality,market.execution_plan)',c),false);
  vm.runInContext('renderClockTick()',c);
- assert.deepEqual(calls,['clock','clock','decision','quality','purchase']);
+ assert.deepEqual(calls,['clock','clock','decision','quality','purchase','trigger']);
  vm.runInContext('renderClockTick()',c);
- assert.deepEqual(calls,['clock','clock','decision','quality','purchase','clock']);
+ assert.deepEqual(calls,['clock','clock','decision','quality','purchase','trigger','clock']);
  assert.equal(writes.length,0);
  assert.match(html,/lastClockPresentationKey=clockPresentationKey\(\)/);
  assert.match(html,/setInterval\(renderClockTick,60000\)/);
@@ -131,3 +132,4 @@ test('saved permission is withheld for stale, future or failed current inputs',(
   h.run('renderTranchePlan()');assert.match(h.nodes.decisionTranchePlan.innerHTML,/HOLD・判定保留/);
  }
 });
+

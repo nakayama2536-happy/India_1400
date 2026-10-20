@@ -237,7 +237,7 @@ jobs:
           python -m unittest tests.test_public_delivery_gate
 
       - name: Quality and purchase presentation regression
-        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs
+        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs tests/snapshot-status.test.cjs
 
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
@@ -256,4 +256,5 @@ jobs:
           node --check deep-dive.js
           node --check deep-dive-bundle.js
           node --check review-history.js
+
 
