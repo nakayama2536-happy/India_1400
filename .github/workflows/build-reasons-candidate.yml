@@ -1,4 +1,5 @@
 name: Build Reasons Candidate Once
+# Attempt 2: integration test now reads complete functions, including local const.
 on:
   push:
     branches: ['ui/decision-reasons-20261021']
