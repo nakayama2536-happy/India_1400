@@ -196,7 +196,7 @@ jobs:
               assert f'statusTileHtml("{label}"' in index, f"India Core status tile missing: {label}"
           assert 'class="status-tile-grid fund-status-grid"' in index, "India Core seven-tile grid missing"
           assert 'class="deep-trigger-cats status-tile-grid"' in index, "GPT four-category color grid missing"
-          assert 'status=!x.active?"OFF / 正常":x.severity>=2?"優先":"推奨"' in index, "GPT trigger green/yellow/red mapping missing"
+          assert 'status=!x.active?"非該当（保存時点）":x.severity>=2?"優先":"推奨"' in index, "GPT saved-time trigger status mapping missing"
           assert 'class="status-tile-grid yen-status-grid"' in index, "yen status tile grid missing"
           assert all(x in index for x in ("円換算 追い風","円換算 逆風","円換算 中立")), "yen contribution color semantics missing"
           assert all(x in index for x in ("↑↑","↑","→","↓","↓↓")), "five-level forecast arrow vocabulary missing"
@@ -237,7 +237,7 @@ jobs:
           python -m unittest tests.test_public_delivery_gate
 
       - name: Quality and purchase presentation regression
-        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs
+        run: node --test tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs tests/snapshot-status.test.cjs
 
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
@@ -256,4 +256,5 @@ jobs:
           node --check deep-dive.js
           node --check deep-dive-bundle.js
           node --check review-history.js
+
 

@@ -14,7 +14,7 @@ test('screenshot holiday NIFTY and VIX are yellow reference, not green current q
  const h=harness();for(const key of ['nifty_current','india_vix']){const p=h.present(item(key,'2026-10-19T19:01:00+09:00','REFERENCE'));assert.equal(p.tone,'warn');assert.equal(p.label,'休場日の参考値');assert.match(p.detail,/現在値ではありません/)}
 });
 test('screenshot aged generation, FX and Brent are explicitly elapsed, not fetch failures',()=>{
- const h=harness();for(const [key,stamp,minutes] of [['generated','14:04:36',106],['usdinr','13:59:00',112],['usdjpy','13:58:00',113],['inrjpy','13:58:00',113],['brent','13:47:00',124]]){const p=h.present(item(key,'2026-10-20T'+stamp+'+09:00'));assert.equal(p.tone,'bad');assert.equal(p.label,'更新が必要');assert.match(p.detail,new RegExp(minutes+'分経過'));assert.doesNotMatch(p.detail,/取得失敗/)}
+ const h=harness();for(const [key,stamp,minutes] of [['generated','14:04:36',106],['usdinr','13:59:00',112],['usdjpy','13:58:00',113],['inrjpy','13:58:00',113],['brent','13:47:00',124]]){const p=h.present(item(key,'2026-10-20T'+stamp+'+09:00'));assert.equal(p.tone,'bad');assert.equal(p.label,'鮮度期限超過');assert.match(p.detail,new RegExp(minutes+'分経過'));assert.doesNotMatch(p.detail,/取得失敗/)}
 });
 test('explicit holiday skips are yellow and unavailable, not failed retrievals',()=>{
  const h=harness();for(const key of ['fii_dii','breadth']){const p=h.present({key,freshness_code:'UNAVAILABLE'});assert.equal(p.tone,'warn');assert.equal(p.label,'休場・取得省略');assert.match(p.detail,/値は補完しません/)}
@@ -23,7 +23,7 @@ test('skip flag alone, yesterday holiday and failed optional source are not excu
  for(const kind of ['regular','old','future','error','no-flag']){const m=fixture();if(kind==='regular')m.operational_state.regular_trading_day=true;if(kind==='old')m.generated_at_jst='2026-10-19T14:00:00+09:00';if(kind==='future')m.generated_at_jst='2026-10-20T16:00:00+09:00';if(kind==='error')m.fii_dii.error='HTTP failure';if(kind==='no-flag')delete m.fii_dii.skipped;assert.equal(harness(m).present({key:'fii_dii',freshness_code:'UNAVAILABLE'}).tone,'bad',kind)}
 });
 test('source error and cached fallback are distinguished without promoting old values',()=>{
- for(const [meta,label] of [[{status:'cached',fetched_this_run:false,error:'429'},'取得失敗'],[{status:'cached',fetched_this_run:false},'今回未取得']]){const m=fixture();m.core_fetch.brent=meta;const p=harness(m).present(item('brent','2026-10-20T15:50:00+09:00'));assert.equal(p.tone,'bad');assert.equal(p.label,label)}
+ for(const [meta,label] of [[{status:'cached',fetched_this_run:false,error:'429'},'取得失敗'],[{status:'cached',fetched_this_run:false},'今回未取得']]){const m=fixture();m.core_fetch.brent=meta;const p=harness(m).present(item('brent','2026-10-20T13:47:00+09:00'));assert.equal(p.tone,'bad');assert.equal(p.label,label)}
 });
 test('missing, invalid and future times remain red with distinct reasons',()=>{
  const h=harness();for(const [stamp,label] of [[undefined,'時刻不明'],['bad','時刻不明'],['2026-10-20T16:00:00+09:00','未来時刻']]){const p=h.present(item('brent',stamp));assert.equal(p.tone,'bad');assert.equal(p.label,label)}
@@ -31,8 +31,13 @@ test('missing, invalid and future times remain red with distinct reasons',()=>{
 test('saved unavailable cannot be promoted by a recent timestamp',()=>{
  const p=harness().present(item('brent','2026-10-20T15:50:00+09:00','UNAVAILABLE'));assert.equal(p.tone,'bad');assert.equal(p.label,'利用不可');
 });
+test('saved stale status is distinguished from elapsed time after retrieval',()=>{
+ const p=harness().present(item('brent','2026-10-20T15:50:00+09:00','STALE'));
+ assert.equal(p.tone,'bad');assert.equal(p.label,'保存時点で鮮度不足');
+ assert.doesNotMatch(p.detail,/取得失敗/);
+});
 test('fresh data is green only while the existing freshness limit holds',()=>{
- const h=harness(),x=item('brent','2026-10-20T15:50:00+09:00');assert.equal(h.present(x).tone,'good');h.setNow(NOW+31*60000);assert.equal(h.present(x).tone,'bad');assert.equal(h.present(x).label,'更新が必要');assert.equal(h.writes.length,0);
+ const h=harness(),x=item('brent','2026-10-20T15:50:00+09:00');assert.equal(h.present(x).tone,'good');h.setNow(NOW+31*60000);assert.equal(h.present(x).tone,'bad');assert.equal(h.present(x).label,'鮮度期限超過');assert.equal(h.writes.length,0);
 });
 test('existing exact NIFTY20 and FX30 minute thresholds are preserved',()=>{
  const m=fixture();m.operational_state.regular_trading_day=true;const h=harness(m);for(const [key,limit] of [['nifty_current',20],['usdinr',30]]){const stamp=new Date(NOW-limit*60000).toISOString();assert.equal(h.present(item(key,stamp)).tone,'good');h.setNow(NOW+1);assert.equal(h.present(item(key,stamp)).tone,'bad');h.setNow(NOW)}
@@ -47,7 +52,7 @@ test('optional data with a known date is reference only; unknown and future date
 });
 test('compact and detail views share color and reason and escape external text',()=>{
  const h=harness(),x={...item('brent','2026-10-20T13:47:00+09:00'),label:'<img onerror=alert(1)>',basis:'<script>bad</script>',provider:'<svg onload=alert(1)>'};
- for(const name of ['compactReferenceHtml','referenceRowHtml']){const rendered=h.render(x,name);assert.match(rendered,/bad/);assert.match(rendered,/更新が必要/);assert.match(rendered,/124分経過/);assert.doesNotMatch(rendered,/<img|<script|<svg/)}
+ for(const name of ['compactReferenceHtml','referenceRowHtml']){const rendered=h.render(x,name);assert.match(rendered,/bad/);assert.match(rendered,/鮮度期限超過/);assert.match(rendered,/124分経過/);assert.doesNotMatch(rendered,/<img|<script|<svg/)}
  assert.equal(h.writes.length,0);
 });
 test('legend explains data colors separately from purchase permission and data retrieval',()=>{
