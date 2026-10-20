@@ -1,0 +1,72 @@
+name: Verify v5.46 Pages Once
+on:
+  push:
+    branches: ['verify/v546-pages-20261021']
+    paths: ['.github/workflows/verify-v546-pages-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-deployed-bytes:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/v546-pages-20261021' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 5de28616a982935ea99d9ad13c39186794602007
+          persist-credentials: false
+      - name: Verify pinned release and complete Node regression suite
+        run: |
+          test "$(git rev-parse HEAD)" = 5de28616a982935ea99d9ad13c39186794602007
+          node --test tests/*.test.cjs
+      - name: Compare live Pages static responses with approved release bytes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from datetime import datetime, timezone
+          from urllib.request import Request, urlopen
+          from urllib.parse import urlsplit
+          import hashlib, json, time
+
+          base = 'https://nakayama2536-happy.github.io/India_1400/'
+          files = ['index.html', 'VERSION', 'manifest.webmanifest', 'sw.js',
+                   'decision-reasons.js', 'decision-reasons.css', 'technical-charts.js',
+                   'review-history.js', 'deep-dive.js', 'deep-dive-bundle.js']
+          probes = [(name, name) for name in files] + [('', 'index.html'), ('?v=5.46', 'index.html')]
+          assert 'UI_VERSION=5.46' in Path('VERSION').read_text()
+          assert 'decision-reasons.js' in Path('sw.js').read_text()
+          assert 'decision-reasons.css' in Path('sw.js').read_text()
+          failures = []
+          for relative, path in probes:
+              expected = Path(path).read_bytes()
+              expected_hash = hashlib.sha256(expected).hexdigest()
+              ok = False
+              reason = 'NOT_ATTEMPTED'
+              for attempt in range(3):
+                  try:
+                      request = Request(base + relative, headers={'Cache-Control': 'no-cache', 'User-Agent': 'India-PWA-release-verification/5.46'})
+                      with urlopen(request, timeout=20) as response:
+                          final = urlsplit(response.geturl())
+                          assert final.scheme == 'https' and final.netloc == 'nakayama2536-happy.github.io'
+                          assert final.path.startswith('/India_1400/')
+                          body = response.read(1000000)
+                          status = response.status
+                      actual_hash = hashlib.sha256(body).hexdigest()
+                      if status == 200 and body == expected:
+                          print(json.dumps({'path': relative or '/', 'status': status, 'bytes': len(body), 'sha256': actual_hash, 'matches_release': True}), flush=True)
+                          ok = True
+                          break
+                      reason = 'HTTP_OR_CONTENT_MISMATCH status=' + str(status) + ' actual_sha256=' + actual_hash
+                  except Exception as exc:
+                      reason = type(exc).__name__ + ': ' + str(exc)
+                  if attempt < 2:
+                      time.sleep(5)
+              if not ok:
+                  failures.append({'path': relative or '/', 'expected_sha256': expected_hash, 'reason': reason})
+          print('CHECKED_AT_UTC=' + datetime.now(timezone.utc).isoformat(), flush=True)
+          if failures:
+              print(json.dumps({'failures': failures}), flush=True)
+              raise SystemExit('LIVE_PAGES_STATIC_BYTES_NOT_VERIFIED')
+          print('LIVE_PAGES_STATIC_BYTES_PASS: 10 assets and 2 entry URLs match approved merge 5de28616a982935ea99d9ad13c39186794602007', flush=True)
+          print('Not an iPhone/Safari/PWA device acceptance or market-data freshness verification.', flush=True)
+          PY
