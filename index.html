@@ -946,14 +946,14 @@ function renderIndicators(){
   const confirmedLast=prices[prices.length-1];
   const supportRows=prices.map(p=>({date:p?.date,nav_yen:p?.close}));
   const matchedConfirmedDate=confirmedLast?.date&&n.technical_date&&String(confirmedLast.date)===String(n.technical_date);
-  const support=matchedConfirmedDate?coreSupportLevels(supportRows):{status:"mismatch",levels:[]};
+  const support=!prices.length||nc.available===false?{status:"insufficient",levels:[]}:!n.technical_date?{status:"unavailable",levels:[]}:matchedConfirmedDate?coreSupportLevels(supportRows):{status:"mismatch",levels:[]};
   $("niftyChart").innerHTML=chartSvg(prices,[{key:"close",cls:"line-main"},{key:"ma5",cls:"line-ma5"},{key:"ma25",cls:"line-ma25"},{key:"ma75",cls:"line-ma75"}],[],{kind:"nifty",supportLevels:support.status==="ok"?support.levels:[]});
   $("rsiChart").innerHTML=chartSvg(nc.rsi14||[],[{key:"value",cls:"line-rsi"}],[{value:30},{value:50,emphasis:true},{value:70}],{kind:"rsi"});
   $("macdChart").innerHTML=chartSvg(nc.macd_hist||[],[{key:"value",cls:"line-macd"}],[],{kind:"macd"});
   setText("niftyChartMeta",nc.available===false?"履歴不足":"確定日足 "+(nc.window_trading_days||30)+"営業日");
   setText("niftyLastClose",confirmedLast&&hasFiniteValue(confirmedLast.close)?"終値 "+fmt(confirmedLast.close,2):"終値 --");
   const level=support.levels?.[0];
-  setText("niftySupportNote",support.status==="ok"&&level?(level.kind==="support"?"支持線候補 ":"直近安値目安 ")+fmt(level.value,0)+" / 終値の谷から自動抽出・参考表示（売買判定には不使用）":support.status==="mismatch"?"確定日と履歴の日付が一致しないため支持線候補は非表示です。":support.status==="insufficient"?"10観測未満のため支持線候補の抽出は保留しています。":"確認できる支持線候補がないため補助線は表示していません。");
+  setText("niftySupportNote",support.status==="ok"&&level?(level.kind==="support"?"支持線候補 ":"直近安値目安 ")+fmt(level.value,0)+" / 終値の谷から自動抽出・参考表示（売買判定には不使用）":support.status==="mismatch"?"確定日と履歴の日付が一致しないため支持線候補は非表示です。":support.status==="insufficient"?"履歴が不足しているため支持線候補の抽出は保留しています。":support.status==="invalid"?"履歴の日付・終値が不整合のため支持線候補は非表示です。":support.status==="unavailable"?"確定日を確認できないため支持線候補は非表示です。":"確認できる支持線候補がないため補助線は表示していません。");
   $("externalMetrics").innerHTML=
     metric("USD/INR",fmt(u.price,4),"時刻 "+fmtJstShort(u.as_of_jst)+" JST / 5日 "+signedHtml(u.change_5d_pct,2,"%"),"series-usd")+
     metric("USD/JPY",fmt(market?.usdjpy?.price,3),"時刻 "+fmtJstShort(market?.usdjpy?.as_of_jst)+" JST / 5日 "+signedHtml(market?.usdjpy?.change_5d_pct,2,"%"))+
