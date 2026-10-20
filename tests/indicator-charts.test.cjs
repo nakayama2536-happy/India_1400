@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const html=fs.readFileSync('index.html','utf8');
 function fn(name){const start=html.indexOf('function '+name+'(');assert.ok(start>=0,name);const tail=html.slice(start),end=tail.search(/\n(?:async )?function /);return end<0?tail:tail.slice(0,end)}
-function harness(){const c=vm.createContext({});for(const n of ['hasFiniteValue','weekStartSunday','coreSupportLevels','chartSvg'])vm.runInContext(fn(n),c);return c}
+function harness(){const c=vm.createContext({IndiaTechnicalCharts:require("../technical-charts.js")});for(const n of ['hasFiniteValue','weekStartSunday','coreSupportLevels','chartSvg'])vm.runInContext(fn(n),c);return c}
 function rows(values){return values.map((value,i)=>({date:new Date(Date.UTC(2026,8,1+i)).toISOString().slice(0,10),close:value,ma5:value+40,ma25:value+140,ma75:value+300}))}
 const series=[{key:'close',cls:'line-main'},{key:'ma5',cls:'line-ma5'},{key:'ma25',cls:'line-ma25'},{key:'ma75',cls:'line-ma75'}];
 
@@ -11,7 +11,7 @@ test('primary NIFTY chart is ahead of metrics, 1.6 times taller, and scoped to i
  assert.ok(part.indexOf('id="niftyChart"')<part.indexOf('id="niftyMetrics"'));
  assert.match(part,/indicator-primary/);
  assert.match(part,/id="niftySupportNote"/);
- assert.match(html,/#page-indicators \.indicators-panel \.chart\.chart-nifty\{height:214px\}/);
+ assert.match(harness().chartSvg(rows([100,101]),series,[],{kind:'nifty'}),/height="216"/);
  assert.ok(214/132>1.6&&214/132<1.7);
  assert.match(html,/--c-ma75:#8b9ab0/);
  assert.doesNotMatch(html,/#page-indicators \.chart \.gridline\{/);
@@ -80,18 +80,18 @@ test('chart operations do not mutate price records, purchase records or threshol
  const c=harness(),v=rows([110,108,100,107,109,110,108,101,107,109,110,111]),before=JSON.stringify(v);
  c.chartSvg(v,series,[],{kind:'nifty',supportLevels:[]});
  assert.equal(JSON.stringify(v),before);
- const render=fn('renderIndicators');
+ const render=fn('renderTechnicalCharts');
  assert.doesNotMatch(render,/(?:localStorage|setItem|updatePurchaseState|decision_eligible\s*=)/);
- assert.match(render,/chartSvg\(nc\.macd_hist\|\|\[\]/);
+ assert.match(render,/nc\.macd_hist\|\|\[\]/);
 });
 
 test('PWA UI version is synchronized and manifest describes the updated chart',()=>{
  const version=fs.readFileSync('VERSION','utf8');
  const sw=fs.readFileSync('sw.js','utf8');
  const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
- assert.match(version,/UI_VERSION=5\.43/);
- assert.match(sw,/india1400-v5-43-/);
- assert.match(sw,/\?v=5\.43/);
- assert.match(manifest.start_url,/v=5\.43/);
- assert.match(html,/v5\.43/);
+ assert.match(version,/UI_VERSION=5\.44/);
+ assert.match(sw,/india1400-v5-44-/);
+ assert.match(sw,/\?v=5\.44/);
+ assert.match(manifest.start_url,/v=5\.44/);
+ assert.match(html,/v5\.44/);
 });
