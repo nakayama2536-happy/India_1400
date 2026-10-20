@@ -25,7 +25,7 @@
     "reason_summary": [
       "○ MACD改善：Hist +87.20 → +88.75",
       "○ 5日線回復：22889 / MA5 22875",
-      "△ 外部環境警戒：Brent 111.3"
+      "△ 外部環境警戒：Brent 111.5"
     ],
     "passed_conditions": [
       {
@@ -80,7 +80,7 @@
       {
         "id": "EXTERNAL_RISK_1",
         "category": "MARKET",
-        "label": "Brent 111.3",
+        "label": "Brent 111.5",
         "status": "WARN",
         "impact": "NEGATIVE",
         "source_group": "external_risk"
@@ -91,8 +91,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-19T19:01+09:00",
-    "fetched_at": "2026-10-20T18:41:05+09:00",
-    "calculated_at": "2026-10-20T18:41:05+09:00"
+    "fetched_at": "2026-10-20T18:54:33+09:00",
+    "calculated_at": "2026-10-20T18:54:33+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
