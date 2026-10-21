@@ -12,7 +12,7 @@ function harness(m={},common={}){
   fundBasisHealth:()=>({ok:false}),planConditionRows:()=>'',
  });
  vm.runInContext('const PURCHASE_STATE_KEY="india1400.purchaseProgress.v1";',c);
- for(const n of ['jstNowInfo','localTsParts','runtimeSnapshotFreshness','qualityTone','renderQualityOverview','liveFreshness','referenceHealth','purchaseRecordKnowledge','decisionDisplayEligible','defaultPurchaseState','loadPurchaseState','trancheDisplayLabel','renderTranchePlan'])vm.runInContext(fn(n),c);
+ for(const n of ['jstNowInfo','localTsParts','runtimeSnapshotFreshness','qualityTone','renderQualityOverview','liveFreshness','referenceHealth','purchaseRecordKnowledge','decisionDisplaySessionOpen','decisionDisplayEligible','defaultPurchaseState','loadPurchaseState','trancheDisplayLabel','renderTranchePlan'])vm.runInContext(fn(n),c);
  return{run:s=>vm.runInContext(s,c),nodes,records,writes:()=>writes};
 }
 
@@ -51,7 +51,7 @@ test('minute clock transition refreshes stale status and purchase gating exactly
   market:{
    generated_at_jst:'2026-10-13T14:04:00+09:00',
    nifty:{as_of_jst:'2026-10-13T14:04:00+09:00'},
-   operational_state:{code:'LIVE'},
+   market_state:{code:'LIVE'},operational_state:{code:'LIVE',regular_trading_day:true},
    core_fetch:{nifty:{status:'fresh',fetched_this_run:true}},
    data_quality:{decision_gate:{allow_rule:true}},
    trade_guide:{decision_eligible:true},
@@ -65,7 +65,7 @@ test('minute clock transition refreshes stale status and purchase gating exactly
   localStorage:{setItem:(...args)=>writes.push(args)}
  });
  vm.runInContext('let lastClockPresentationKey=null;',c);
- for(const n of ['runtimeSnapshotFreshness','decisionDisplayEligible','clockPresentationKey'])
+ for(const n of ['runtimeSnapshotFreshness','decisionDisplaySessionOpen','decisionDisplayEligible','clockPresentationKey'])
   vm.runInContext(fn(n),c);
  const tick=html.slice(html.indexOf('function renderClockTick(')).split('\nrefreshData(true);')[0];
  assert.match(tick,/function renderClockTick/);
@@ -123,7 +123,7 @@ test('legacy boolean purchase records remain known without migration',()=>{
  assert.equal(h.run('purchaseRecordKnowledge()'),true);assert.equal(h.records.get('india1400.purchaseProgress.v1'),s);assert.equal(h.writes(),0);
 });
 test('even eligible READY never authorizes orders or assumes funding',()=>{
- const h=harness({generated_at_jst:'2026-10-13T14:04:00+09:00',nifty:{as_of_jst:'2026-10-13T14:04:00+09:00'},core_fetch:{nifty:{status:'fresh',fetched_this_run:true}},data_quality:{decision_gate:{allow_rule:true}},trade_guide:{decision_eligible:true},execution_plan:{decision_gate_allow_rule:true,tranches:[{stage:2,status:'READY',conditions:[]}]}});
+ const h=harness({market_state:{code:'LIVE'},operational_state:{code:'LIVE',regular_trading_day:true},generated_at_jst:'2026-10-13T14:04:00+09:00',nifty:{as_of_jst:'2026-10-13T14:04:00+09:00'},core_fetch:{nifty:{status:'fresh',fetched_this_run:true}},data_quality:{decision_gate:{allow_rule:true}},trade_guide:{decision_eligible:true},execution_plan:{decision_gate_allow_rule:true,tranches:[{stage:2,status:'READY',conditions:[]}]}});
  h.run('renderTranchePlan()');assert.match(h.nodes.decisionTranchePlan.innerHTML,/本人確認が必要/);assert.match(h.nodes.decisionTranchePlan.innerHTML,/自動購入可ではありません/);
 });
 test('saved permission is withheld for stale, future or failed current inputs',()=>{
