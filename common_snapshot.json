@@ -23,8 +23,9 @@
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "WAIT",
     "reason_summary": [
-      "△ MACD悪化：Hist +88.75 → +77.21",
-      "△ 5日線割れ：22727 / MA5 22876"
+      "△ MACD悪化：Hist +88.75 → +77.96",
+      "△ 5日線割れ：22738 / MA5 22879",
+      "△ 外部環境警戒：Brent 110.1"
     ],
     "passed_conditions": [],
     "pending_conditions": [
@@ -34,7 +35,7 @@
         "label": "調整・低位",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "RSI 44.8 / 25日線乖離 -0.7%",
+        "observed": "RSI 45.0 / 25日線乖離 -0.6%",
         "source_group": "buy_condition"
       },
       {
@@ -43,7 +44,7 @@
         "label": "RSI改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "47.7 → 44.8",
+        "observed": "47.7 → 45.0",
         "source_group": "buy_condition"
       },
       {
@@ -52,7 +53,7 @@
         "label": "MACD改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "Hist +88.75 → +77.21",
+        "observed": "Hist +88.75 → +77.96",
         "source_group": "buy_condition"
       },
       {
@@ -61,7 +62,7 @@
         "label": "5日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22727 / MA5 22876",
+        "observed": "22738 / MA5 22879",
         "source_group": "buy_condition"
       },
       {
@@ -70,7 +71,7 @@
         "label": "25日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22727 / MA25 22882",
+        "observed": "22738 / MA25 22882",
         "source_group": "buy_condition"
       }
     ],
@@ -81,7 +82,7 @@
         "label": "MACD悪化",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "Hist +88.75 → +77.21",
+        "observed": "Hist +88.75 → +77.96",
         "source_group": "sell_condition"
       },
       {
@@ -90,17 +91,25 @@
         "label": "5日線割れ",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "22727 / MA5 22876",
+        "observed": "22738 / MA5 22879",
         "source_group": "sell_condition"
+      },
+      {
+        "id": "EXTERNAL_RISK_1",
+        "category": "MARKET",
+        "label": "Brent 110.1",
+        "status": "WARN",
+        "impact": "NEGATIVE",
+        "source_group": "external_risk"
       }
     ],
     "blocking_conditions": [],
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-10-21T18:34+09:00",
-    "fetched_at": "2026-10-21T18:42:24+09:00",
-    "calculated_at": "2026-10-21T18:42:24+09:00"
+    "market_as_of": "2026-10-21T18:46+09:00",
+    "fetched_at": "2026-10-21T18:56:21+09:00",
+    "calculated_at": "2026-10-21T18:56:21+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
