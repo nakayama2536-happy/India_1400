@@ -1,26 +1,32 @@
-# Display-time session boundary safety (UI 5.32 candidate)
+# 表示時点の閉場境界修正 — UI 5.47 候補
 
-Base: Public main `7c4c52b0a9053c52cb96be4282f6d918b5271584`; Core policy inspected at `b06ca61f1320919f286d77d2206f35da6c3a436c`.
+更新: 2026-10-22 JST。PR #61の旧UI 5.32候補を、Public main `4bbd98ab6fd6650e27757c1f04b1377ceedd5a86`（UI 5.46）へ統合した記録。
+Coreの現行通常取引時間は `5dbaf0c0af059b5c09e18bc9a3855954af66ef75` の `update_market.py` で確認した。
 
-## Why necessary / current gap / minimal safe change
+## なぜ必要 / なぜ現状不足 / なぜ最小安全
 
-- Necessary: market-condition READY must not imply execution eligibility after the regular session closes.
-- Gap: a synthetic saved LIVE/eligible snapshot at 18:59 JST still returned eligible at 19:05 because the old display guard checked only saved permissions and 20-minute freshness. The clock refresh did not refresh the purchase views. This is a reproduced code defect, not proof of an actual user trade or device incident.
-- Minimal safety: add only a restrictive display guard. Keep Core's existing inclusive 12:45:00–19:00:00 JST regular-session boundary, saved LIVE status, explicit regular-trading-day flag, same-JST-date generation/quote, existing freshness and all saved gates. No holiday inference grants permission. Missing evidence fails closed. Market READY is preserved while final display becomes HOLD.
+- 必要: 保存時の市場条件READYを、閉場後にも購入判断が可能という意味で表示しないため。
+- 現状不足: 最新mainでも、18:59 JSTのLIVE・全ゲート許可・取得成功データを19:05に表示すると、20分以内だけを見て `decisionDisplayEligible=true` になる合成ケースを再現した。品質ゲートと市場状態も保存時の緑表示が残る。実際の注文や端末事故を確認したという意味ではない。
+- 最小安全: Coreの既存通常時間12:45:00〜19:00:00 JST（両端を含む）と、保存されたLIVE・通常営業日・同日生成/価格の証拠を、表示を制限する条件として追加する。売買条件、20分鮮度、取得成功、既存3ゲートは緩和しない。14:00運用状態は判定資格に接続しない。
 
-## Scope
+## 変更
 
-Purchase views re-render on the existing 60-second clock tick and when the document becomes visible. This performs no provider fetch, record migration or storage writes. Browser timer throttling and device clock error remain limitations: this is not an exact-second background execution guarantee. Orders are not implemented. Purchase conditions, allocations, personal records, Core rules and market JSON are unchanged.
+- 市場条件READYはそのまま保持し、閉場後の最終表示はHOLDとする。
+- 判断ラベル、品質ゲート、市場状態、購入状況、段階別条件、判断理由が同じ表示資格を使う。保存時LIVEは「保存時」と明示する。
+- 既存の毎分再描画に閉場遷移を接続し、画面を再表示した際も再評価する。再取得・記録書込みは行わない。
+- 最新の色の理由表示、4タブ、購入記録と実施日、チャート、判断理由の配置を維持する。旧PRのUI 5.32へ戻さない。
+- UI識別・自アプリcache・manifestを5.47へ揃える。APP/ANALYTICS 5.7、DECISION_GATE 5.1-gate-1は変更しない。
 
-UI version, manifest and own service-worker cache identifier advance together to 5.32. No other application's cache policy changes. Publication manifest remains managed by the existing approved publication pipeline; this PR does not publish.
+## 検証
 
-## Verification
+- 修正前: 18:59保存→19:05表示で期待falseに対しtrueとなることを確認。
+- Node: 172 tests PASS（既存165 + 新規7テスト群）。通常時間のミリ秒境界、休日/週末/営業日不明、日付跨ぎ、未来値、鮮度20分、取得失敗、READY/HOLDの分離、閉場後の各表示、画面復帰を含む。
+- Python: 70 tests PASS。公開JSON安全gate、CIのPWA/JSON静的検証、全JavaScript構文検証PASS。
+- 購入記録の保持、表示でstorageを書かないこと、ネットワーク再取得しないこと、正常時の判定表示維持を確認した。
+- CI結果はPRの最新headを正とする。自動テストはiPhone実機受入を代替しない。
 
-- Node suite: 68 passed, zero failures (including session boundaries, fresh cached close transition, weekend/calendar unknown, stale dates, READY/HOLD and clock-refresh wiring).
-- Python suite: 70 passed and 33 subtests passed.
-- Actual iPhone foreground/background return and published-service-worker acceptance: pending; not inferred from unit tests.
-- CI status is recorded on the PR. Main merge and production publication require separate approval.
+## 制約・変更管理
 
-## Remaining work
-
-Brent comparable five-session source evidence/licensing, natural production OHLC refresh, forecast forward evidence and device acceptance remain independent work items. This display fix does not complete them or establish Burn-in.
+main反映・本番公開は未実施で、個別承認が必要。PR #61の履歴を保持し、最新mainを親に含む統合commitで更新する。force pushしない。
+ブラウザのタイマー抑制、端末時計のずれ、iPhone PWAの旧cache移行/復帰は実機確認が残る。毎分更新は閉場と同時の秒精度保証ではない。
+Brentの正式比較source、USD/JPY取得元障害、GitHub定時起動遅延、外部起動の承認整合、Burn-in、forward評価は別残件。本PRの成功をそれらの完了にしない。

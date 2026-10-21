@@ -84,8 +84,8 @@ jobs:
           common_ui_markers = [
               'id="qualityTopSummary"',
               'id="globalReferenceTimes"',
-              'id="page-quality"',
-              'data-page="quality"',
+              'id="qualityPanel"',
+              'id="qualityDetailsBtn"',
               'fetchJson("common_snapshot.json").catch(()=>null)',
               'function renderQualityOverview()',
               'function fundBasisHealth(',
@@ -188,7 +188,8 @@ jobs:
           reference_pos = index.index('id="globalReferenceTimes"')
           assert decision_start < reference_pos < indicators_start, "reference time strip must live only inside the decision tab"
           assert 'id="decisionDataTimes"' not in index, "legacy decision reference time card must stay removed"
-          assert index.index('id="page-quality"') < index.index('id="qualityTopSummary"') < index.index('id="page-detail"'), "quality summary must live inside the dedicated quality tab"
+          assert 'id="page-quality"' not in index and 'data-page="quality"' not in index, "quality must be consolidated into Management"
+          assert index.index('id="page-detail"') < index.index('id="qualityPanel"') < index.index('id="qualityTopSummary"') < index.index('id="deepDivePanel"'), "quality summary must remain in Management with a direct access button"
           global_status = index[index.index('class="card global-status-card"'):index.index('id="page-decision"')]
           assert "データ品質" not in global_status and 'id="qualityTopSummary"' not in global_status, "data quality must not remain in the global strip"
           assert 'basis-${basisHealth.ok?"good":"bad"}' not in index, "legacy India Core single-field coloring should be replaced by seven status tiles"
@@ -196,16 +197,18 @@ jobs:
               assert f'statusTileHtml("{label}"' in index, f"India Core status tile missing: {label}"
           assert 'class="status-tile-grid fund-status-grid"' in index, "India Core seven-tile grid missing"
           assert 'class="deep-trigger-cats status-tile-grid"' in index, "GPT four-category color grid missing"
-          assert 'status=!x.active?"OFF / 正常":x.severity>=2?"優先":"推奨"' in index, "GPT trigger green/yellow/red mapping missing"
+          assert 'status=!x.active?"非該当（保存時点）":x.severity>=2?"優先":"推奨"' in index, "GPT saved-time trigger status mapping missing"
           assert 'class="status-tile-grid yen-status-grid"' in index, "yen status tile grid missing"
-          assert all(x in index for x in ("円換算 追い風","円換算 逆風","円換算 中立")), "yen contribution color semantics missing"
+          assert all(x in index for x in ("円換算にプラス","円換算にマイナス","円換算に中立","未算出（履歴不足）")), "yen direction and missing-history semantics missing"
+          assert "function yenContributionPresentation(" in index and "yenContributionPresentation(rates)" in index, "yen data-state evaluation missing"
+          assert ".yen-status-grid .status-tile .status-tile-value{color:var(--text)" in index, "yen values must separate direction from data-quality colors"
           assert all(x in index for x in ("↑↑","↑","→","↓","↓↓")), "five-level forecast arrow vocabulary missing"
           assert 'h2,.card-title{font-size:20px' in index, "card title hierarchy contract missing"
           assert "ref-compact-grid" in index and "ref-compact-item" in index, "compact reference time UI missing"
           assert "status-tile-grid" in index and "status-tile.good" in index and "status-tile.bad" in index, "shared colored tile graphic missing"
           assert "function signClass(" in index and "function signedHtml(" in index, "signed-value color helpers missing"
           assert ".sign-pos{color:var(--ok)!important}" in index and ".sign-neg{color:var(--ng)!important}" in index, "signed-value color CSS missing"
-          for marker in ("signedHtml(h.median_return_pct","signClass(mhist)","signClass(fii.net_value_crore)","signClass(contribution)"):
+          for marker in ("signedHtml(h.median_return_pct","signClass(mhist)","signClass(fii.net_value_crore)"):
               assert marker in index, f"signed-value color use missing: {marker}"
           assert ".tabs{position:fixed" in index and "bottom:0" in index and "z-index:100" in index, "bottom tab selector must remain fixed above content"
           assert "calc(112px + env(safe-area-inset-bottom))" in index, "content must clear the fixed bottom tabs"
@@ -217,9 +220,11 @@ jobs:
           external_env = index.index("<h2>外部環境</h2>", indicator_start)
           forecast_start = index.index('id="page-forecast"')
           assert nifty_tech < nifty_detail < external_env < forecast_start, "NIFTY detail chart must sit below NIFTY technicals in Indicators"
-          assert "NIFTY 詳細チャートを見る" not in index[forecast_start:index.index('id="page-quality"')], "NIFTY detail chart must not remain in Forecast tab"
-          assert "良否は最終データ生成時に判定" in index, "reference-data judgement timing must be explicit"
-          assert "通常取引中は現在時刻からの経過時間でも表示色を再評価" in index, "live freshness display semantics must be explicit"
+          assert "NIFTY 詳細チャートを見る" not in index[forecast_start:index.index('id="page-detail"')], "NIFTY detail chart must not remain in Forecast tab"
+          assert "表示時点で経過時間を再確認" in index, "reference-data judgement timing must be explicit"
+          assert "緑でも購入可能という意味ではありません" in index, "data quality must not imply purchase permission"
+          assert "function referencePresentation(" in index and "休場・取得省略" in index, "reference color reasons missing"
+          assert "表示時点でも経過時間を確認" in index, "live freshness display semantics must be explicit"
           assert '["nifty_current","nifty_provisional"].includes(x?.key))limit=20' in index, "NIFTY live display freshness limit missing"
           assert '["usdinr","usdjpy","inrjpy","brent","india_vix"].includes(x?.key))limit=30' in index, "external live display freshness limit missing"
           assert 'age<=120?"参考":"更新推奨"' in index, "live display stale threshold missing"
@@ -235,7 +240,7 @@ jobs:
           python -m unittest tests.test_public_delivery_gate
 
       - name: Quality and purchase presentation regression
-        run: node --test tests/quality-presentation.test.cjs tests/purchase-compact.test.cjs
+        run: node --test tests/session-boundary.test.cjs tests/quality-presentation.test.cjs tests/reference-colors.test.cjs tests/purchase-compact.test.cjs tests/snapshot-status.test.cjs tests/yen-presentation.test.cjs tests/core-support.test.cjs tests/indicator-charts.test.cjs
 
       - name: Check India Core updater syntax
         run: python -m py_compile update_india_core.py
@@ -254,3 +259,5 @@ jobs:
           node --check deep-dive.js
           node --check deep-dive-bundle.js
           node --check review-history.js
+
+

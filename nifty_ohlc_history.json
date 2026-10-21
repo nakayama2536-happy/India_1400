@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "method_version": "5.7-candle-1",
+  "method_version": "5.7-candle-4",
   "basis": "NIFTY daily OHLC for optional detailed chart only",
   "records": [
     {
@@ -9,8 +9,11 @@
       "high": 26197.55,
       "low": 26113.4,
       "close": 26146.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-02",
@@ -18,8 +21,11 @@
       "high": 26340.0,
       "low": 26118.4,
       "close": 26328.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-05",
@@ -27,8 +33,11 @@
       "high": 26373.2,
       "low": 26210.05,
       "close": 26250.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-06",
@@ -36,8 +45,11 @@
       "high": 26273.95,
       "low": 26124.75,
       "close": 26178.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-07",
@@ -45,8 +57,11 @@
       "high": 26187.15,
       "low": 26067.9,
       "close": 26140.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-08",
@@ -54,8 +69,11 @@
       "high": 26133.2,
       "low": 25858.45,
       "close": 25876.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-09",
@@ -63,8 +81,11 @@
       "high": 25940.6,
       "low": 25623.0,
       "close": 25683.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-12",
@@ -72,8 +93,11 @@
       "high": 25813.15,
       "low": 25473.4,
       "close": 25790.25,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-13",
@@ -81,8 +105,11 @@
       "high": 25899.8,
       "low": 25603.3,
       "close": 25732.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-14",
@@ -90,8 +117,11 @@
       "high": 25791.75,
       "low": 25603.95,
       "close": 25665.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-16",
@@ -99,8 +129,11 @@
       "high": 25873.5,
       "low": 25662.4,
       "close": 25694.35,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-19",
@@ -108,8 +141,11 @@
       "high": 25653.3,
       "low": 25494.35,
       "close": 25585.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-20",
@@ -117,8 +153,11 @@
       "high": 25585.0,
       "low": 25171.35,
       "close": 25232.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-21",
@@ -126,8 +165,11 @@
       "high": 25300.95,
       "low": 24919.8,
       "close": 25157.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-22",
@@ -135,8 +177,11 @@
       "high": 25435.75,
       "low": 25168.5,
       "close": 25289.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-23",
@@ -144,8 +189,11 @@
       "high": 25347.95,
       "low": 25025.3,
       "close": 25048.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-27",
@@ -153,8 +201,11 @@
       "high": 25246.65,
       "low": 24932.55,
       "close": 25175.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-28",
@@ -162,8 +213,11 @@
       "high": 25372.1,
       "low": 25187.65,
       "close": 25342.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-29",
@@ -171,8 +225,11 @@
       "high": 25458.15,
       "low": 25159.8,
       "close": 25418.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-01-30",
@@ -180,8 +237,11 @@
       "high": 25370.7,
       "low": 25213.65,
       "close": 25320.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-01",
@@ -189,8 +249,12 @@
       "high": 25440.9,
       "low": 24571.75,
       "close": 24825.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "session_source": "https://nsearchives.nseindia.com/content/circulars/CMTR72349.pdf",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-02",
@@ -198,8 +262,11 @@
       "high": 25108.1,
       "low": 24679.4,
       "close": 25088.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-03",
@@ -207,8 +274,11 @@
       "high": 26341.2,
       "low": 25641.3,
       "close": 25727.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-04",
@@ -216,8 +286,11 @@
       "high": 25818.55,
       "low": 25563.95,
       "close": 25776.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-05",
@@ -225,8 +298,11 @@
       "high": 25757.65,
       "low": 25579.5,
       "close": 25642.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-06",
@@ -234,8 +310,11 @@
       "high": 25703.95,
       "low": 25491.9,
       "close": 25693.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-09",
@@ -243,8 +322,11 @@
       "high": 25922.25,
       "low": 25780.9,
       "close": 25867.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-10",
@@ -252,8 +334,11 @@
       "high": 25989.45,
       "low": 25870.45,
       "close": 25935.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-11",
@@ -261,8 +346,11 @@
       "high": 26009.4,
       "low": 25899.8,
       "close": 25953.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-12",
@@ -270,8 +358,11 @@
       "high": 25906.7,
       "low": 25752.4,
       "close": 25807.2,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-13",
@@ -279,8 +370,11 @@
       "high": 25630.35,
       "low": 25444.3,
       "close": 25471.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-16",
@@ -288,8 +382,11 @@
       "high": 25697.0,
       "low": 25372.7,
       "close": 25682.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-17",
@@ -297,8 +394,11 @@
       "high": 25764.4,
       "low": 25570.3,
       "close": 25725.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-18",
@@ -306,8 +406,11 @@
       "high": 25828.05,
       "low": 25645.15,
       "close": 25819.35,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-19",
@@ -315,8 +418,11 @@
       "high": 25885.3,
       "low": 25388.75,
       "close": 25454.35,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-20",
@@ -324,8 +430,11 @@
       "high": 25663.55,
       "low": 25379.75,
       "close": 25571.25,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-23",
@@ -333,8 +442,11 @@
       "high": 25771.45,
       "low": 25609.35,
       "close": 25713.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-24",
@@ -342,8 +454,11 @@
       "high": 25641.8,
       "low": 25327.6,
       "close": 25424.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-25",
@@ -351,8 +466,11 @@
       "high": 25652.6,
       "low": 25428.2,
       "close": 25482.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-26",
@@ -360,8 +478,11 @@
       "high": 25572.95,
       "low": 25400.95,
       "close": 25496.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-02-27",
@@ -369,8 +490,11 @@
       "high": 25476.4,
       "low": 25141.3,
       "close": 25178.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-02",
@@ -378,8 +502,11 @@
       "high": 24989.35,
       "low": 24603.5,
       "close": 24865.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-04",
@@ -387,8 +514,11 @@
       "high": 24602.45,
       "low": 24305.4,
       "close": 24480.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-05",
@@ -396,8 +526,11 @@
       "high": 24854.2,
       "low": 24529.4,
       "close": 24765.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-06",
@@ -405,8 +538,11 @@
       "high": 24700.8,
       "low": 24415.75,
       "close": 24450.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-09",
@@ -414,8 +550,11 @@
       "high": 24078.15,
       "low": 23697.8,
       "close": 24028.05,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-10",
@@ -423,8 +562,11 @@
       "high": 24303.8,
       "low": 24079.95,
       "close": 24261.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-11",
@@ -432,8 +574,11 @@
       "high": 24299.0,
       "low": 23834.3,
       "close": 23866.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-12",
@@ -441,8 +586,11 @@
       "high": 23833.15,
       "low": 23556.3,
       "close": 23639.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-13",
@@ -450,8 +598,11 @@
       "high": 23492.4,
       "low": 23112.0,
       "close": 23151.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-16",
@@ -459,8 +610,11 @@
       "high": 23502.0,
       "low": 22955.25,
       "close": 23408.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-17",
@@ -468,8 +622,11 @@
       "high": 23656.8,
       "low": 23346.6,
       "close": 23581.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-18",
@@ -477,8 +634,11 @@
       "high": 23862.25,
       "low": 23618.45,
       "close": 23777.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-19",
@@ -486,8 +646,11 @@
       "high": 23378.7,
       "low": 22930.35,
       "close": 23002.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-20",
@@ -495,8 +658,11 @@
       "high": 23345.15,
       "low": 23067.6,
       "close": 23114.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-23",
@@ -504,8 +670,11 @@
       "high": 22851.7,
       "low": 22471.25,
       "close": 22512.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-24",
@@ -513,8 +682,11 @@
       "high": 23057.3,
       "low": 22624.2,
       "close": 22912.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-25",
@@ -522,8 +694,11 @@
       "high": 23465.35,
       "low": 23063.2,
       "close": 23306.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-27",
@@ -531,8 +706,11 @@
       "high": 23186.1,
       "low": 22804.55,
       "close": 22819.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-03-30",
@@ -540,8 +718,11 @@
       "high": 22714.1,
       "low": 22283.85,
       "close": 22331.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-01",
@@ -549,8 +730,11 @@
       "high": 22941.3,
       "low": 22618.6,
       "close": 22679.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-02",
@@ -558,8 +742,11 @@
       "high": 22782.3,
       "low": 22182.55,
       "close": 22713.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-06",
@@ -567,8 +754,11 @@
       "high": 22998.35,
       "low": 22542.95,
       "close": 22968.25,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-07",
@@ -576,8 +766,11 @@
       "high": 23153.85,
       "low": 22719.3,
       "close": 23123.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-08",
@@ -585,8 +778,11 @@
       "high": 24025.15,
       "low": 23828.5,
       "close": 23997.35,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-09",
@@ -594,8 +790,11 @@
       "high": 23990.75,
       "low": 23682.8,
       "close": 23775.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-10",
@@ -603,8 +802,11 @@
       "high": 24074.05,
       "low": 23856.35,
       "close": 24050.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-13",
@@ -612,8 +814,11 @@
       "high": 23907.4,
       "low": 23555.6,
       "close": 23842.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-15",
@@ -621,8 +826,11 @@
       "high": 24280.9,
       "low": 24145.8,
       "close": 24231.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-16",
@@ -630,8 +838,11 @@
       "high": 24400.95,
       "low": 24102.8,
       "close": 24196.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-17",
@@ -639,8 +850,11 @@
       "high": 24371.9,
       "low": 24096.05,
       "close": 24353.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-20",
@@ -648,8 +862,11 @@
       "high": 24480.65,
       "low": 24241.25,
       "close": 24364.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-21",
@@ -657,8 +874,11 @@
       "high": 24601.7,
       "low": 24354.9,
       "close": 24576.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-22",
@@ -666,8 +886,11 @@
       "high": 24515.95,
       "low": 24352.9,
       "close": 24378.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-23",
@@ -675,8 +898,11 @@
       "high": 24310.2,
       "low": 24134.8,
       "close": 24173.05,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-24",
@@ -684,8 +910,11 @@
       "high": 24206.0,
       "low": 23813.65,
       "close": 23897.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-27",
@@ -693,8 +922,11 @@
       "high": 24130.7,
       "low": 23936.2,
       "close": 24092.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-28",
@@ -702,8 +934,11 @@
       "high": 24181.8,
       "low": 23957.05,
       "close": 23995.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-29",
@@ -711,8 +946,11 @@
       "high": 24334.7,
       "low": 24059.95,
       "close": 24177.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-04-30",
@@ -720,8 +958,11 @@
       "high": 24087.45,
       "low": 23796.85,
       "close": 23997.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-04",
@@ -729,8 +970,11 @@
       "high": 24290.2,
       "low": 24004.75,
       "close": 24119.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-05",
@@ -738,8 +982,11 @@
       "high": 24081.7,
       "low": 23882.05,
       "close": 24032.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-06",
@@ -747,8 +994,11 @@
       "high": 24356.5,
       "low": 23997.9,
       "close": 24330.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-07",
@@ -756,8 +1006,11 @@
       "high": 24482.1,
       "low": 24284.0,
       "close": 24326.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-08",
@@ -765,8 +1018,11 @@
       "high": 24253.8,
       "low": 24126.65,
       "close": 24176.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-11",
@@ -774,8 +1030,11 @@
       "high": 23997.45,
       "low": 23799.1,
       "close": 23815.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-12",
@@ -783,8 +1042,11 @@
       "high": 23757.55,
       "low": 23348.4,
       "close": 23379.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-13",
@@ -792,8 +1054,11 @@
       "high": 23582.95,
       "low": 23262.55,
       "close": 23412.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-14",
@@ -801,8 +1066,11 @@
       "high": 23777.2,
       "low": 23426.55,
       "close": 23689.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-15",
@@ -810,8 +1078,11 @@
       "high": 23839.3,
       "low": 23610.3,
       "close": 23643.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-18",
@@ -819,8 +1090,11 @@
       "high": 23695.65,
       "low": 23317.1,
       "close": 23649.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-19",
@@ -828,8 +1102,11 @@
       "high": 23782.3,
       "low": 23587.2,
       "close": 23618.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-20",
@@ -837,8 +1114,11 @@
       "high": 23690.9,
       "low": 23397.3,
       "close": 23659.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-21",
@@ -846,8 +1126,11 @@
       "high": 23859.9,
       "low": 23596.6,
       "close": 23654.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-22",
@@ -855,8 +1138,11 @@
       "high": 23835.65,
       "low": 23671.0,
       "close": 23719.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-25",
@@ -864,8 +1150,11 @@
       "high": 24054.45,
       "low": 23922.85,
       "close": 24031.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-26",
@@ -873,8 +1162,11 @@
       "high": 24089.8,
       "low": 23885.45,
       "close": 23913.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-27",
@@ -882,8 +1174,11 @@
       "high": 23983.2,
       "low": 23858.25,
       "close": 23907.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-05-29",
@@ -891,8 +1186,11 @@
       "high": 24002.8,
       "low": 23484.75,
       "close": 23547.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-01",
@@ -900,8 +1198,11 @@
       "high": 23733.7,
       "low": 23357.95,
       "close": 23382.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-02",
@@ -909,8 +1210,11 @@
       "high": 23556.95,
       "low": 23229.15,
       "close": 23483.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-03",
@@ -918,8 +1222,11 @@
       "high": 23459.65,
       "low": 23151.5,
       "close": 23405.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-04",
@@ -927,8 +1234,11 @@
       "high": 23465.3,
       "low": 23247.3,
       "close": 23416.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-05",
@@ -936,8 +1246,11 @@
       "high": 23516.35,
       "low": 23282.65,
       "close": 23366.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-08",
@@ -945,8 +1258,11 @@
       "high": 23267.3,
       "low": 23070.15,
       "close": 23123.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-09",
@@ -954,8 +1270,11 @@
       "high": 23279.4,
       "low": 23104.45,
       "close": 23242.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-10",
@@ -963,8 +1282,11 @@
       "high": 23425.35,
       "low": 23184.6,
       "close": 23214.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-11",
@@ -972,8 +1294,11 @@
       "high": 23327.45,
       "low": 23072.05,
       "close": 23161.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-12",
@@ -981,8 +1306,11 @@
       "high": 23645.35,
       "low": 23313.9,
       "close": 23622.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-15",
@@ -990,8 +1318,11 @@
       "high": 24011.4,
       "low": 23817.8,
       "close": 23853.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-16",
@@ -999,8 +1330,11 @@
       "high": 24002.6,
       "low": 23888.2,
       "close": 23989.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-17",
@@ -1008,8 +1342,11 @@
       "high": 24108.2,
       "low": 23969.7,
       "close": 24085.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-18",
@@ -1017,8 +1354,11 @@
       "high": 24189.25,
       "low": 24036.95,
       "close": 24168.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-19",
@@ -1026,8 +1366,11 @@
       "high": 24047.2,
       "low": 23901.9,
       "close": 24013.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-22",
@@ -1035,8 +1378,11 @@
       "high": 24168.05,
       "low": 24073.15,
       "close": 24102.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-23",
@@ -1044,8 +1390,11 @@
       "high": 24135.5,
       "low": 23784.95,
       "close": 23824.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-24",
@@ -1053,8 +1402,11 @@
       "high": 24090.05,
       "low": 23789.25,
       "close": 24021.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-25",
@@ -1062,8 +1414,11 @@
       "high": 24261.6,
       "low": 24039.0,
       "close": 24056.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-29",
@@ -1071,8 +1426,11 @@
       "high": 24120.0,
       "low": 23924.55,
       "close": 23946.25,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-06-30",
@@ -1080,8 +1438,11 @@
       "high": 24035.55,
       "low": 23829.2,
       "close": 23865.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-01",
@@ -1089,8 +1450,11 @@
       "high": 24049.9,
       "low": 23895.1,
       "close": 24005.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-02",
@@ -1098,8 +1462,11 @@
       "high": 24194.55,
       "low": 24058.8,
       "close": 24175.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-03",
@@ -1107,8 +1474,11 @@
       "high": 24378.15,
       "low": 24252.35,
       "close": 24271.2,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-06",
@@ -1116,8 +1486,11 @@
       "high": 24458.65,
       "low": 24287.1,
       "close": 24430.35,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-07",
@@ -1125,8 +1498,11 @@
       "high": 24530.9,
       "low": 24348.95,
       "close": 24398.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-08",
@@ -1134,8 +1510,11 @@
       "high": 24300.0,
       "low": 23805.2,
       "close": 23882.05,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-09",
@@ -1143,8 +1522,11 @@
       "high": 24134.7,
       "low": 23925.7,
       "close": 23962.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-10",
@@ -1152,8 +1534,11 @@
       "high": 24228.45,
       "low": 24120.35,
       "close": 24206.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-13",
@@ -1161,8 +1546,11 @@
       "high": 24259.8,
       "low": 24000.2,
       "close": 24211.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-14",
@@ -1170,8 +1558,11 @@
       "high": 24157.1,
       "low": 24023.7,
       "close": 24052.05,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-15",
@@ -1179,8 +1570,11 @@
       "high": 24220.35,
       "low": 24010.55,
       "close": 24078.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-16",
@@ -1188,8 +1582,11 @@
       "high": 24186.5,
       "low": 24050.0,
       "close": 24072.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-17",
@@ -1197,8 +1594,11 @@
       "high": 24367.3,
       "low": 24099.05,
       "close": 24334.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-20",
@@ -1206,8 +1606,11 @@
       "high": 24266.1,
       "low": 24135.85,
       "close": 24238.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-21",
@@ -1215,8 +1618,11 @@
       "high": 24262.2,
       "low": 24135.65,
       "close": 24187.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-22",
@@ -1224,8 +1630,11 @@
       "high": 24166.3,
       "low": 23961.4,
       "close": 23996.25,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-23",
@@ -1233,8 +1642,11 @@
       "high": 23990.75,
       "low": 23807.2,
       "close": 23869.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-24",
@@ -1242,8 +1654,11 @@
       "high": 23823.6,
       "low": 23606.3,
       "close": 23767.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-27",
@@ -1251,8 +1666,11 @@
       "high": 24011.6,
       "low": 23891.55,
       "close": 23995.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-28",
@@ -1260,8 +1678,11 @@
       "high": 24041.15,
       "low": 23954.6,
       "close": 23985.35,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-29",
@@ -1269,8 +1690,11 @@
       "high": 24283.55,
       "low": 24136.75,
       "close": 24250.2,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-30",
@@ -1278,8 +1702,11 @@
       "high": 24342.95,
       "low": 24187.1,
       "close": 24317.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-07-31",
@@ -1287,8 +1714,11 @@
       "high": 24429.4,
       "low": 24299.7,
       "close": 24383.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-03",
@@ -1296,8 +1726,11 @@
       "high": 24774.3,
       "low": 24515.15,
       "close": 24774.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-04",
@@ -1305,8 +1738,11 @@
       "high": 24703.9,
       "low": 24427.95,
       "close": 24614.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-05",
@@ -1314,8 +1750,11 @@
       "high": 24677.6,
       "low": 24497.95,
       "close": 24624.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-06",
@@ -1323,8 +1762,11 @@
       "high": 24677.05,
       "low": 24604.15,
       "close": 24636.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-07",
@@ -1332,8 +1774,11 @@
       "high": 24630.4,
       "low": 24522.75,
       "close": 24570.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-10",
@@ -1341,8 +1786,11 @@
       "high": 24620.95,
       "low": 24511.1,
       "close": 24583.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-11",
@@ -1350,8 +1798,11 @@
       "high": 24576.85,
       "low": 24429.25,
       "close": 24471.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-12",
@@ -1359,8 +1810,11 @@
       "high": 24473.3,
       "low": 24265.95,
       "close": 24435.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-13",
@@ -1368,8 +1822,11 @@
       "high": 24431.6,
       "low": 24311.4,
       "close": 24395.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-14",
@@ -1377,8 +1834,11 @@
       "high": 24405.2,
       "low": 24296.8,
       "close": 24366.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-17",
@@ -1386,8 +1846,11 @@
       "high": 24360.1,
       "low": 24226.95,
       "close": 24287.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-18",
@@ -1395,8 +1858,11 @@
       "high": 24269.65,
       "low": 24154.9,
       "close": 24154.9,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-19",
@@ -1404,8 +1870,11 @@
       "high": 24172.85,
       "low": 24025.65,
       "close": 24078.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-20",
@@ -1413,8 +1882,11 @@
       "high": 24265.15,
       "low": 24184.55,
       "close": 24231.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-21",
@@ -1422,8 +1894,11 @@
       "high": 24284.05,
       "low": 24206.8,
       "close": 24252.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-24",
@@ -1431,8 +1906,11 @@
       "high": 24313.0,
       "low": 24144.3,
       "close": 24219.05,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-25",
@@ -1440,8 +1918,11 @@
       "high": 24334.55,
       "low": 24115.45,
       "close": 24334.55,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-26",
@@ -1449,8 +1930,11 @@
       "high": 24378.6,
       "low": 24207.75,
       "close": 24207.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-27",
@@ -1458,8 +1942,11 @@
       "high": 24297.45,
       "low": 24090.85,
       "close": 24090.85,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-28",
@@ -1467,8 +1954,11 @@
       "high": 24188.3,
       "low": 24076.85,
       "close": 24175.65,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-08-31",
@@ -1476,8 +1966,11 @@
       "high": 24128.7,
       "low": 23993.6,
       "close": 24080.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-01",
@@ -1485,8 +1978,11 @@
       "high": 24143.15,
       "low": 23952.55,
       "close": 24055.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-02",
@@ -1494,8 +1990,11 @@
       "high": 23914.45,
       "low": 23786.8,
       "close": 23914.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-03",
@@ -1503,8 +2002,11 @@
       "high": 24025.4,
       "low": 23873.45,
       "close": 23873.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-04",
@@ -1512,8 +2014,11 @@
       "high": 24005.75,
       "low": 23895.85,
       "close": 23897.7,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-07",
@@ -1521,8 +2026,11 @@
       "high": 23890.0,
       "low": 23737.9,
       "close": 23779.15,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-08",
@@ -1530,8 +2038,11 @@
       "high": 23758.95,
       "low": 23623.1,
       "close": 23635.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-09",
@@ -1539,8 +2050,11 @@
       "high": 23571.55,
       "low": 23431.5,
       "close": 23431.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-10",
@@ -1548,8 +2062,11 @@
       "high": 23494.95,
       "low": 23380.1,
       "close": 23477.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-11",
@@ -1557,8 +2074,11 @@
       "high": 23448.1,
       "low": 23231.4,
       "close": 23398.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-15",
@@ -1566,8 +2086,11 @@
       "high": 23592.85,
       "low": 23118.6,
       "close": 23118.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-16",
@@ -1575,8 +2098,11 @@
       "high": 23284.75,
       "low": 23116.1,
       "close": 23217.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-17",
@@ -1584,8 +2110,11 @@
       "high": 23363.55,
       "low": 23193.65,
       "close": 23270.6,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-18",
@@ -1593,8 +2122,11 @@
       "high": 23389.15,
       "low": 23286.6,
       "close": 23346.4,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-21",
@@ -1602,8 +2134,11 @@
       "high": 23466.8,
       "low": 23314.8,
       "close": 23414.3,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-22",
@@ -1611,8 +2146,11 @@
       "high": 23489.0,
       "low": 23285.75,
       "close": 23329.0,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-23",
@@ -1620,8 +2158,11 @@
       "high": 23466.9,
       "low": 23349.55,
       "close": 23446.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-24",
@@ -1629,8 +2170,11 @@
       "high": 23281.95,
       "low": 23046.15,
       "close": 23063.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-25",
@@ -1638,8 +2182,11 @@
       "high": 23162.7,
       "low": 23020.95,
       "close": 23140.5,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-28",
@@ -1647,8 +2194,11 @@
       "high": 23080.25,
       "low": 22762.2,
       "close": 22780.25,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-29",
@@ -1656,8 +2206,11 @@
       "high": 22753.25,
       "low": 22569.65,
       "close": 22716.2,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-09-30",
@@ -1665,8 +2218,11 @@
       "high": 22809.35,
       "low": 22595.2,
       "close": 22620.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-10-01",
@@ -1674,8 +2230,11 @@
       "high": 22610.6,
       "low": 22217.3,
       "close": 22421.95,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-10-05",
@@ -1683,8 +2242,11 @@
       "high": 22621.8,
       "low": 22397.1,
       "close": 22555.75,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-10-06",
@@ -1692,8 +2254,11 @@
       "high": 22776.1,
       "low": 22561.6,
       "close": 22776.1,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-10-07",
@@ -1701,8 +2266,11 @@
       "high": 22717.65,
       "low": 22546.3,
       "close": 22603.05,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-10-08",
@@ -1710,8 +2278,11 @@
       "high": 22599.05,
       "low": 22179.9,
       "close": 22231.8,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
     },
     {
       "date": "2026-10-09",
@@ -1719,21 +2290,111 @@
       "high": 22580.75,
       "low": 22294.75,
       "close": 22520.45,
-      "volume": 0.0,
-      "source": "Tickjournal NIFTY 50 daily YTD"
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-12",
+      "open": 22593.2,
+      "high": 22651.1,
+      "low": 22304.45,
+      "close": 22363.35,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-13",
+      "open": 22364.15,
+      "high": 22721.95,
+      "low": 22288.45,
+      "close": 22721.95,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-14",
+      "open": 22715.75,
+      "high": 22757.95,
+      "low": 22558.95,
+      "close": 22622.7,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-15",
+      "open": 22671.3,
+      "high": 23056.4,
+      "low": 22637.4,
+      "close": 22997.35,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-16",
+      "open": 23065.1,
+      "high": 23149.85,
+      "low": 22913.8,
+      "close": 23146.15,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
+      "volume_usable_for_analysis": false,
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-19",
+      "open": 23150.85,
+      "high": 23175.25,
+      "low": 22845.0,
+      "close": 22888.95,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "volume_usable_for_analysis": false,
+      "source": "NSE official daily index CSV",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_19102026.csv",
+      "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-21",
+      "open": 23016.0,
+      "high": 23120.9,
+      "low": 22649.9,
+      "close": 22811.35,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "volume_usable_for_analysis": false,
+      "source": "NSE official daily index CSV",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_21102026.csv",
+      "close_consistency": "MATCH"
     }
   ],
   "source_reports": [
     {
       "source": "Tickjournal",
       "status": "ok",
-      "rows": 191,
-      "last_date": "2026-10-09"
+      "rows": 196,
+      "last_date": "2026-10-16"
     },
     {
-      "source": "Yahoo Finance",
-      "status": "error",
-      "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+      "source": "NSE official daily index CSV",
+      "status": "ok",
+      "rows": 1,
+      "last_date": "2026-10-21"
     }
   ]
 }

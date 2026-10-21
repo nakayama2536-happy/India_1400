@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_jst": "2026-10-14T02:47:36+09:00",
+  "updated_at_jst": "2026-10-22T00:36:43+09:00",
   "series": {
     "usdinr": [
       {
@@ -137,8 +137,44 @@
       },
       {
         "date": "2026-10-14",
-        "value": 95.0865,
-        "as_of_jst": "2026-10-14T02:46+09:00",
+        "value": 95.1492,
+        "as_of_jst": "2026-10-14T18:54+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 94.9942,
+        "as_of_jst": "2026-10-15T18:29+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-16",
+        "value": 94.8738,
+        "as_of_jst": "2026-10-16T23:53+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-19",
+        "value": 94.8818,
+        "as_of_jst": "2026-10-19T19:29+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-20",
+        "value": 94.8505,
+        "as_of_jst": "2026-10-20T18:40+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 94.4465,
+        "as_of_jst": "2026-10-21T18:53+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-22",
+        "value": 94.3526,
+        "as_of_jst": "2026-10-22T00:27+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -271,8 +307,44 @@
       },
       {
         "date": "2026-10-14",
-        "value": 105.65,
-        "as_of_jst": "2026-10-14T02:36+09:00",
+        "value": 105.88,
+        "as_of_jst": "2026-10-14T18:47+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 104.07,
+        "as_of_jst": "2026-10-15T18:21+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-16",
+        "value": 105.83,
+        "as_of_jst": "2026-10-16T23:49+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-19",
+        "value": 108.62,
+        "as_of_jst": "2026-10-19T19:16+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-20",
+        "value": 111.54,
+        "as_of_jst": "2026-10-20T18:36+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 110.13,
+        "as_of_jst": "2026-10-21T18:45+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-22",
+        "value": 108.93,
+        "as_of_jst": "2026-10-22T00:24+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -377,6 +449,36 @@
         "date": "2026-10-13",
         "value": 14.12,
         "as_of_jst": "2026-10-13T19:14+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-14",
+        "value": 14.62,
+        "as_of_jst": "2026-10-14T19:13+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 14.02,
+        "as_of_jst": "2026-10-15T19:13+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-16",
+        "value": 14.02,
+        "as_of_jst": "2026-10-16T19:00+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-19",
+        "value": 14.77,
+        "as_of_jst": "2026-10-19T19:14+09:00",
+        "provider": "Google Finance"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 15.68,
+        "as_of_jst": "2026-10-21T19:13+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -503,10 +605,50 @@
       },
       {
         "date": "2026-10-14",
-        "value": 158.3895,
-        "as_of_jst": "2026-10-14T02:46+09:00",
+        "value": 158.4465,
+        "as_of_jst": "2026-10-14T18:56+09:00",
         "provider": "Google Finance",
-        "recorded_at_jst": "2026-10-14T02:47:36+09:00",
+        "recorded_at_jst": "2026-10-14T19:00:12+09:00",
+        "basis": "observed_reference_quote_not_session_close"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 157.7115,
+        "as_of_jst": "2026-10-15T18:36+09:00",
+        "provider": "Google Finance",
+        "recorded_at_jst": "2026-10-15T18:42:21+09:00",
+        "basis": "observed_reference_quote_not_session_close"
+      },
+      {
+        "date": "2026-10-16",
+        "value": 157.9295,
+        "as_of_jst": "2026-10-16T23:55+09:00",
+        "provider": "Google Finance",
+        "recorded_at_jst": "2026-10-16T23:59:55+09:00",
+        "basis": "observed_reference_quote_not_session_close"
+      },
+      {
+        "date": "2026-10-19",
+        "value": 158.2645,
+        "as_of_jst": "2026-10-19T19:27+09:00",
+        "provider": "Google Finance",
+        "recorded_at_jst": "2026-10-19T19:37:38+09:00",
+        "basis": "observed_reference_quote_not_session_close"
+      },
+      {
+        "date": "2026-10-20",
+        "value": 158.132,
+        "as_of_jst": "2026-10-20T18:42+09:00",
+        "provider": "Google Finance",
+        "recorded_at_jst": "2026-10-20T18:54:33+09:00",
+        "basis": "observed_reference_quote_not_session_close"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 158.137,
+        "as_of_jst": "2026-10-21T18:49+09:00",
+        "provider": "Google Finance",
+        "recorded_at_jst": "2026-10-21T18:56:21+09:00",
         "basis": "observed_reference_quote_not_session_close"
       }
     ]

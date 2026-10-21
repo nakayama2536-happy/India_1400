@@ -1,63 +1,72 @@
 {
-  "generated_at_utc": "2026-10-13T17:47:36+00:00",
-  "generated_at_jst": "2026-10-14T02:47:36+09:00",
+  "generated_at_utc": "2026-10-21T15:36:43+00:00",
+  "generated_at_jst": "2026-10-22T00:36:43+09:00",
   "status": "ok",
   "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=persistent local cache seeded from public GitHub mirrors + Tickjournal recent bridge, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
   "nifty": {
     "symbol": "^NSEI",
     "provider_symbol": "NIFTY_50:INDEXNSE",
     "provider": "Google Finance + NSE Indices",
-    "price": 22721.95,
-    "as_of_jst": "2026-10-13T19:01+09:00",
-    "previous_close": 22363.35,
-    "change_pct": 1.604,
-    "technical_close": 22721.95,
-    "technical_date": "2026-10-13",
-    "ma5": 22488.12,
-    "ma25": 23015.19,
-    "ma75": 23807.92,
-    "rsi14": 43.43,
-    "rsi14_prev": 34.04,
-    "macd": -331.67,
-    "macd_signal": -336.716,
-    "macd_hist": 5.046,
-    "macd_hist_prev": -24.744,
-    "ret5_pct": -0.24,
-    "ret20_pct": -2.89,
-    "vol20_annualized_pct": 14.81,
-    "price_vs_ma5_pct": 1.04,
-    "price_vs_ma25_pct": -1.27,
-    "price_vs_ma75_pct": -4.56,
+    "price": 22811.35,
+    "as_of_jst": "2026-10-21T19:01+09:00",
+    "previous_close": 22888.95,
+    "change_pct": -0.339,
+    "technical_close": 22811.35,
+    "technical_date": "2026-10-21",
+    "ma5": 22893.3,
+    "ma25": 22884.99,
+    "ma75": 23730.61,
+    "rsi14": 46.27,
+    "rsi14_prev": 47.72,
+    "macd": -170.522,
+    "macd_signal": -253.137,
+    "macd_hist": 82.615,
+    "macd_hist_prev": 88.753,
+    "ret5_pct": 0.39,
+    "ret20_pct": -2.58,
+    "vol20_annualized_pct": 16.01,
+    "price_vs_ma5_pct": -0.36,
+    "price_vs_ma25_pct": -0.32,
+    "price_vs_ma75_pct": -3.87,
     "technical_basis": "前営業日までの確定日足",
     "provisional": {
       "available": false,
       "basis": "休場・時間外のため14:00暫定テクニカルは使用しません。確定日足を参照します。",
-      "date": "2026-10-13"
+      "date": "2026-10-21"
     }
   },
   "usdinr": {
     "symbol": "INR=X",
     "provider_symbol": "USD-INR",
     "provider": "Google Finance",
-    "price": 95.0865,
-    "as_of_jst": "2026-10-14T02:46+09:00",
+    "price": 94.3526,
+    "as_of_jst": "2026-10-22T00:27+09:00",
     "change_5d_pct": null
   },
   "brent": {
     "symbol": "BZ=F",
     "provider_symbol": "BZW00:NYMEX",
     "provider": "Google Finance",
-    "price": 105.65,
-    "as_of_jst": "2026-10-14T02:36+09:00",
-    "change_5d_pct": null
+    "price": 108.93,
+    "as_of_jst": "2026-10-22T00:24+09:00",
+    "change_5d_pct": null,
+    "formal_5d": {
+      "code": "UNKNOWN",
+      "change_pct": null,
+      "reason": "NO_VERIFIED_SETTLEMENT_HISTORY",
+      "method_version": "settlement-5session-1",
+      "used_for_trading_rules": false
+    }
   },
-  "errors": [],
+  "errors": [
+    "USD/JPY: Twelve Data: HTTP Error 401: Unauthorized; Google Finance: Google Finance valid price not found for USD-JPY within sanity range (50.0, 300.0); Yahoo Finance: HTTP 429; Retry-After=unspecified"
+  ],
   "note": "v5.4 reliability: market-state-aware freshness; closed-day values remain reference data instead of aging into false stale warnings.",
   "india_vix": {
     "symbol": "^INDIAVIX",
     "provider": "Google Finance",
-    "price": 14.12,
-    "as_of_jst": "2026-10-13T19:14+09:00",
+    "price": 15.68,
+    "as_of_jst": "2026-10-21T19:13+09:00",
     "change_5d_pct": null,
     "data_status": "fresh"
   },
@@ -79,35 +88,25 @@
     "NSE session: HTTP Error 403: Forbidden"
   ],
   "signals": {
-    "buy_setup_score": 42,
-    "sell_setup_score": 0,
-    "technical_buy_score": 42,
-    "technical_sell_score": 0,
-    "buy_setup_label": "中立〜前兆",
+    "buy_setup_score": 0,
+    "sell_setup_score": 22,
+    "technical_buy_score": 0,
+    "technical_sell_score": 22,
+    "buy_setup_label": "弱い",
     "sell_setup_label": "弱い",
-    "buy_factors": [
+    "buy_factors": [],
+    "sell_factors": [
       {
         "points": 14,
-        "label": "MACDヒストグラム改善",
-        "detail": "-24.74 → 5.05"
-      },
-      {
-        "points": 10,
-        "label": "RSI改善",
-        "detail": "34.0 → 43.4"
-      },
-      {
-        "points": 10,
-        "label": "5日線を上回る",
-        "detail": "価格 22722 / 5日線 22488"
+        "label": "MACDヒストグラム悪化",
+        "detail": "88.75 → 82.61"
       },
       {
         "points": 8,
-        "label": "MACDヒストグラムがプラス転換",
-        "detail": "モメンタム改善"
+        "label": "5日線を下回る",
+        "detail": "価格 22811 / 5日線 22893"
       }
     ],
-    "sell_factors": [],
     "technical_basis_used": "確定日足テクニカル",
     "definition": "0〜100は条件一致度であり、将来の上昇・下落確率ではありません。",
     "backtest_scope": "検証タブはNIFTY日足だけで再現できるテクニカル中核スコアを検証します。",
@@ -120,83 +119,83 @@
     "available": true,
     "method_version": "4.7-stat-1",
     "window_years": 10,
-    "window_start": "2016-10-13",
-    "window_end": "2026-10-13",
-    "label": "やや上向き",
+    "window_start": "2016-10-21",
+    "window_end": "2026-10-21",
+    "label": "中立",
     "statistical_reference": "中",
     "sample_adequacy": "中",
-    "basis_date": "2026-10-13",
+    "basis_date": "2026-10-21",
     "horizon": "20営業日（約1か月）",
     "analog_count": 30,
-    "up_rate_pct": 66.7,
-    "mean_return_pct": 1.57,
-    "median_return_pct": 1.8,
-    "q25_return_pct": -2.27,
-    "q75_return_pct": 3.61,
-    "median_max_drawdown_pct": -2.67,
-    "median_similarity_distance": 0.79,
+    "up_rate_pct": 53.3,
+    "mean_return_pct": 0.99,
+    "median_return_pct": 0.69,
+    "q25_return_pct": -2.31,
+    "q75_return_pct": 4.22,
+    "median_max_drawdown_pct": -2.9,
+    "median_similarity_distance": 0.86,
     "method": "直近10年から、RSI・25日線乖離・25/75日線関係・MACDヒストグラム・5日騰落率・20日ボラティリティが近い局面を検索。",
     "warning": "過去類似局面の上昇割合は将来の上昇確率ではありません。平均より中央値・分布・最大下落を優先して確認してください。",
     "examples": [
       {
-        "date": "2016-12-28",
-        "distance": 0.376,
-        "return_20d_pct": 7.07,
-        "max_drawdown_20d_pct": 0.86
+        "date": "2016-12-12",
+        "distance": 0.222,
+        "return_20d_pct": 0.8,
+        "max_drawdown_20d_pct": -3.21
       },
       {
-        "date": "2025-01-29",
-        "distance": 0.411,
-        "return_20d_pct": -2.66,
-        "max_drawdown_20d_pct": -2.66
+        "date": "2022-07-04",
+        "distance": 0.294,
+        "return_20d_pct": 9.5,
+        "max_drawdown_20d_pct": -0.15
       },
       {
-        "date": "2023-03-29",
-        "distance": 0.411,
-        "return_20d_pct": 5.91,
-        "max_drawdown_20d_pct": 1.63
+        "date": "2019-08-28",
+        "distance": 0.301,
+        "return_20d_pct": 4.22,
+        "max_drawdown_20d_pct": -3.09
       },
       {
-        "date": "2019-08-19",
-        "distance": 0.42,
-        "return_20d_pct": -1.93,
-        "max_drawdown_20d_pct": -2.83
+        "date": "2019-09-16",
+        "distance": 0.371,
+        "return_20d_pct": 4.19,
+        "max_drawdown_20d_pct": -2.71
       },
       {
-        "date": "2019-09-18",
-        "distance": 0.449,
-        "return_20d_pct": 7.58,
-        "max_drawdown_20d_pct": -1.25
+        "date": "2024-11-29",
+        "distance": 0.435,
+        "return_20d_pct": -2.01,
+        "max_drawdown_20d_pct": -2.25
       },
       {
-        "date": "2021-12-24",
-        "distance": 0.487,
-        "return_20d_pct": 3.61,
-        "max_drawdown_20d_pct": 0.49
+        "date": "2021-12-30",
+        "distance": 0.529,
+        "return_20d_pct": -0.59,
+        "max_drawdown_20d_pct": -0.59
       },
       {
-        "date": "2018-04-04",
-        "distance": 0.507,
-        "return_20d_pct": 5.44,
-        "max_drawdown_20d_pct": 1.94
+        "date": "2018-11-22",
+        "distance": 0.707,
+        "return_20d_pct": 2.16,
+        "max_drawdown_20d_pct": -0.36
       },
       {
-        "date": "2024-11-22",
-        "distance": 0.591,
-        "return_20d_pct": -1.34,
-        "max_drawdown_20d_pct": -1.34
+        "date": "2016-11-30",
+        "distance": 0.73,
+        "return_20d_pct": -2.31,
+        "max_drawdown_20d_pct": -3.85
       },
       {
-        "date": "2022-07-01",
-        "distance": 0.627,
-        "return_20d_pct": 8.93,
-        "max_drawdown_20d_pct": 0.37
+        "date": "2022-06-08",
+        "distance": 0.796,
+        "return_20d_pct": -2.24,
+        "max_drawdown_20d_pct": -6.5
       },
       {
-        "date": "2019-09-05",
-        "distance": 0.658,
-        "return_20d_pct": 2.57,
-        "max_drawdown_20d_pct": -1.32
+        "date": "2022-07-14",
+        "distance": 0.802,
+        "return_20d_pct": 11.04,
+        "max_drawdown_20d_pct": 0.69
       }
     ],
     "_data_status": "fresh"
@@ -205,13 +204,13 @@
     "available": true,
     "method_version": "4.7-stat-1",
     "window_years": 10,
-    "window_start": "2016-10-13",
-    "window_end": "2026-10-13",
-    "basis": "NIFTY 50 日足・直近10年（最終 2026-10-13）",
+    "window_start": "2016-10-21",
+    "window_end": "2026-10-21",
+    "basis": "NIFTY 50 日足・直近10年（最終 2026-10-21）",
     "baseline": {
-      "sample_count": 2473,
+      "sample_count": 2472,
       "avg_return_pct": 0.04,
-      "up_rate_pct": 53.9,
+      "up_rate_pct": 53.8,
       "monthly_sample_count": 121,
       "monthly_avg_return_pct": 0.92
     },
@@ -226,18 +225,18 @@
       },
       {
         "weekday": "火",
-        "sample_count": 497,
+        "sample_count": 496,
         "sample_adequacy": "高",
         "avg_return_pct": 0.13,
-        "up_rate_pct": 55.1,
+        "up_rate_pct": 55.0,
         "excess_vs_baseline_pct": 0.09
       },
       {
         "weekday": "水",
-        "sample_count": 497,
+        "sample_count": 498,
         "sample_adequacy": "高",
         "avg_return_pct": 0.08,
-        "up_rate_pct": 52.9,
+        "up_rate_pct": 52.8,
         "excess_vs_baseline_pct": 0.04
       },
       {
@@ -246,14 +245,14 @@
         "sample_adequacy": "高",
         "avg_return_pct": 0.01,
         "up_rate_pct": 52.2,
-        "excess_vs_baseline_pct": -0.04
+        "excess_vs_baseline_pct": -0.03
       },
       {
         "weekday": "金",
-        "sample_count": 488,
+        "sample_count": 487,
         "sample_adequacy": "高",
         "avg_return_pct": 0.04,
-        "up_rate_pct": 51.8,
+        "up_rate_pct": 52.0,
         "excess_vs_baseline_pct": -0.0
       }
     ],
@@ -283,7 +282,7 @@
         "avg_return_pct": -1.39,
         "median_return_pct": 1.34,
         "up_rate_pct": 70.0,
-        "excess_vs_baseline_pct": -2.3
+        "excess_vs_baseline_pct": -2.31
       },
       {
         "month": 4,
@@ -319,7 +318,7 @@
         "avg_return_pct": 2.87,
         "median_return_pct": 3.43,
         "up_rate_pct": 80.0,
-        "excess_vs_baseline_pct": 1.96
+        "excess_vs_baseline_pct": 1.95
       },
       {
         "month": 8,
@@ -328,7 +327,7 @@
         "avg_return_pct": 1.14,
         "median_return_pct": 0.14,
         "up_rate_pct": 50.0,
-        "excess_vs_baseline_pct": 0.23
+        "excess_vs_baseline_pct": 0.22
       },
       {
         "month": 9,
@@ -343,10 +342,10 @@
         "month": 10,
         "sample_count": 11,
         "sample_adequacy": "不足",
-        "avg_return_pct": 0.85,
-        "median_return_pct": 0.45,
+        "avg_return_pct": 0.89,
+        "median_return_pct": 0.84,
         "up_rate_pct": 72.7,
-        "excess_vs_baseline_pct": -0.06
+        "excess_vs_baseline_pct": -0.03
       },
       {
         "month": 11,
@@ -355,7 +354,7 @@
         "avg_return_pct": 1.92,
         "median_return_pct": 1.69,
         "up_rate_pct": 60.0,
-        "excess_vs_baseline_pct": 1.01
+        "excess_vs_baseline_pct": 1.0
       },
       {
         "month": 12,
@@ -374,12 +373,12 @@
       "turn_days": {
         "sample_count": 725,
         "sample_adequacy": "高",
-        "avg_return_pct": 0.1,
-        "up_rate_pct": 53.5,
+        "avg_return_pct": 0.09,
+        "up_rate_pct": 53.4,
         "excess_vs_baseline_pct": 0.05
       },
       "other_days": {
-        "sample_count": 1748,
+        "sample_count": 1747,
         "sample_adequacy": "高",
         "avg_return_pct": 0.02,
         "up_rate_pct": 54.0,
@@ -429,38 +428,30 @@
     "available": true,
     "method_version": "4.7-stat-1",
     "window_years": 10,
-    "window_start": "2016-10-13",
-    "window_end": "2026-10-13",
-    "basis": "NIFTY 50 日足・直近10年、重複局面を5営業日間隔で間引き（最終 2026-10-13）",
+    "window_start": "2016-10-21",
+    "window_end": "2026-10-21",
+    "basis": "NIFTY 50 日足・直近10年、重複局面を5営業日間隔で間引き（最終 2026-10-21）",
     "baseline": {
-      "sample_count": 2454,
+      "sample_count": 2453,
       "up_rate_pct": 63.1,
       "down_rate_pct": 36.9,
-      "avg_return_20d_pct": 0.91,
+      "avg_return_20d_pct": 0.92,
       "median_return_20d_pct": 1.09
     },
     "buy": [
       {
         "threshold": 35,
-        "sample_count": 45,
+        "sample_count": 46,
         "sample_adequacy": "中",
         "calibration": "WEAK_OR_CONTRADICTORY",
-        "success_rate_20d_pct": 62.2,
-        "success_rate_lift_vs_baseline_pctpt": -0.9,
-        "avg_return_5d_pct": 0.08,
-        "avg_return_20d_pct": 0.43,
-        "median_return_20d_pct": 0.87,
-        "median_max_drawdown_20d_pct": -2.25,
-        "median_max_upside_20d_pct": 2.84,
+        "success_rate_20d_pct": 60.9,
+        "success_rate_lift_vs_baseline_pctpt": -2.2,
+        "avg_return_5d_pct": 0.1,
+        "avg_return_20d_pct": 0.4,
+        "median_return_20d_pct": 0.76,
+        "median_max_drawdown_20d_pct": -2.29,
+        "median_max_upside_20d_pct": 2.73,
         "recent_examples": [
-          {
-            "date": "2026-02-03",
-            "score": 42,
-            "return_5d_pct": 0.80691709859666,
-            "return_20d_pct": -4.847138573241527,
-            "max_drawdown_20d_pct": -4.847138573241527,
-            "max_upside_20d_pct": 0.8796018276128192
-          },
           {
             "date": "2026-03-10",
             "score": 48,
@@ -492,6 +483,14 @@
             "return_20d_pct": 5.810303305141096,
             "max_drawdown_20d_pct": 1.123360527625028,
             "max_upside_20d_pct": 8.204516336387368
+          },
+          {
+            "date": "2026-09-16",
+            "score": 54,
+            "return_5d_pct": 0.9871821376886469,
+            "return_20d_pct": -0.948633795052034,
+            "max_drawdown_20d_pct": -4.245916890634693,
+            "max_upside_20d_pct": 0.9871821376886469
           }
         ]
       },
@@ -711,8 +710,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
-        "as_of_jst": "2026-10-13T19:01+09:00",
-        "age_minutes": 466.6,
+        "as_of_jst": "2026-10-21T19:01+09:00",
+        "age_minutes": 335.7,
         "error": null
       },
       "usdinr": {
@@ -721,8 +720,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance",
         "provider_symbol": "USD-INR",
-        "as_of_jst": "2026-10-14T02:46+09:00",
-        "age_minutes": 1.6,
+        "as_of_jst": "2026-10-22T00:27+09:00",
+        "age_minutes": 9.7,
         "error": null
       },
       "brent": {
@@ -731,8 +730,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
-        "as_of_jst": "2026-10-14T02:36+09:00",
-        "age_minutes": 11.6,
+        "as_of_jst": "2026-10-22T00:24+09:00",
+        "age_minutes": 12.7,
         "error": null
       }
     },
@@ -747,58 +746,58 @@
   "comparison": {
     "available": true,
     "basis": "前回14:00保存値",
-    "previous_date_jst": "2026-10-12",
-    "previous_price_as_of_jst": "2026-10-12T14:03:00+09:00",
+    "previous_date_jst": "2026-10-19",
+    "previous_price_as_of_jst": "2026-10-19T14:01:00+09:00",
     "values": {
       "nifty_price": {
-        "current": 22721.95,
-        "previous": 22470.8,
-        "delta": 251.15,
-        "delta_pct": 1.118
+        "current": 22811.35,
+        "previous": 23077.95,
+        "delta": -266.6,
+        "delta_pct": -1.155
       },
       "usdinr": {
-        "current": 95.0865,
-        "previous": 95.7167,
-        "delta": -0.6302,
-        "delta_pct": -0.658
+        "current": 94.3526,
+        "previous": 94.8252,
+        "delta": -0.4726,
+        "delta_pct": -0.498
       },
       "brent": {
-        "current": 105.65,
-        "previous": 103.51,
-        "delta": 2.14,
-        "delta_pct": 2.067
+        "current": 108.93,
+        "previous": 107.8,
+        "delta": 1.13,
+        "delta_pct": 1.048
       },
       "rsi14_confirmed": {
-        "current": 43.43,
-        "previous": 36.5,
-        "delta": 6.93,
+        "current": 46.27,
+        "previous": 52.81,
+        "delta": -6.54,
         "delta_pct": null
       },
       "rsi14_provisional": {
-        "current": 43.43,
-        "previous": 35.68,
-        "delta": 7.75,
+        "current": 46.27,
+        "previous": 51.35,
+        "delta": -5.08,
         "delta_pct": null
       },
       "macd_hist_confirmed": {
-        "current": 5.046,
-        "previous": -28.776,
-        "delta": 33.822,
+        "current": 82.615,
+        "previous": 87.203,
+        "delta": -4.588,
         "delta_pct": null
       },
       "macd_hist_provisional": {
-        "current": 5.046,
-        "previous": -17.887,
-        "delta": 22.933,
+        "current": 82.615,
+        "previous": 100.814,
+        "delta": -18.199,
         "delta_pct": null
       }
     }
   },
-  "summary": "短期は5日線を上回っています。25日線・75日線より下です。RSIは43.4で中立圏です。過去類似局面の20営業日見通しは「やや上向き」です。データ判定は「売買ルール判定保留」です。",
+  "summary": "短期は5日線を下回っています。25日線・75日線より下です。RSIは46.3で中立圏です。過去類似局面の20営業日見通しは「中立」です。データ判定は「売買ルール判定保留」です。",
   "market_state": {
     "code": "PREVIOUS_SESSION",
     "label": "前営業日データ",
-    "detail": "NIFTY価格は 2026/10/13 19:01 JST 時点です。",
+    "detail": "NIFTY価格は 2026/10/21 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
   "app_version": "5.7",
@@ -806,37 +805,37 @@
     "nifty": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-13T19:01+09:00",
+      "as_of_jst": "2026-10-21T19:01+09:00",
       "provider": "Google Finance + NSE Indices",
       "provider_symbol": "NIFTY_50:INDEXNSE",
       "technical_status": "fresh",
-      "technical_date": "2026-10-13",
+      "technical_date": "2026-10-21",
       "technical_error": null,
       "history_source": "Tickjournal recent-history bridge + self-maintained Google close",
-      "history_cache_rows": 6506,
+      "history_cache_rows": 6511,
       "history_cache_first_date": "2000-01-03",
-      "history_cache_last_date": "2026-10-13",
+      "history_cache_last_date": "2026-10-21",
       "history_bootstrap_reports": [],
       "history_tickjournal_report": {
         "source": "Tickjournal NIFTY 50 daily YTD",
-        "rows": 191,
+        "rows": 196,
         "first_date": "2026-01-01",
-        "last_date": "2026-10-09"
+        "last_date": "2026-10-16"
       },
       "history_yahoo_html_report": {
         "status": "error",
-        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: HTTP Error 404: Not Found; ca.finance.yahoo.com: Yahoo history HTML too short (0 rows)"
+        "error": "finance.yahoo.com: Yahoo history HTML too short (0 rows); uk.finance.yahoo.com: Yahoo history HTML too short (0 rows); ca.finance.yahoo.com: Yahoo history HTML too short (0 rows)"
       },
       "history_recent_contiguous": true,
       "history_continuity": {
-        "latest": "2026-10-13",
-        "rows_120d": 84,
+        "latest": "2026-10-21",
+        "rows_120d": 83,
         "max_gap_days": 4
       },
       "history_self_updates": [
         {
-          "date": "2026-10-13",
-          "close": 22721.95,
+          "date": "2026-10-21",
+          "close": 22811.35,
           "basis": "Google Finance post-close quote"
         }
       ],
@@ -849,23 +848,22 @@
     "usdinr": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-14T02:46+09:00",
+      "as_of_jst": "2026-10-22T00:27+09:00",
       "provider": "Google Finance",
       "provider_symbol": "USD-INR",
       "error": null
     },
     "usdjpy": {
-      "status": "fresh",
-      "fetched_this_run": true,
-      "as_of_jst": "2026-10-14T02:46+09:00",
-      "provider": "Google Finance",
-      "provider_symbol": "USD-JPY",
-      "error": null
+      "status": "fallback",
+      "fetched_this_run": false,
+      "reused_previous_value": true,
+      "previous_as_of_jst": "2026-10-21T18:49+09:00",
+      "error": "Twelve Data: HTTP Error 401: Unauthorized; Google Finance: Google Finance valid price not found for USD-JPY within sanity range (50.0, 300.0); Yahoo Finance: HTTP 429; Retry-After=unspecified"
     },
     "brent": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-10-14T02:36+09:00",
+      "as_of_jst": "2026-10-22T00:24+09:00",
       "provider": "Google Finance",
       "provider_symbol": "BZW00:NYMEX",
       "error": null
@@ -888,19 +886,19 @@
       "series": {
         "usdinr": {
           "label": "USD/INR",
-          "observation_count": 23,
+          "observation_count": 29,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-20",
-          "latest_date": "2026-10-14",
-          "latest_as_of_jst": "2026-10-14T02:46:00+09:00",
-          "observed_reference_change_5obs_pct": -1.8182,
+          "latest_date": "2026-10-22",
+          "latest_as_of_jst": "2026-10-22T00:27:00+09:00",
+          "observed_reference_change_5obs_pct": -0.6754,
           "reference_window": {
-            "start_date": "2026-10-08",
-            "start_as_of_jst": "2026-10-08T20:50:00+09:00",
-            "start_value": 96.8474,
-            "end_date": "2026-10-14",
-            "end_as_of_jst": "2026-10-14T02:46:00+09:00",
-            "end_value": 95.0865,
+            "start_date": "2026-10-15",
+            "start_as_of_jst": "2026-10-15T18:29:00+09:00",
+            "start_value": 94.9942,
+            "end_date": "2026-10-22",
+            "end_as_of_jst": "2026-10-22T00:27:00+09:00",
+            "end_value": 94.3526,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -910,19 +908,19 @@
         },
         "usdjpy": {
           "label": "USD/JPY",
-          "observation_count": 16,
+          "observation_count": 21,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-29",
-          "latest_date": "2026-10-14",
-          "latest_as_of_jst": "2026-10-14T02:46:00+09:00",
-          "observed_reference_change_5obs_pct": 0.0891,
+          "latest_date": "2026-10-21",
+          "latest_as_of_jst": "2026-10-21T18:49:00+09:00",
+          "observed_reference_change_5obs_pct": -0.1953,
           "reference_window": {
-            "start_date": "2026-10-09",
-            "start_as_of_jst": "2026-10-09T20:43:00+09:00",
-            "start_value": 158.2485,
-            "end_date": "2026-10-14",
-            "end_as_of_jst": "2026-10-14T02:46:00+09:00",
-            "end_value": 158.3895,
+            "start_date": "2026-10-14",
+            "start_as_of_jst": "2026-10-14T18:56:00+09:00",
+            "start_value": 158.4465,
+            "end_date": "2026-10-21",
+            "end_as_of_jst": "2026-10-21T18:49:00+09:00",
+            "end_value": 158.137,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -932,19 +930,19 @@
         },
         "brent": {
           "label": "Brent",
-          "observation_count": 22,
+          "observation_count": 28,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-19",
-          "latest_date": "2026-10-14",
-          "latest_as_of_jst": "2026-10-14T02:36:00+09:00",
-          "observed_reference_change_5obs_pct": 1.1392,
+          "latest_date": "2026-10-22",
+          "latest_as_of_jst": "2026-10-22T00:24:00+09:00",
+          "observed_reference_change_5obs_pct": 4.6699,
           "reference_window": {
-            "start_date": "2026-10-08",
-            "start_as_of_jst": "2026-10-08T20:41:00+09:00",
-            "start_value": 104.46,
-            "end_date": "2026-10-14",
-            "end_as_of_jst": "2026-10-14T02:36:00+09:00",
-            "end_value": 105.65,
+            "start_date": "2026-10-15",
+            "start_as_of_jst": "2026-10-15T18:21:00+09:00",
+            "start_value": 104.07,
+            "end_date": "2026-10-22",
+            "end_as_of_jst": "2026-10-22T00:24:00+09:00",
+            "end_value": 108.93,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -954,19 +952,19 @@
         },
         "india_vix": {
           "label": "India VIX",
-          "observation_count": 17,
+          "observation_count": 22,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-18",
-          "latest_date": "2026-10-13",
-          "latest_as_of_jst": "2026-10-13T19:14:00+09:00",
-          "observed_reference_change_5obs_pct": 3.7472,
+          "latest_date": "2026-10-21",
+          "latest_as_of_jst": "2026-10-21T19:13:00+09:00",
+          "observed_reference_change_5obs_pct": 11.0482,
           "reference_window": {
-            "start_date": "2026-10-06",
-            "start_as_of_jst": "2026-10-06T19:13:00+09:00",
-            "start_value": 13.61,
-            "end_date": "2026-10-13",
-            "end_as_of_jst": "2026-10-13T19:14:00+09:00",
-            "end_value": 14.12,
+            "start_date": "2026-10-13",
+            "start_as_of_jst": "2026-10-13T19:14:00+09:00",
+            "start_value": 14.12,
+            "end_date": "2026-10-21",
+            "end_as_of_jst": "2026-10-21T19:13:00+09:00",
+            "end_value": 15.68,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -983,12 +981,12 @@
     "basis_principle": "取引中は当日暫定スナップショット、時間外は最新確定日足スナップショットを使用し、価格・MA・RSI・MACD・1/3/14営業日予測を同一時点に統一。",
     "history_method_version": "5.3-history-2",
     "status_method_version": "5.4-status-2",
-    "forecast_verification_version": "5.6-eval-1",
-    "detail_chart_version": "5.7-candle-1",
-    "execution_plan_version": "5.8-execution-1"
+    "forecast_verification_version": "5.6-eval-2",
+    "detail_chart_version": "5.7-candle-4",
+    "execution_plan_version": "5.8-execution-2"
   },
   "data_lineage": {
-    "fetched_at_jst": "2026-10-14T02:47:36+09:00",
+    "fetched_at_jst": "2026-10-22T00:36:43+09:00",
     "market_open": false,
     "market_state": "PREVIOUS_SESSION",
     "calendar_source": "NSE 2026 holiday calendar",
@@ -998,9 +996,9 @@
       "nifty": {
         "source": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
-        "quote_time_jst": "2026-10-13T19:01+09:00",
-        "fetched_at_jst": "2026-10-14T02:47:36+09:00",
-        "data_age_minutes": 466.6,
+        "quote_time_jst": "2026-10-21T19:01+09:00",
+        "fetched_at_jst": "2026-10-22T00:36:43+09:00",
+        "data_age_minutes": 335.7,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
@@ -1009,9 +1007,9 @@
       "usdinr": {
         "source": "Google Finance",
         "provider_symbol": "USD-INR",
-        "quote_time_jst": "2026-10-14T02:46+09:00",
-        "fetched_at_jst": "2026-10-14T02:47:36+09:00",
-        "data_age_minutes": 1.6,
+        "quote_time_jst": "2026-10-22T00:27+09:00",
+        "fetched_at_jst": "2026-10-22T00:36:43+09:00",
+        "data_age_minutes": 9.7,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
@@ -1020,9 +1018,9 @@
       "brent": {
         "source": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
-        "quote_time_jst": "2026-10-14T02:36+09:00",
-        "fetched_at_jst": "2026-10-14T02:47:36+09:00",
-        "data_age_minutes": 11.6,
+        "quote_time_jst": "2026-10-22T00:24+09:00",
+        "fetched_at_jst": "2026-10-22T00:36:43+09:00",
+        "data_age_minutes": 12.7,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
@@ -1030,20 +1028,20 @@
       }
     },
     "nifty_technicals": {
-      "technical_date": "2026-10-13",
+      "technical_date": "2026-10-21",
       "technical_status": "fresh",
       "technical_basis": "前営業日までの確定日足",
       "provisional_available": false
     },
     "history": {
       "source": "Tickjournal recent-history bridge + self-maintained Google close",
-      "rows": 6506,
+      "rows": 6511,
       "first_date": "2000-01-03",
-      "last_date": "2026-10-13",
+      "last_date": "2026-10-21",
       "recent_contiguous": true,
       "continuity": {
-        "latest": "2026-10-13",
-        "rows_120d": 84,
+        "latest": "2026-10-21",
+        "rows_120d": 83,
         "max_gap_days": 4
       },
       "ready_for_current_technicals": true
@@ -1053,44 +1051,44 @@
     "available": true,
     "method_version": "4.8-stat-1",
     "window_years": 10,
-    "basis_date": "2026-10-13",
-    "basis_price": 22721.95,
+    "basis_date": "2026-10-21",
+    "basis_price": 22811.35,
     "basis": "確定日足テクニカル（同一時点）",
     "analog_count": 40,
-    "median_similarity_distance": 0.77,
+    "median_similarity_distance": 0.89,
     "consensus": "中立混在",
     "horizons": {
       "1": {
         "trading_days": 1,
-        "label": "上向き",
-        "sample_count": 40,
-        "sample_adequacy": "中",
-        "statistical_reference": "中",
-        "median_return_pct": 0.2,
-        "mean_return_pct": 0.0,
-        "q25_return_pct": -0.7,
-        "q75_return_pct": 0.62,
-        "historical_up_share_pct": 57.5,
-        "median_price": 22767.8,
-        "q25_price": 22562.59,
-        "q75_price": 22863.77,
-        "median_max_drawdown_pct": 0.2
-      },
-      "3": {
-        "trading_days": 3,
         "label": "中立",
         "sample_count": 40,
         "sample_adequacy": "中",
         "statistical_reference": "中",
-        "median_return_pct": -0.12,
+        "median_return_pct": 0.12,
         "mean_return_pct": 0.15,
-        "q25_return_pct": -1.41,
-        "q75_return_pct": 1.45,
-        "historical_up_share_pct": 47.5,
-        "median_price": 22695.23,
-        "q25_price": 22401.86,
-        "q75_price": 23052.07,
-        "median_max_drawdown_pct": -0.57
+        "q25_return_pct": -0.4,
+        "q75_return_pct": 0.74,
+        "historical_up_share_pct": 55.0,
+        "median_price": 22839.14,
+        "q25_price": 22719.36,
+        "q75_price": 22981.29,
+        "median_max_drawdown_pct": 0.12
+      },
+      "3": {
+        "trading_days": 3,
+        "label": "上向き",
+        "sample_count": 40,
+        "sample_adequacy": "中",
+        "statistical_reference": "中",
+        "median_return_pct": 0.82,
+        "mean_return_pct": 0.23,
+        "q25_return_pct": -1.5,
+        "q75_return_pct": 1.39,
+        "historical_up_share_pct": 62.5,
+        "median_price": 22998.3,
+        "q25_price": 22469.69,
+        "q75_price": 23129.3,
+        "median_max_drawdown_pct": -0.19
       },
       "14": {
         "trading_days": 14,
@@ -1098,15 +1096,15 @@
         "sample_count": 40,
         "sample_adequacy": "中",
         "statistical_reference": "中",
-        "median_return_pct": 0.04,
-        "mean_return_pct": 0.61,
-        "q25_return_pct": -1.82,
-        "q75_return_pct": 2.95,
-        "historical_up_share_pct": 50.0,
-        "median_price": 22730.02,
-        "q25_price": 22308.6,
-        "q75_price": 23392.23,
-        "median_max_drawdown_pct": -1.74
+        "median_return_pct": 0.47,
+        "mean_return_pct": 0.34,
+        "q25_return_pct": -2.89,
+        "q75_return_pct": 2.52,
+        "historical_up_share_pct": 52.5,
+        "median_price": 22917.47,
+        "q25_price": 22151.38,
+        "q75_price": 23385.17,
+        "median_max_drawdown_pct": -1.73
       }
     },
     "method": "直近10年の類似テクニカル局面を使い、1・3・14営業日後の分布を集計。",
@@ -1121,43 +1119,43 @@
     "decision_eligible": false,
     "action_code": "HOLD",
     "action_label": "判定保留",
-    "market_stage_code": "TRANCHE2",
-    "market_stage_label": "第2弾相当・短期反転",
+    "market_stage_code": "WAIT",
+    "market_stage_label": "待機",
     "technical_basis_used": "確定日足テクニカル（同一時点）",
-    "buy_condition_count": 3,
+    "buy_condition_count": 0,
     "buy_condition_total": 5,
-    "sell_condition_count": 0,
+    "sell_condition_count": 2,
     "sell_condition_total": 4,
     "buy_conditions": [
       {
         "key": "low_zone",
         "label": "調整・低位",
         "met": false,
-        "detail": "RSI 43.4 / 25日線乖離 -1.3%"
+        "detail": "RSI 46.3 / 25日線乖離 -0.3%"
       },
       {
         "key": "rsi_improving",
         "label": "RSI改善",
-        "met": true,
-        "detail": "34.0 → 43.4"
+        "met": false,
+        "detail": "47.7 → 46.3"
       },
       {
         "key": "macd_improving",
         "label": "MACD改善",
-        "met": true,
-        "detail": "Hist -24.74 → +5.05"
+        "met": false,
+        "detail": "Hist +88.75 → +82.61"
       },
       {
         "key": "above_ma5",
         "label": "5日線回復",
-        "met": true,
-        "detail": "22722 / MA5 22488"
+        "met": false,
+        "detail": "22811 / MA5 22893"
       },
       {
         "key": "above_ma25",
         "label": "25日線回復",
         "met": false,
-        "detail": "22722 / MA25 23015"
+        "detail": "22811 / MA25 22885"
       }
     ],
     "sell_conditions": [
@@ -1165,25 +1163,25 @@
         "key": "rsi_high",
         "label": "RSI高位",
         "met": false,
-        "detail": "RSI 43.4"
+        "detail": "RSI 46.3"
       },
       {
         "key": "ma25_extended",
         "label": "25日線上方乖離",
         "met": false,
-        "detail": "-1.3%"
+        "detail": "-0.3%"
       },
       {
         "key": "macd_worsening",
         "label": "MACD悪化",
-        "met": false,
-        "detail": "Hist -24.74 → +5.05"
+        "met": true,
+        "detail": "Hist +88.75 → +82.61"
       },
       {
         "key": "below_ma5",
         "label": "5日線割れ",
-        "met": false,
-        "detail": "22722 / MA5 22488"
+        "met": true,
+        "detail": "22811 / MA5 22893"
       }
     ],
     "external_risk": "NORMAL",
@@ -1192,13 +1190,12 @@
     "forecast_14d_label": "中立",
     "caution": false,
     "reasons": [
-      "○ RSI改善：34.0 → 43.4",
-      "○ MACD改善：Hist -24.74 → +5.05",
-      "○ 5日線回復：22722 / MA5 22488"
+      "△ MACD悪化：Hist +88.75 → +82.61",
+      "△ 5日線割れ：22811 / MA5 22893"
     ],
     "rule_note": "3分割の市場段階を示す目安です。実際の注文は、既に実施した購入段階・資金配分・投信締切を確認して決定してください。",
-    "basis_date": "2026-10-13",
-    "basis_price": 22721.95,
+    "basis_date": "2026-10-21",
+    "basis_price": 22811.35,
     "basis_consistency": "OK",
     "basis_snapshot_version": "5.2-basis-1",
     "external_data_state": "OK",
@@ -1212,41 +1209,6 @@
       "available": true,
       "window_trading_days": 30,
       "price": [
-        {
-          "date": "2026-08-31",
-          "close": 24080.4,
-          "ma5": 24177.84,
-          "ma25": 24340.92,
-          "ma75": 24018.02
-        },
-        {
-          "date": "2026-09-01",
-          "close": 24055.8,
-          "ma5": 24122.09,
-          "ma25": 24343.74,
-          "ma75": 24023.52
-        },
-        {
-          "date": "2026-09-02",
-          "close": 23914.45,
-          "ma5": 24063.43,
-          "ma25": 24330.31,
-          "ma75": 24027.04
-        },
-        {
-          "date": "2026-09-03",
-          "close": 23873.45,
-          "ma5": 24019.95,
-          "ma25": 24312.56,
-          "ma75": 24030.45
-        },
-        {
-          "date": "2026-09-04",
-          "close": 23897.7,
-          "ma5": 23964.36,
-          "ma25": 24293.13,
-          "ma75": 24033.63
-        },
         {
           "date": "2026-09-07",
           "close": 23779.15,
@@ -1421,29 +1383,44 @@
           "ma5": 22488.12,
           "ma25": 23015.19,
           "ma75": 23807.92
+        },
+        {
+          "date": "2026-10-14",
+          "close": 22622.7,
+          "ma5": 22492.05,
+          "ma25": 22968.94,
+          "ma75": 23790.27
+        },
+        {
+          "date": "2026-10-15",
+          "close": 22997.35,
+          "ma5": 22645.16,
+          "ma25": 22943.43,
+          "ma75": 23778.69
+        },
+        {
+          "date": "2026-10-16",
+          "close": 23146.15,
+          "ma5": 22770.3,
+          "ma25": 22932.01,
+          "ma75": 23767.23
+        },
+        {
+          "date": "2026-10-19",
+          "close": 22888.95,
+          "ma5": 22875.42,
+          "ma25": 22908.46,
+          "ma75": 23750.07
+        },
+        {
+          "date": "2026-10-21",
+          "close": 22811.35,
+          "ma5": 22893.3,
+          "ma25": 22884.99,
+          "ma75": 23730.61
         }
       ],
       "rsi14": [
-        {
-          "date": "2026-08-31",
-          "value": 43.7
-        },
-        {
-          "date": "2026-09-01",
-          "value": 42.86
-        },
-        {
-          "date": "2026-09-02",
-          "value": 38.34
-        },
-        {
-          "date": "2026-09-03",
-          "value": 37.11
-        },
-        {
-          "date": "2026-09-04",
-          "value": 38.37
-        },
         {
           "date": "2026-09-07",
           "value": 34.72
@@ -1543,29 +1520,29 @@
         {
           "date": "2026-10-13",
           "value": 43.43
+        },
+        {
+          "date": "2026-10-14",
+          "value": 41.66
+        },
+        {
+          "date": "2026-10-15",
+          "value": 49.94
+        },
+        {
+          "date": "2026-10-16",
+          "value": 52.81
+        },
+        {
+          "date": "2026-10-19",
+          "value": 47.72
+        },
+        {
+          "date": "2026-10-21",
+          "value": 46.27
         }
       ],
       "macd_hist": [
-        {
-          "date": "2026-08-31",
-          "value": -38.383
-        },
-        {
-          "date": "2026-09-01",
-          "value": -39.418
-        },
-        {
-          "date": "2026-09-02",
-          "value": -47.05
-        },
-        {
-          "date": "2026-09-03",
-          "value": -51.905
-        },
-        {
-          "date": "2026-09-04",
-          "value": -50.484
-        },
         {
           "date": "2026-09-07",
           "value": -54.201
@@ -1665,6 +1642,26 @@
         {
           "date": "2026-10-13",
           "value": 5.046
+        },
+        {
+          "date": "2026-10-14",
+          "value": 20.189
+        },
+        {
+          "date": "2026-10-15",
+          "value": 55.555
+        },
+        {
+          "date": "2026-10-16",
+          "value": 87.203
+        },
+        {
+          "date": "2026-10-19",
+          "value": 88.753
+        },
+        {
+          "date": "2026-10-21",
+          "value": 82.615
         }
       ]
     },
@@ -1804,8 +1801,44 @@
         },
         {
           "date": "2026-10-14",
-          "value": 95.0865,
-          "as_of_jst": "2026-10-14T02:46+09:00",
+          "value": 95.1492,
+          "as_of_jst": "2026-10-14T18:54+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-15",
+          "value": 94.9942,
+          "as_of_jst": "2026-10-15T18:29+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-16",
+          "value": 94.8738,
+          "as_of_jst": "2026-10-16T23:53+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-19",
+          "value": 94.8818,
+          "as_of_jst": "2026-10-19T19:29+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-20",
+          "value": 94.8505,
+          "as_of_jst": "2026-10-20T18:40+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-21",
+          "value": 94.4465,
+          "as_of_jst": "2026-10-21T18:53+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-22",
+          "value": 94.3526,
+          "as_of_jst": "2026-10-22T00:27+09:00",
           "provider": "Google Finance"
         }
       ],
@@ -1938,8 +1971,44 @@
         },
         {
           "date": "2026-10-14",
-          "value": 105.65,
-          "as_of_jst": "2026-10-14T02:36+09:00",
+          "value": 105.88,
+          "as_of_jst": "2026-10-14T18:47+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-15",
+          "value": 104.07,
+          "as_of_jst": "2026-10-15T18:21+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-16",
+          "value": 105.83,
+          "as_of_jst": "2026-10-16T23:49+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-19",
+          "value": 108.62,
+          "as_of_jst": "2026-10-19T19:16+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-20",
+          "value": 111.54,
+          "as_of_jst": "2026-10-20T18:36+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-21",
+          "value": 110.13,
+          "as_of_jst": "2026-10-21T18:45+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-22",
+          "value": 108.93,
+          "as_of_jst": "2026-10-22T00:24+09:00",
           "provider": "Google Finance"
         }
       ],
@@ -2045,6 +2114,36 @@
           "value": 14.12,
           "as_of_jst": "2026-10-13T19:14+09:00",
           "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-14",
+          "value": 14.62,
+          "as_of_jst": "2026-10-14T19:13+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-15",
+          "value": 14.02,
+          "as_of_jst": "2026-10-15T19:13+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-16",
+          "value": 14.02,
+          "as_of_jst": "2026-10-16T19:00+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-19",
+          "value": 14.77,
+          "as_of_jst": "2026-10-19T19:14+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-10-21",
+          "value": 15.68,
+          "as_of_jst": "2026-10-21T19:13+09:00",
+          "provider": "Google Finance"
         }
       ]
     },
@@ -2053,23 +2152,23 @@
   "source_summary": {
     "nifty_current": {
       "provider": "Google Finance + NSE Indices",
-      "as_of_jst": "2026-10-13T19:01+09:00"
+      "as_of_jst": "2026-10-21T19:01+09:00"
     },
     "nifty_history": {
       "provider": "Tickjournal recent-history bridge + self-maintained Google close",
-      "last_date": "2026-10-13",
-      "rows": 6506
+      "last_date": "2026-10-21",
+      "rows": 6511
     }
   },
   "reference_data": {
     "version": "5.1-ref-2",
-    "generated_at_jst": "2026-10-14T02:47:36+09:00",
+    "generated_at_jst": "2026-10-22T00:36:43+09:00",
     "items": [
       {
         "key": "generated",
         "label": "判定生成",
         "role": "生成時刻",
-        "as_of_jst": "2026-10-14T02:47:36+09:00",
+        "as_of_jst": "2026-10-22T00:36:43+09:00",
         "date": null,
         "provider": "GitHub Actions",
         "age_minutes": 0,
@@ -2082,10 +2181,10 @@
         "key": "nifty_current",
         "label": "NIFTY現在値",
         "role": "判断主体",
-        "as_of_jst": "2026-10-13T19:01+09:00",
+        "as_of_jst": "2026-10-21T19:01+09:00",
         "date": null,
         "provider": "Google Finance + NSE Indices",
-        "age_minutes": 466,
+        "age_minutes": 335,
         "freshness": "参考",
         "basis": "現在値",
         "freshness_code": "REFERENCE",
@@ -2096,84 +2195,84 @@
         "label": "NIFTY確定日足",
         "role": "基準履歴",
         "as_of_jst": null,
-        "date": "2026-10-13",
+        "date": "2026-10-21",
         "provider": "Tickjournal recent-history bridge + self-maintained Google close",
         "age_minutes": null,
         "freshness": "最新",
         "basis": "移動平均・RSI・MACDの確定基準",
         "freshness_code": "LATEST",
-        "status_note": "最新確定日足 2026-10-13"
+        "status_note": "最新確定日足 2026-10-21"
       },
       {
         "key": "usdinr",
         "label": "USD/INR",
         "role": "外部参考",
-        "as_of_jst": "2026-10-14T02:46+09:00",
+        "as_of_jst": "2026-10-22T00:27+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 1,
+        "age_minutes": 9,
         "freshness": "最新",
         "basis": null,
         "freshness_code": "LATEST",
-        "status_note": "1分前"
+        "status_note": "9分前"
       },
       {
         "key": "usdjpy",
         "label": "USD/JPY",
         "role": "円換算参考",
-        "as_of_jst": "2026-10-14T02:46+09:00",
+        "as_of_jst": "2026-10-21T18:49+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 1,
-        "freshness": "最新",
+        "age_minutes": 347,
+        "freshness": "利用不可",
         "basis": null,
-        "freshness_code": "LATEST",
-        "status_note": "1分前"
+        "freshness_code": "UNAVAILABLE",
+        "status_note": "USD/JPYを今回取得できていません。"
       },
       {
         "key": "inrjpy",
         "label": "INR/JPY",
         "role": "円換算参考",
-        "as_of_jst": "2026-10-14T02:46+09:00",
+        "as_of_jst": "2026-10-21T18:49+09:00",
         "date": null,
         "provider": "Derived: USD/JPY ÷ USD/INR",
-        "age_minutes": 1,
-        "freshness": "最新",
+        "age_minutes": 347,
+        "freshness": "利用不可",
         "basis": "円換算参考。2つの為替レートのうち古い時刻を基準時刻として表示。",
-        "freshness_code": "LATEST",
-        "status_note": "USD/JPY ÷ USD/INR"
+        "freshness_code": "UNAVAILABLE",
+        "status_note": "USD/INRまたはUSD/JPYが利用不可です。"
       },
       {
         "key": "brent",
         "label": "Brent",
         "role": "外部参考",
-        "as_of_jst": "2026-10-14T02:36+09:00",
+        "as_of_jst": "2026-10-22T00:24+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 11,
+        "age_minutes": 12,
         "freshness": "最新",
         "basis": null,
         "freshness_code": "LATEST",
-        "status_note": "11分前"
+        "status_note": "12分前"
       },
       {
         "key": "india_vix",
         "label": "India VIX",
         "role": "外部参考",
-        "as_of_jst": "2026-10-13T19:14+09:00",
+        "as_of_jst": "2026-10-21T19:13+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 453,
+        "age_minutes": 323,
         "freshness": "参考",
         "basis": null,
         "freshness_code": "REFERENCE",
-        "status_note": "453分前"
+        "status_note": "323分前"
       }
     ],
     "note": "時刻はすべてJST。NIFTYを判断主体、USD/JPY・INR/JPYを円換算参考、USD/INR・原油・VIXを外部参考として表示します。",
     "prediction_basis": {
-      "date": "2026-10-13",
-      "price": 22721.95,
+      "date": "2026-10-21",
+      "price": 22811.35,
       "type": "confirmed",
       "label": "確定日足テクニカル（同一時点）",
       "source": "Tickjournal recent-history bridge + self-maintained Google close",
@@ -2193,25 +2292,26 @@
     "version": "5.2-basis-1",
     "type": "confirmed",
     "label": "確定日足テクニカル（同一時点）",
-    "date": "2026-10-13",
-    "price": 22721.95,
+    "date": "2026-10-21",
+    "price": 22811.35,
     "quote_as_of_jst": null,
     "source": "Tickjournal recent-history bridge + self-maintained Google close",
-    "ma5": 22488.12,
-    "ma25": 23015.19,
-    "ma75": 23807.92,
-    "rsi14": 43.43,
-    "macd_hist": 5.046,
-    "ret5_pct": -0.24,
-    "vol20_annualized_pct": 14.81,
+    "ma5": 22893.3,
+    "ma25": 22884.99,
+    "ma75": 23730.61,
+    "rsi14": 46.27,
+    "rsi_method": "Wilder smoothed RSI14 (initial 14-difference mean)",
+    "macd_hist": 82.615,
+    "ret5_pct": 0.39,
+    "vol20_annualized_pct": 16.01,
     "consistency": "price / MA / RSI / MACD / forecast all use this snapshot"
   },
   "history_1400": {
     "version": "5.3-history-2",
     "saved": false,
     "replaced_existing": false,
-    "record_count": 6,
-    "date_jst": "2026-10-14",
+    "record_count": 10,
+    "date_jst": "2026-10-22",
     "current_date_has_record": false,
     "current_date_selected_price_as_of_jst": null,
     "message": "14:00保存時間帯外です。"
@@ -2220,11 +2320,11 @@
     "version": "5.4-status-2",
     "code": "CONFIRMED",
     "label": "確定済",
-    "detail": "最新確定日足 2026-10-13 を利用しています。",
+    "detail": "最新確定日足 2026-10-21 を利用しています。",
     "raw_code": "PREVIOUS_SESSION",
     "raw_label": "前営業日データ",
     "regular_trading_day": true,
-    "technical_date": "2026-10-13"
+    "technical_date": "2026-10-21"
   },
   "quality_state": {
     "version": "5.4-status-2",
@@ -2239,7 +2339,7 @@
       "nifty_confirmed": {
         "code": "LATEST",
         "label": "最新",
-        "note": "最新確定日足 2026-10-13"
+        "note": "最新確定日足 2026-10-21"
       },
       "nifty_provisional": {
         "code": "UNAVAILABLE",
@@ -2249,53 +2349,53 @@
       "usdinr": {
         "code": "LATEST",
         "label": "最新",
-        "note": "1分前"
+        "note": "9分前"
       },
       "usdjpy": {
-        "code": "LATEST",
-        "label": "最新",
-        "note": "1分前"
+        "code": "UNAVAILABLE",
+        "label": "利用不可",
+        "note": "USD/JPYを今回取得できていません。"
       },
       "brent": {
         "code": "LATEST",
         "label": "最新",
-        "note": "11分前"
+        "note": "12分前"
       },
       "inrjpy": {
-        "code": "LATEST",
-        "label": "最新",
-        "note": "USD/JPY ÷ USD/INR"
+        "code": "UNAVAILABLE",
+        "label": "利用不可",
+        "note": "USD/INRまたはUSD/JPYが利用不可です。"
       },
       "india_vix": {
         "code": "REFERENCE",
         "label": "参考",
-        "note": "453分前"
+        "note": "323分前"
       }
     },
     "principle": "NIFTY判断主体、円換算FX、その他外部参考を分離し、最新・参考・古い・利用不可の4分類で表示。"
   },
   "forecast_verification": {
-    "method_version": "5.6-eval-1",
-    "forecast_count": 3,
-    "pending_count": 3,
+    "method_version": "5.6-eval-2",
+    "forecast_count": 7,
+    "pending_count": 7,
     "horizons": {
       "1": {
-        "evaluated_count": 2,
+        "evaluated_count": 6,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": 0.454,
-        "mean_absolute_return_error_pct": 0.454,
-        "median_price_error_pct": 0.454,
-        "range_25_75_hit_pct": 50.0,
-        "direction_match_pct": 100.0
+        "median_absolute_return_error_pct": 0.848,
+        "mean_absolute_return_error_pct": 0.725,
+        "median_price_error_pct": 0.846,
+        "range_25_75_hit_pct": 33.3,
+        "direction_match_pct": 66.7
       },
       "3": {
-        "evaluated_count": 1,
+        "evaluated_count": 5,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": 0.498,
-        "mean_absolute_return_error_pct": 0.498,
-        "median_price_error_pct": 0.497,
-        "range_25_75_hit_pct": 100.0,
-        "direction_match_pct": 100.0
+        "median_absolute_return_error_pct": 0.68,
+        "mean_absolute_return_error_pct": 1.23,
+        "median_price_error_pct": 0.677,
+        "range_25_75_hit_pct": 60.0,
+        "direction_match_pct": 40.0
       },
       "14": {
         "evaluated_count": 0,
@@ -2308,7 +2408,27 @@
       }
     },
     "note": "誤差・レンジ内率・方向一致率は過去予測の検証指標であり、将来の上昇確率ではありません。",
-    "history_record_count": 6,
+    "evaluation_states": {
+      "1": {
+        "EVALUATED": 6,
+        "PENDING": 1,
+        "MISSING_DATA": 0,
+        "UNEVALUABLE": 0
+      },
+      "3": {
+        "EVALUATED": 5,
+        "PENDING": 2,
+        "MISSING_DATA": 0,
+        "UNEVALUABLE": 0
+      },
+      "14": {
+        "EVALUATED": 0,
+        "PENDING": 7,
+        "MISSING_DATA": 0,
+        "UNEVALUABLE": 0
+      }
+    },
+    "history_record_count": 10,
     "excluded_history_records": [
       {
         "snapshot_date_jst": "2026-10-05",
@@ -2324,121 +2444,44 @@
       }
     ],
     "latest_evaluated": {
-      "forecast_id": "2026-10-12",
-      "snapshot_date_jst": "2026-10-12",
+      "forecast_id": "2026-10-19",
+      "snapshot_date_jst": "2026-10-19",
       "results": {
         "1": {
           "status": "EVALUATED",
-          "target_date": "2026-10-13",
-          "actual_close": 22721.95,
-          "actual_return_pct": 1.118,
-          "actual_direction": "上向き",
-          "forecast_direction": "上向き",
-          "direction_match": true,
-          "median_return_error_pct": 0.708,
-          "absolute_median_return_error_pct": 0.708,
-          "median_price_error_pct": 0.707,
+          "target_date": "2026-10-21",
+          "actual_close": 22811.35,
+          "actual_return_pct": -1.155,
+          "actual_direction": "下向き",
+          "forecast_direction": "中立",
+          "direction_match": false,
+          "median_return_error_pct": -1.195,
+          "absolute_median_return_error_pct": 1.195,
+          "median_price_error_pct": 1.193,
           "range_25_75_hit": false
         },
         "3": {
           "status": "PENDING",
-          "target_date": null,
-          "message": "3営業日後の確定日足待ち"
+          "target_date": "2026-10-23",
+          "reason": "NOT_DUE"
         },
         "14": {
           "status": "PENDING",
-          "target_date": null,
-          "message": "14営業日後の確定日足待ち"
+          "target_date": "2026-11-09",
+          "reason": "NOT_DUE"
         }
       }
     }
   },
   "detail_chart": {
     "available": true,
-    "method_version": "5.7-candle-1",
+    "method_version": "5.7-candle-4",
     "type": "daily_candlestick",
     "display_trading_days": 60,
-    "latest_ohlc_date": "2026-10-09",
-    "latest_confirmed_date": "2026-10-13",
-    "lag_calendar_days": 4,
+    "latest_ohlc_date": "2026-10-21",
+    "latest_confirmed_date": "2026-10-21",
+    "lag_calendar_days": 0,
     "candles": [
-      {
-        "date": "2026-07-16",
-        "open": 24142.1,
-        "high": 24186.5,
-        "low": 24050.0,
-        "close": 24072.75,
-        "ma5": 24124.24,
-        "ma25": 24018.35,
-        "ma75": 23810.21,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
-      {
-        "date": "2026-07-17",
-        "open": 24127.6,
-        "high": 24367.3,
-        "low": 24099.05,
-        "close": 24334.3,
-        "ma5": 24149.72,
-        "ma25": 24065.26,
-        "ma75": 23823.91,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
-      {
-        "date": "2026-07-20",
-        "open": 24190.05,
-        "high": 24266.1,
-        "low": 24135.85,
-        "close": 24238.5,
-        "ma5": 24155.22,
-        "ma25": 24089.89,
-        "ma75": 23842.83,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
-      {
-        "date": "2026-07-21",
-        "open": 24216.05,
-        "high": 24262.2,
-        "low": 24135.65,
-        "close": 24187.7,
-        "ma5": 24182.35,
-        "ma25": 24103.24,
-        "ma75": 23867.58,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
-      {
-        "date": "2026-07-22",
-        "open": 24150.45,
-        "high": 24166.3,
-        "low": 23961.4,
-        "close": 23996.25,
-        "ma5": 24165.9,
-        "ma25": 24103.52,
-        "ma75": 23885.14,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
-      {
-        "date": "2026-07-23",
-        "open": 23904.8,
-        "high": 23990.75,
-        "low": 23807.2,
-        "close": 23869.6,
-        "ma5": 24125.27,
-        "ma25": 24094.88,
-        "ma75": 23900.56,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
-      {
-        "date": "2026-07-24",
-        "open": 23666.35,
-        "high": 23823.6,
-        "low": 23606.3,
-        "close": 23767.45,
-        "ma5": 24011.9,
-        "ma25": 24078.86,
-        "ma75": 23911.21,
-        "source": "Tickjournal NIFTY 50 daily YTD"
-      },
       {
         "date": "2026-07-27",
         "open": 23928.4,
@@ -3021,43 +3064,127 @@
         "ma25": 23122.63,
         "ma75": 23847.82,
         "source": "Tickjournal NIFTY 50 daily YTD"
+      },
+      {
+        "date": "2026-10-12",
+        "open": 22593.2,
+        "high": 22651.1,
+        "low": 22304.45,
+        "close": 22363.35,
+        "ma5": 22498.95,
+        "ma25": 23062.22,
+        "ma75": 23825.71,
+        "source": "Tickjournal NIFTY 50 daily YTD"
+      },
+      {
+        "date": "2026-10-13",
+        "open": 22364.15,
+        "high": 22721.95,
+        "low": 22288.45,
+        "close": 22721.95,
+        "ma5": 22488.12,
+        "ma25": 23015.19,
+        "ma75": 23807.92,
+        "source": "Tickjournal NIFTY 50 daily YTD"
+      },
+      {
+        "date": "2026-10-14",
+        "open": 22715.75,
+        "high": 22757.95,
+        "low": 22558.95,
+        "close": 22622.7,
+        "ma5": 22492.05,
+        "ma25": 22968.94,
+        "ma75": 23790.27,
+        "source": "Tickjournal NIFTY 50 daily YTD"
+      },
+      {
+        "date": "2026-10-15",
+        "open": 22671.3,
+        "high": 23056.4,
+        "low": 22637.4,
+        "close": 22997.35,
+        "ma5": 22645.16,
+        "ma25": 22943.43,
+        "ma75": 23778.69,
+        "source": "Tickjournal NIFTY 50 daily YTD"
+      },
+      {
+        "date": "2026-10-16",
+        "open": 23065.1,
+        "high": 23149.85,
+        "low": 22913.8,
+        "close": 23146.15,
+        "ma5": 22770.3,
+        "ma25": 22932.01,
+        "ma75": 23767.23,
+        "source": "Tickjournal NIFTY 50 daily YTD"
+      },
+      {
+        "date": "2026-10-19",
+        "open": 23150.85,
+        "high": 23175.25,
+        "low": 22845.0,
+        "close": 22888.95,
+        "ma5": 22875.42,
+        "ma25": 22908.46,
+        "ma75": 23750.07,
+        "source": "NSE official daily index CSV"
+      },
+      {
+        "date": "2026-10-21",
+        "open": 23016.0,
+        "high": 23120.9,
+        "low": 22649.9,
+        "close": 22811.35,
+        "ma5": 22893.3,
+        "ma25": 22884.99,
+        "ma75": 23730.61,
+        "source": "NSE official daily index CSV"
       }
     ],
     "source_reports": [
       {
         "source": "Tickjournal",
         "status": "ok",
-        "rows": 191,
-        "last_date": "2026-10-09"
+        "rows": 196,
+        "last_date": "2026-10-16"
       },
       {
-        "source": "Yahoo Finance",
-        "status": "error",
-        "error": "query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests; query1.finance.yahoo.com: HTTP Error 429: Too Many Requests; query2.finance.yahoo.com: HTTP Error 429: Too Many Requests"
+        "source": "NSE official daily index CSV",
+        "status": "ok",
+        "rows": 1,
+        "last_date": "2026-10-21"
       }
     ],
+    "quality": {
+      "rejected_dates": [],
+      "close_mismatch_dates": [],
+      "volume_usable_for_analysis": false,
+      "volume_note": "0は未提供として扱います。指数・構成銘柄・ETFの出来高を同一視しません。"
+    },
     "note": "詳細確認用の日足OHLCです。売買判定ロジックはこの任意チャートの取得成否に依存しません。"
   },
   "usdjpy": {
     "symbol": "JPY=X",
     "provider_symbol": "USD-JPY",
     "provider": "Google Finance",
-    "price": 158.3895,
-    "as_of_jst": "2026-10-14T02:46+09:00",
+    "price": 158.137,
+    "as_of_jst": "2026-10-21T18:49+09:00",
     "change_5d_pct": null
   },
   "inrjpy": {
     "symbol": "INR/JPY",
     "provider": "Derived: USD/JPY ÷ USD/INR",
-    "price": 1.66574,
-    "as_of_jst": "2026-10-14T02:46+09:00",
+    "price": 1.67602,
+    "as_of_jst": "2026-10-21T18:49+09:00",
     "change_5d_pct": null,
     "basis": "円換算参考。2つの為替レートのうち古い時刻を基準時刻として表示。"
   },
   "yen_effect": {
     "available": false,
     "horizon": "5営業日概算",
-    "stock_return_pct": -0.24,
+    "stock_return_pct": 0.39,
     "fx_return_pct": null,
     "combined_return_pct": null,
     "fx_contribution_pt": null,
@@ -3070,13 +3197,25 @@
     "reason": "公式指数データを取得できませんでした。"
   },
   "execution_plan": {
-    "version": "5.8-execution-1",
-    "basis_date": "2026-10-13",
-    "generated_at_jst": "2026-10-14T02:47:36+09:00",
-    "market_stage_code": "TRANCHE2",
-    "market_stage_label": "第2弾相当・短期反転",
+    "version": "5.8-execution-2",
+    "basis_date": "2026-10-21",
+    "generated_at_jst": "2026-10-22T00:36:43+09:00",
+    "market_stage_code": "WAIT",
+    "market_stage_label": "待機",
     "decision_gate_allow_rule": false,
     "mode": "decision_support",
+    "qualification": {
+      "market_conditions": "各段階のstatusは市場条件のみ",
+      "data_quality": "PARTIAL",
+      "decision_eligible": false,
+      "final_status": "HOLD",
+      "reasons": [
+        "通常取引時間中ではないため、第1弾購入ルールは自動確定しません。"
+      ],
+      "personal_progress": "NOT_INCLUDED",
+      "allocation": "NOT_INCLUDED",
+      "order_authorized": false
+    },
     "tranches": [
       {
         "stage": 1,
@@ -3087,10 +3226,10 @@
         "conditions": [
           {
             "key": "nifty_recovery_zone",
-            "label": "NIFTY 22,400～22,500 回復",
+            "label": "NIFTY 22,800～22,900 回復",
             "state": "met",
             "met": true,
-            "detail": "現在 22,722 / MA5 22,488を100pt幅で丸めた回復ゾーン",
+            "detail": "現在 22,811 / MA5 22,893を100pt幅で丸めた回復ゾーン",
             "source": "NIFTY/MA5"
           },
           {
@@ -3098,7 +3237,7 @@
             "label": "USD/INR 96未満",
             "state": "met",
             "met": true,
-            "detail": "現在 95.0865",
+            "detail": "現在 94.3526",
             "source": "USD/INR"
           },
           {
@@ -3106,40 +3245,40 @@
             "label": "Brent低下",
             "state": "unknown",
             "met": null,
-            "detail": "5日変化未取得",
-            "source": "Brent 5日変化"
+            "detail": "5営業日比較不能：NO_VERIFIED_SETTLEMENT_HISTORY。観測履歴の有無とは別です。",
+            "source": "Brent 検証済み5営業日変化"
           }
         ]
       },
       {
         "stage": 2,
         "label": "第2弾・短期反転",
-        "status": "READY",
-        "next_condition": "条件充足",
-        "hold_reason": "表示条件はすべて充足",
+        "status": "WAIT",
+        "next_condition": "5日線回復",
+        "hold_reason": "未達：5日線回復 / RSI改善 / MACD改善",
         "conditions": [
           {
             "key": "above_ma5",
             "label": "5日線回復",
-            "state": "met",
-            "met": true,
-            "detail": "現在 22,722 / MA5 22,488",
+            "state": "pending",
+            "met": false,
+            "detail": "現在 22,811 / MA5 22,893",
             "source": "NIFTY technical"
           },
           {
             "key": "rsi_improving",
             "label": "RSI改善",
-            "state": "met",
-            "met": true,
-            "detail": "34.0 → 43.4",
+            "state": "pending",
+            "met": false,
+            "detail": "47.7 → 46.3",
             "source": "NIFTY RSI14"
           },
           {
             "key": "macd_improving",
             "label": "MACD改善",
-            "state": "met",
-            "met": true,
-            "detail": "Hist -24.74 → +5.05",
+            "state": "pending",
+            "met": false,
+            "detail": "Hist +88.75 → +82.61",
             "source": "NIFTY MACD histogram"
           }
         ]
@@ -3149,22 +3288,22 @@
         "label": "第3弾・中期回復",
         "status": "WAIT",
         "next_condition": "25日線回復",
-        "hold_reason": "未達：25日線回復",
+        "hold_reason": "未達：25日線回復 / 5日線維持",
         "conditions": [
           {
             "key": "above_ma25",
             "label": "25日線回復",
             "state": "pending",
             "met": false,
-            "detail": "現在 22,722 / MA25 23,015",
+            "detail": "現在 22,811 / MA25 22,885",
             "source": "NIFTY technical"
           },
           {
             "key": "above_ma5",
             "label": "5日線維持",
-            "state": "met",
-            "met": true,
-            "detail": "現在 22,722 / MA5 22,488",
+            "state": "pending",
+            "met": false,
+            "detail": "現在 22,811 / MA5 22,893",
             "source": "NIFTY technical"
           },
           {
@@ -3172,7 +3311,7 @@
             "label": "MACDヒストグラム0以上",
             "state": "met",
             "met": true,
-            "detail": "Hist +5.05",
+            "detail": "Hist +82.61",
             "source": "NIFTY MACD histogram"
           }
         ]
@@ -3189,12 +3328,12 @@
   },
   "acquisition_status": {
     "version": "acquisition-status-1",
-    "date_jst": "2026-10-14",
+    "date_jst": "2026-10-22",
     "code": "WAITING_WINDOW",
     "label": "取得前",
     "detail": "14:00定点の保存時間帯前です。",
     "window_jst": "13:45-14:20",
-    "record_count": 6,
+    "record_count": 10,
     "same_date_row_count": 0,
     "selected_price_as_of_jst": null,
     "selected_generated_at_jst": null,

@@ -1,5 +1,23 @@
 # Changelog
 
+## UI v5.46 candidate — 2026-10-21
+
+- Issue #87: compact saved decision conditions; remove exact duplicate reasons.
+- Buy conditions always visible; sell cautions and unknowns always visible, only known non-matches folded.
+- Preserve QC/freshness/blocking warnings and SHADOW/reference meaning. No trade/purchase/data changes.
+- Add decision-reasons JS/CSS, regression tests and own-cache shell entries.
+- Candidate only: main, Pages and iPhone acceptance remain separate. Details: docs/DECISION_REASONS_UI_20261021.md.
+
+## 2026-10-20 — UI v5.45 mobile chart polish
+
+- 指標グループの外枠とローソク足の二重枠を整理し、描画に使える横幅を拡大。
+- 終値・RSI・MACDで右余白と営業日セルの位置を統一。
+- 既存の参考支持線に短い価格ラベルを追加。
+- 算出方法・取得処理の説明を補足へ移動し、参考表示・日付不一致・取得エラーは見える位置に維持。
+- OHLC終値不一致時は保留の文言と実際の表示を一致させ、日付の前後を確認せず「古い」と断定する表記を修正。
+- グラフの高さ・配色・支持線算出・売買判定・購入記録・公開データは維持。
+- Issue #84。
+
 ## 2026-09-25 — UI v5.10 operational hardening
 
 - 14:00状態を生成時刻推定から実際の14:00履歴証跡へ変更
