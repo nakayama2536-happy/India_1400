@@ -2380,6 +2380,19 @@
       "source": "NSE official daily index CSV",
       "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_21102026.csv",
       "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-10-22",
+      "open": 22687.75,
+      "high": 22785.0,
+      "low": 22554.85,
+      "close": 22687.65,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "volume_usable_for_analysis": false,
+      "source": "NSE official daily index CSV",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_22102026.csv",
+      "close_consistency": "MATCH"
     }
   ],
   "source_reports": [
@@ -2391,14 +2404,9 @@
     },
     {
       "source": "NSE official daily index CSV",
-      "status": "error",
-      "date": "2026-10-22",
-      "error": "HTTP Error 404: Not Found"
-    },
-    {
-      "source": "Yahoo Finance",
-      "status": "error",
-      "error": "HTTP 429; Retry-After=unspecified"
+      "status": "ok",
+      "rows": 1,
+      "last_date": "2026-10-22"
     }
   ]
 }
