@@ -507,7 +507,7 @@
 <script>
 const REPO_WORKFLOW_URL="https://github.com/nakayama2536-happy/india-stock-check/actions/workflows/update-market.yml";
 let market=null,indiaCore=null,indiaCoreHistory=null,indiaCoreHistoryPromise=null,commonSnapshot=null,lastGenerated=null,pollTimer=null;
-let candlePeriod="60",candleLongRows=null,candleLongKey=null;
+let candlePeriod="60",candleLongRows=null,candleLongKey=null,candleLoadNonce=0;
 const chartExperience=typeof IndiaChartExperience!=="undefined"?IndiaChartExperience.createController(window):null;
 function candleSnapshotKey(d=market?.detail_chart){return [market?.generated_at_jst||"",d?.method_version||"",d?.latest_ohlc_date||"",d?.latest_confirmed_date||"",d?.candles?.length||0,d?.candles?.at(-1)?.close??""].join("|")}
 const $=id=>document.getElementById(id);
@@ -824,7 +824,7 @@ async function fetchJson(path){const r=await fetch(`${path}?v=${Date.now()}`,{ca
 async function refreshData(silent=false){try{const [m,fund,common]=await Promise.all([fetchJson("market.json"),fetchJson("india_core.json").catch(()=>null),fetchJson("common_snapshot.json").catch(()=>null)]);const old=lastGenerated,oldChartKey=candleSnapshotKey();
     market=m;indiaCore=fund;commonSnapshot=common;lastGenerated=m.generated_at_jst||null;
     if(oldChartKey!==candleSnapshotKey()){
-      candleLongRows=null;candleLongKey=null;
+      ++candleLoadNonce;candleLongRows=null;candleLongKey=null;
       if(candlePeriod==="200")candlePeriod="60";
       if(chartExperience)chartExperience.close();
     }
@@ -1054,12 +1054,14 @@ function candlestickSvg(points,options){
 async function changeCandlePeriod(){
   const selector=$("candlePeriodSelect"),wanted=selector?.value;
   if(!["30","60","200"].includes(wanted))return;
+  const request=++candleLoadNonce;
   if(wanted!=="200"){candlePeriod=wanted;renderDetailChart();return}
   const current=market?.detail_chart||{},snapshotKey=candleSnapshotKey();
   if(candleLongRows&&candleLongKey===snapshotKey){candlePeriod="200";renderDetailChart();return}
   setText("candlePeriodFeedback","長期履歴を読込・照合しています。現在の売買判定には影響しません。");
   try{
     const data=await fetchJson("nifty_ohlc_history.json");
+    if(request!==candleLoadNonce||selector?.value!=="200")return;
     if(snapshotKey!==candleSnapshotKey())throw Error("市場データが更新されました。");
     if(typeof IndiaChartExperience==="undefined")throw Error("詳細表示の検証部品を読み込めません。");
     const result=IndiaChartExperience.validateLongCandles(data,current);
@@ -1070,6 +1072,7 @@ async function changeCandlePeriod(){
     renderDetailChart();
     const scroll=$("candleScrollWrap");if(scroll)scroll.scrollLeft=scroll.scrollWidth;
   }catch(error){
+    if(request!==candleLoadNonce||selector?.value!=="200")return;
     candlePeriod="60";candleLongRows=null;candleLongKey=null;
     if(selector)selector.value="60";
     renderDetailChart();
