@@ -1,0 +1,124 @@
+name: Verify UI 5.50 Expanded Dates Once
+on:
+  push:
+    branches: ['verify/u550-dates-browser-20261024']
+    paths: ['.github/workflows/verify-u550-dates-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-visual-dates:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u550-dates-browser-20261024'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin public PR candidate unchanged except isolated verifier
+        run: |
+          git merge-base --is-ancestor 415e3e602e1059a1d4c5e1c8fe8bf4bd98fcab09 HEAD
+          test "$(git diff --name-only 415e3e602e1059a1d4c5e1c8fe8bf4bd98fcab09 HEAD)" = ".github/workflows/verify-u550-dates-once.yml"
+          node --check chart-experience.js
+          node --check technical-charts.js
+          node --test tests/chart-date-axis.test.cjs
+      - name: Verify actual text labels in phone-width Chrome viewports
+        run: |
+          cat > .verify-date-labels.html <<'HTML'
+          <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <style>
+          :root{--bg:#07111f;--card:#0f1b2e;--line:#263854;--muted:#9eb0c8;--text:#f4f7fb;--accent:#70a9ff;--c-nifty:#80b6ff;--c-ma5:#dfb255;--c-ma25:#35baa5;--c-ma75:#8b9ab0}
+          *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:14px sans-serif}
+          .chart{width:100%;height:auto;display:block}.chart text{font-size:11px;fill:#a5b4ca}.chart .gridline{stroke:#334963}.chart .line-main{stroke:var(--c-nifty);fill:none;stroke-width:2}.chart .line-ma5{stroke:var(--c-ma5);fill:none}.chart .line-ma25{stroke:var(--c-ma25);fill:none}.chart .line-ma75{stroke:var(--c-ma75);fill:none}
+          </style><link rel="stylesheet" href="/chart-experience.css"></head><body>
+          <button id="expand" type="button" data-ix-expand="niftyChart">NIFTYを拡大</button>
+          <div id="niftyChart" style="width:100%;max-width:350px"></div><pre id="report">pending</pre>
+          <script src="/technical-charts.js"></script><script src="/chart-experience.js"></script>
+          <script>
+          (async()=>{
+            try{
+              const data=await (await fetch('/market.json')).json(),rows=data.chart_data.nifty.price;
+              const series=[{key:'close',cls:'line-main'},{key:'ma5',cls:'line-ma5'},{key:'ma25',cls:'line-ma25'},{key:'ma75',cls:'line-ma75'}];
+              const chart=document.getElementById('niftyChart');
+              chart.innerHTML=IndiaTechnicalCharts.lineChart(rows,series,[],{kind:'nifty',width:chart.clientWidth||350});
+              const controller=IndiaChartExperience.createController(window,{renderExpandedChart:(id,w,h)=>IndiaTechnicalCharts.lineChart(rows,series,[],{kind:'nifty',width:w,height:h})});
+              controller.bind();
+              function labels(svg){
+                return [...svg.querySelectorAll('text')].filter(n=>/^\d{2}\/\d{2}$/.test(n.textContent)).map(n=>{
+                  const r=n.getBoundingClientRect();return{date:n.textContent,left:r.left,right:r.right,center:(r.left+r.right)/2};
+                });
+              }
+              function visible(svg,viewport){
+                const r=viewport.getBoundingClientRect();
+                return labels(svg).filter(x=>x.right>=r.left+1&&x.left<=r.right-1).sort((a,b)=>a.left-b.left);
+              }
+              const embedded=labels(chart.querySelector('svg'));
+              document.getElementById('expand').click();
+              const overlay=document.getElementById('ixChartOverlay');
+              const body=overlay.querySelector('.ix-modal-body');
+              const fit=visible(overlay.querySelector('svg'),body);
+              for(let i=0;i<6;i++)overlay.querySelector('[data-ix-zoom="1"]').click();
+              const full=overlay.querySelector('svg'),right=visible(full,body);
+              const all=labels(full);
+              const rightMinGap=Math.min(...right.slice(1).map((x,i)=>x.left-right[i].right));
+              const latest=rows[rows.length-1].date.slice(5).replace('-','/');
+              const header=overlay.querySelector('.ix-modal-head').getBoundingClientRect(),button=overlay.querySelector('.ix-close').getBoundingClientRect();
+              const leftLimit=body.scrollWidth-body.clientWidth;body.scrollLeft=Math.floor(leftLimit/2);
+              const middle=visible(full,body);
+              const middleMinGap=Math.min(...middle.slice(1).map((x,i)=>x.left-middle[i].right));
+              const report={
+                viewport:{width:innerWidth,height:innerHeight},zoom:overlay.querySelector('.ix-zoom-label').textContent,
+                embedded:embedded.map(x=>x.date),expandedLabels:all.length,
+                right:right.map(x=>x.date),rightMinGap,middle:middle.map(x=>x.date),middleMinGap,
+                latest,plotHeight:full.getBoundingClientRect().height,
+                headerRight:header.right,closeRight:button.right,scrollMax:leftLimit,
+                validDates:all.every(x=>rows.some(row=>row.date.slice(5).replace('-','/')===x.date))
+              };
+              report.passes=embedded.length===3&&all.length>3&&right.length>=3&&
+                right.at(-1).date===latest&&middle.length>=3&&
+                rightMinGap>=15&&middleMinGap>=15&&report.validDates&&
+                report.plotHeight>180&&report.plotHeight<340&&
+                report.headerRight<=innerWidth+2&&report.closeRight<=innerWidth+2&&leftLimit>0;
+              document.getElementById('report').textContent=JSON.stringify(report);
+            }catch(e){document.getElementById('report').textContent='ERROR '+(e.stack||e.message);}
+          })();
+          </script></body></html>
+          HTML
+          python3 -m http.server 9879 --bind 127.0.0.1 >/tmp/u550-browser-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          node <<'JS'
+          const {spawn}=require('node:child_process');
+          const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const chrome=['/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>fs.existsSync(x))||'google-chrome';
+          const temp=fs.mkdtempSync(path.join(os.tmpdir(),'u550-dates-'));
+          const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu',
+            '--remote-debugging-port=9229','--remote-allow-origins=*','--user-data-dir='+temp,'about:blank'],{stdio:'ignore'});
+          async function verify(){
+            for(let t=0;t<50;t++){try{await(await fetch('http://127.0.0.1:9229/json/version')).json();break}catch(_){await sleep(120)}}
+            const target=await(await fetch('http://127.0.0.1:9229/json/new?about:blank',{method:'PUT'})).json();
+            const ws=new WebSocket(target.webSocketDebuggerUrl);
+            await new Promise((res,rej)=>{ws.addEventListener('open',res,{once:true});ws.addEventListener('error',rej,{once:true})});
+            let next=0;const pending=new Map();
+            ws.addEventListener('message',ev=>{const r=JSON.parse(ev.data);if(!r.id)return;const p=pending.get(r.id);if(p){pending.delete(r.id);r.error?p.reject(Error(JSON.stringify(r.error))):p.resolve(r.result)}});
+            const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++next;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+            try{
+              await cdp('Page.enable');
+              for(const [width,height,dpr]of[[320,700,2],[375,812,3],[393,852,3],[430,932,3]]){
+                await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:dpr,mobile:true,screenWidth:width,screenHeight:height});
+                await cdp('Page.navigate',{url:'http://127.0.0.1:9879/.verify-date-labels.html?width='+width});
+                await sleep(500);
+                const expression="new Promise(resolve=>{let tries=0;const loop=setInterval(()=>{const v=document.getElementById('report')?.textContent;if(v?.startsWith('{')||v?.startsWith('ERROR')||++tries>100){clearInterval(loop);resolve(v||'NO_RESULT')}},60)})";
+                const result=await cdp('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});
+                const raw=result?.result?.value;
+                if(!raw||!raw.startsWith('{'))throw Error('INVALID_BROWSER_RESULT '+width+' '+raw);
+                const report=JSON.parse(raw);
+                console.log('DATES_VISUAL '+JSON.stringify({expected:width,report}));
+                if(report.viewport.width!==width||report.passes!==true)throw Error('DATE_TICKS_LAYOUT_FAIL '+width);
+              }
+              console.log('UI_550_BROWSER_DATES_PASS: four mobile CSS viewports, 250% right/middle scrolled date ticks. Not iPhone Safari acceptance.');
+            }finally{ws.close()}
+          }
+          verify().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>proc.kill('SIGTERM'));
+          JS
