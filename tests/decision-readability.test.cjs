@@ -14,7 +14,7 @@ const between = (a,b) => {
   return html.slice(start,end);
 };
 const hero = between('<div id="decisionCard"','<div class="card fund-trend-card">');
-const style = between('/* UI 5.52: iPhone 17 readability','</style>');
+const style = between('/* UI 5.51: iPhone 17 readability','</style>');
 const cssRule = selector => {
   const i=style.indexOf(selector+'{');
   assert.ok(i>=0,'missing css selector: '+selector);
