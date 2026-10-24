@@ -124,3 +124,79 @@ test('UI 5.48 deploy shell and stylesheet remain app-scoped',()=>{
   assert.match(sw,/key\.startsWith\(CACHE_PREFIX\)/);
   assert.doesNotMatch(sw,/caches\.match\s*\(/);
 });
+
+test('late 200-row response cannot override a later 30-row user selection',async()=>{
+  const vm=require('node:vm'),html=fs.readFileSync('index.html','utf8');
+  const a=html.indexOf('async function changeCandlePeriod(){');
+  const b=html.indexOf('\nfunction renderDetailChart(){',a);
+  assert.ok(a>=0&&b>a);
+  const selector={value:'200'},seen=[],nodes={candlePeriodSelect:selector,candlePeriodFeedback:{classList:{add(){},remove(){}}}};
+  let resolveLoad,loads=0;
+  const context=vm.createContext({
+    market:{detail_chart:current()},
+    $:id=>nodes[id]||(nodes[id]={}),
+    setText:()=>{},
+    fetchJson:()=>{loads++;return new Promise(resolve=>{resolveLoad=resolve;});},
+    candleSnapshotKey:()=> 'fixed-snapshot',
+    IndiaChartExperience:charts,
+    renderDetailChart:()=>seen.push(vm.runInContext('candlePeriod',context)),
+  });
+  vm.runInContext('let candlePeriod="60",candleLongRows=null,candleLongKey=null,candleLoadNonce=0;',context);
+  vm.runInContext(html.slice(a,b),context);
+  selector.value='30';
+  await vm.runInContext('changeCandlePeriod()',context);
+  assert.equal(loads,0);
+  selector.value='200';
+  const pending=vm.runInContext('changeCandlePeriod()',context);
+  assert.equal(loads,1);
+  selector.value='30';
+  await vm.runInContext('changeCandlePeriod()',context);
+  resolveLoad(original());
+  await pending;
+  assert.equal(vm.runInContext('candlePeriod',context),'30');
+  assert.equal(vm.runInContext('candleLongRows',context),null);
+  assert.deepEqual(seen,['30','30']);
+});
+test('capture diagnostic identifies externally tagged saved record, not on-time GitHub guard',()=>{
+  const vm=require('node:vm'),html=fs.readFileSync('index.html','utf8');
+  const a=html.indexOf('function renderCaptureEvidence(){'),b=html.indexOf('\nasync function fetchJson(',a);
+  assert.ok(a>=0&&b>a);
+  const node={innerHTML:''},report={
+    acquisition_status:{code:'CAPTURED',date_jst:'2026-10-23',
+      selected_price_as_of_jst:'2026-10-23T14:01:00+09:00',
+      selected_generated_at_jst:'2026-10-23T14:04:22+09:00',
+      capture_origin:{code:'EXTERNAL_TRIGGER',label:'外部冗長'}}
+  };
+  const context=vm.createContext({
+    market:report,$:()=>node,referenceText:String,
+    fmtJstShort:String
+  });
+  vm.runInContext(html.slice(a,b),context);
+  vm.runInContext('renderCaptureEvidence()',context);
+  assert.match(node.innerHTML,/EXTERNAL_TRIGGER/);
+  assert.match(node.innerHTML,/GitHub-onlyの自然取得実績には含めません/);
+  assert.match(node.innerHTML,/現在の購入資格とは別/);
+});
+test('forecast progress uses actual evaluated counts without adoption shortcut',()=>{
+  const vm=require('node:vm'),html=fs.readFileSync('index.html','utf8');
+  const a=html.indexOf('function renderForecastVerification(){'),b=html.indexOf('\nfunction candlePath(',a);
+  assert.ok(a>=0&&b>a);
+  const nodes={},m={forecast_verification:{forecast_count:9,pending_count:9,horizons:{
+    '1':{evaluated_count:8,sample_adequacy:'不足'},
+    '3':{evaluated_count:6,sample_adequacy:'不足'},
+    '14':{evaluated_count:0,sample_adequacy:'不足'}
+  }}};
+  const c=vm.createContext({market:m,$:id=>nodes[id]||(nodes[id]={innerHTML:''}),
+    fmt:v=>v===null||v===undefined?'--':String(v),
+    setText:(id,value)=>(nodes[id]||(nodes[id]={})).textContent=value});
+  vm.runInContext(html.slice(a,b),c);
+  vm.runInContext('renderForecastVerification()',c);
+  assert.match(nodes.verificationSummary.innerHTML,/8件/);
+  assert.match(nodes.verificationSummary.innerHTML,/6件/);
+  assert.match(nodes.verificationSummary.innerHTML,/0件/);
+  assert.match(nodes.verificationSummary.innerHTML,/aria-valuemax="30"/);
+  assert.match(nodes.verificationNote.textContent,/30件でも自動採用しません/);
+  m.forecast_verification.horizons['14']={};
+  vm.runInContext('renderForecastVerification()',c);
+  assert.match(nodes.verificationSummary.innerHTML,/評価件数不明/);
+});
