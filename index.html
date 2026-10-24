@@ -507,6 +507,9 @@
 <script>
 const REPO_WORKFLOW_URL="https://github.com/nakayama2536-happy/india-stock-check/actions/workflows/update-market.yml";
 let market=null,indiaCore=null,indiaCoreHistory=null,indiaCoreHistoryPromise=null,commonSnapshot=null,lastGenerated=null,pollTimer=null;
+let candlePeriod="60",candleLongRows=null,candleLongKey=null;
+const chartExperience=typeof IndiaChartExperience!=="undefined"?IndiaChartExperience.createController(window):null;
+function candleSnapshotKey(d=market?.detail_chart){return [market?.generated_at_jst||"",d?.method_version||"",d?.latest_ohlc_date||"",d?.latest_confirmed_date||"",d?.candles?.length||0,d?.candles?.at(-1)?.close??""].join("|")}
 const $=id=>document.getElementById(id);
 function fmt(x,d=2){if(x===null||x===undefined||Number.isNaN(Number(x)))return"--";return Number(x).toLocaleString("ja-JP",{minimumFractionDigits:d,maximumFractionDigits:d})}
 function signed(x,d=2,s=""){if(x===null||x===undefined||Number.isNaN(Number(x)))return"--";const n=Number(x);return`${n>0?"+":""}${fmt(n,d)}${s}`}
@@ -999,14 +1002,57 @@ function candlePath(points,key,x,y){let d="";points.forEach((p,i)=>{const v=Numb
 function candlestickSvg(points,options){
   return typeof IndiaTechnicalCharts!=="undefined"?IndiaTechnicalCharts.candlestickChart(points,options):'<div class="history-wait">チャート表示部品を読み込めません。再読込してください。</div>';
 }
+async function changeCandlePeriod(){
+  const selector=$("candlePeriodSelect"),wanted=selector?.value;
+  if(!["30","60","200"].includes(wanted))return;
+  if(wanted!=="200"){candlePeriod=wanted;renderDetailChart();return}
+  const current=market?.detail_chart||{},snapshotKey=candleSnapshotKey();
+  if(candleLongRows&&candleLongKey===snapshotKey){candlePeriod="200";renderDetailChart();return}
+  setText("candlePeriodFeedback","長期履歴を読込・照合しています。現在の売買判定には影響しません。");
+  try{
+    const data=await fetchJson("nifty_ohlc_history.json");
+    if(snapshotKey!==candleSnapshotKey())throw Error("市場データが更新されました。");
+    if(typeof IndiaChartExperience==="undefined")throw Error("詳細表示の検証部品を読み込めません。");
+    const result=IndiaChartExperience.validateLongCandles(data,current);
+    if(!result.ok)throw Error(result.reason);
+    candleLongRows=result.rows;
+    candleLongKey=snapshotKey;
+    candlePeriod="200";
+    renderDetailChart();
+    const scroll=$("candleScrollWrap");if(scroll)scroll.scrollLeft=scroll.scrollWidth;
+  }catch(error){
+    candlePeriod="60";candleLongRows=null;candleLongKey=null;
+    if(selector)selector.value="60";
+    renderDetailChart();
+    const node=$("candlePeriodFeedback");
+    if(node){node.textContent="200本表示を保留し60本に戻しました："+String(error.message||"照合できません");node.classList.add("ix-warning")}
+  }
+}
 function renderDetailChart(){
-  const d=market?.detail_chart||{},rows=d.candles||[];
+  const d=market?.detail_chart||{},base=d.candles||[];
   const basisDiff=!!(d.latest_confirmed_date&&d.latest_ohlc_date&&d.latest_confirmed_date!==d.latest_ohlc_date);
   const mismatch=!!d.quality?.close_mismatch_dates?.length;
-  const drawable=d.available&&!mismatch;
+  const longOk=candlePeriod==="200"&&candleLongKey===candleSnapshotKey()&&Array.isArray(candleLongRows);
+  const rows=typeof IndiaChartExperience!=="undefined"?
+    IndiaChartExperience.rowsForPeriod(d,longOk?candleLongRows:null,candlePeriod):
+    candlePeriod==="30"?base.slice(-30):base.slice(-60);
+  const drawable=!!(d.available&&!mismatch&&(candlePeriod!=="200"||longOk)&&rows.length>=10);
+  const long=drawable&&candlePeriod==="200";
   const errors=(Array.isArray(d.source_reports)?d.source_reports:[]).filter(x=>x.status==="error").map(x=>x.source+": "+x.error);
-  setText("detailCandleMeta",drawable?`直近 ${rows.length}営業日 / 四本値確定 ${String(d.latest_ohlc_date||"--").replaceAll("-","/")}${basisDiff?" / 参考（基準日不一致）":""}`:mismatch?"終値との不一致により表示保留":"日足データ利用不可");
-  $("detailCandleChart").innerHTML=drawable?candlestickSvg(rows,{width:technicalChartWidth("detailCandleChart")}):'<div class="history-wait">'+(mismatch?'確定終値との不一致があるため、ローソク足の表示を保留しています。':'詳細ローソク足を利用できません。確定終値の判定とは別です。')+'</div>';
+  const titleDate=String(d.latest_ohlc_date||"--").replaceAll("-","/");
+  setText("detailCandleMeta",drawable?`直近 ${rows.length}本 / 四本値確定 ${titleDate}${basisDiff?" / 参考（基準日不一致）":""}`:
+    mismatch?"終値との不一致により表示保留":candlePeriod==="200"?"長期履歴の照合待ち":"日足データ利用不可");
+  const wrap=$("candleScrollWrap");if(wrap)wrap.classList.toggle("ix-long-candles",long);
+  const selector=$("candlePeriodSelect");if(selector&&selector.value!==candlePeriod)selector.value=candlePeriod;
+  $("detailCandleChart").innerHTML=drawable?candlestickSvg(rows,{width:long?1500:technicalChartWidth("detailCandleChart")}):
+    '<div class="history-wait">'+(mismatch?'確定終値との不一致があるため、ローソク足の表示を保留しています。':
+      candlePeriod==="200"?'照合できた長期四本値がありません。':'詳細ローソク足を利用できません。確定終値の判定とは別です。')+'</div>';
+  const feedback=$("candlePeriodFeedback");
+  if(feedback){feedback.classList.remove("ix-warning");feedback.textContent=drawable?
+    (long?"保存済み200本と現在の60本の四本値を照合済み。横スクロールで確認できます。長期の移動平均・出来高は未表示です。":
+    "直近"+rows.length+"本の確定OHLCを表示します。拡大ボタンで詳しく確認できます。"):
+    "履歴の品質・基準日を確認してください。";
+  }
   const warnings=[];
   if(mismatch)warnings.push("終値との不一致により表示保留");
   else if(!d.available)warnings.push("日足データを利用できません");
@@ -1017,6 +1063,7 @@ function renderDetailChart(){
   const notes=[d.note||"日足の詳細確認用です。"];
   if(basisDiff)notes.push(`確定終値は ${d.latest_confirmed_date}、ローソク足は ${d.latest_ohlc_date} が基準です。`);
   notes.push("出来高は未提供または対象未確認のため分析に使用しません。");
+  if(long)notes.push("200本は四本値のみ。長期MAは元履歴に含まれないため補完しません。");
   if(mismatch)notes.push("確定終値との不一致があるためチャートを保留します。");
   if(errors.length)notes.push("取得状況："+errors.join(" / "));
   setText("detailCandleDetails",notes.join("\n"));
