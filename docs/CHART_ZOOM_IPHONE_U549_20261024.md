@@ -37,3 +37,11 @@ Only after safe code/CI and a distinct **explicit approval** may the new Public 
 PENDING-014 (GitHub-only on-time 14:00), independent trigger state, Burn-in, and predictive method adoption are separate and remain unchanged.
 
 **Rollback:** a forward-only UI rollback/fix through Public PR; retain purchased/review records, all existing JSON, data provenance, and other PWA cache namespaces.
+
+## Actual Chromium browser geometry verification
+
+- PR candidate code pinned to `b19ef9585753bd3a9f319da0b8876351d74f4cbd`. Verified by isolated read-only Actions [run 40094425194](https://github.com/nakayama2536-happy/India_1400/actions/runs/40094425194); completed SUCCESS, no deployment. The isolated branch differs from the pinned code only by its verification workflow and is not included in this PR.
+- Real Chromium CSS layout plus CDP device emulation at **320×700**, **375×812**, **393×852**, **430×932** portrait and **844×390** landscape (DPR 2/3) were all PASS. The 250% RSI zoom retained **260 CSS px height** for the four portrait widths and **190 CSS px** in landscape, with fixed modal/header/close-button placement inside the viewport, horizontal-only scrolling, visible RSI 50 reference colors, and gesture-event prevention on the open modal.
+- Earlier isolated verification runs failed on runner shallow Git ancestry, fixed-size fixture viewport, or overly strict landscape-height expectations; the final successful run explicitly corrected these *verification fixtures*, not the business data or trade/forecast criteria. Existing candidate PR head remained unchanged during that verification.
+- Main PR final CI for the code SHA `b19ef9585753bd3a9f319da0b8876351d74f4cbd`: **9/9 success**, full Node 195/195, chart 47/47, PR Validation 93/93, Security/Cache/Purchase/Publication/Review History/Deep Dive successful.
+- **Limit**: Chromium/DevTools emulation is not iPhone Safari or installed PWA gesture verification. On-device v5.49 recheck remains the remaining UI acceptance gate. No automatic promotion to DEVICE_PASS, formal trading, or GitHub-only natural 14:00 proof.
