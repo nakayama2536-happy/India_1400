@@ -790,9 +790,45 @@ function renderDataTimes(){const el=$("dataTimes");if(!el||!market)return;el.inn
 function renderClockDependent(){if(!market)return;const cw=checkWindowStatus();setText("checkWindowState",cw.label);const el=$("checkWindowState");if(el)el.className="pill "+cw.cls;setText("nextAction","次のアクション："+cw.action);renderReferenceTimes();renderDataTimes();renderYenContext()}
 function qualityTone(value){return["PASS","FRESH","LATEST","ELIGIBLE","CAPTURED"].includes(String(value||"").toUpperCase())?"ok":["FAIL","STALE","MISSING","ERROR","MISSED","CALENDAR_UNVERIFIED","UNKNOWN"].includes(String(value||"").toUpperCase())?"ng":"warn"}
 function runtimeSnapshotFreshness(){const ms=market?.operational_state||market?.market_state||{},live=ms.code==="LIVE"||ms.raw_code==="LIVE"||ms.state==="OPEN";if(!live)return{stale:false,reason:"NOT_LIVE"};const now=Date.now(),gen=Date.parse(market?.generated_at_jst||""),quote=Date.parse(market?.nifty?.as_of_jst||""),valid=t=>Number.isFinite(t)&&now>=t&&now-t<=20*60000;return{stale:!(valid(gen)&&valid(quote)),reason:valid(gen)&&valid(quote)?"CURRENT":"LIVE_SNAPSHOT_AGED"}}
-function renderQualityOverview(){const el=$("qualityTopSummary");if(!el||!market)return;const cq=commonSnapshot?.data_quality||{},mq=market?.data_quality||{},qs=market?.quality_state||{},acq=market?.acquisition_status||{},runtimeStale=runtimeSnapshotFreshness().stale;const qc=cq.qc_state||((mq.critical_reasons||[]).length?"FAIL":"PASS"),ds=runtimeStale?"STALE":(cq.data_state||qs.code||"--"),ac=acq.code||"UNKNOWN";const qcText={PASS:"品質良好",WARN:"品質注意",FAIL:"品質異常"}[qc]||qc;const dsText=runtimeStale?"更新要確認":({FRESH:"データ最新",PARTIAL:"一部参考",STALE:"データ古い",MISSING:"データ不足"}[ds]||qs.label||ds);const acText={CAPTURED:"14:00取得済",PENDING:"14:00取得待ち",WAITING_WINDOW:"14:00判定待ち",MISSED:"14:00欠測",NOT_APPLICABLE:"14:00対象外",CALENDAR_UNVERIFIED:"営業日未検証",UNKNOWN:"取得状態不明"}[ac]||ac;el.innerHTML=`<div class="quality-top-item ${qualityTone(qc)}"><span>品質</span><b>${qcText}</b></div><div class="quality-top-item ${qualityTone(ds)}"><span>鮮度</span><b>${dsText}</b></div><div class="quality-top-item ${qualityTone(ac)}"><span>14:00</span><b>${acText}</b></div>`}
+function renderQualityOverview(){
+  const el=$("qualityTopSummary");if(!el||!market)return;
+  const cq=commonSnapshot?.data_quality||{},mq=market?.data_quality||{},qs=market?.quality_state||{},acq=market?.acquisition_status||{},runtimeStale=runtimeSnapshotFreshness().stale;
+  const qc=cq.qc_state||((mq.critical_reasons||[]).length?"FAIL":"PASS");
+  const ds=runtimeStale?"STALE":(cq.data_state||qs.code||"--");
+  const ac=acq.code||"UNKNOWN";
+  const qcText={PASS:"品質良好",WARN:"品質注意",FAIL:"品質異常"}[qc]||qc;
+  const dsText=runtimeStale?"更新要確認":({FRESH:"データ最新",PARTIAL:"一部参考",STALE:"データ古い",MISSING:"データ不足"}[ds]||qs.label||ds);
+  const acText={CAPTURED:"14:00取得済",PENDING:"14:00取得待ち",WAITING_WINDOW:"14:00判定待ち",MISSED:"14:00欠測",NOT_APPLICABLE:"14:00対象外",CALENDAR_UNVERIFIED:"営業日未検証",UNKNOWN:"取得状態不明"}[ac]||ac;
+  const escape=x=>String(x??"--").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const tile=(key,label,value,status)=>'<button type="button" class="quality-top-item ix-quality-tile '+qualityTone(status)+'" data-quality-target="'+key+'" aria-controls="'+({qc:"qualityReasons",freshness:"dataTimes",capture:"captureEvidence"}[key])+'"><span>'+label+'</span><b>'+escape(value)+'</b></button>';
+  el.innerHTML=tile("qc","品質",qcText,qc)+tile("freshness","鮮度",dsText,ds)+tile("capture","14:00",acText,ac);
+}
+function renderCaptureEvidence(){
+  const el=$("captureEvidence");if(!el||!market)return;
+  const a=market.acquisition_status||{},esc=referenceText;
+  const origin=a.capture_origin?.code||"UNKNOWN",label=a.capture_origin?.label||"取得由来未確認";
+  const at=a.selected_price_as_of_jst?fmtJstShort(a.selected_price_as_of_jst)+" JST":"保存採用時刻なし";
+  const generated=a.selected_generated_at_jst?fmtJstShort(a.selected_generated_at_jst)+" JST":"保存生成時刻なし";
+  const originNote=origin==="EXTERNAL_TRIGGER"?"外部起動タグです。GitHub-onlyの自然取得実績には含めません。":
+    origin==="UNKNOWN"?"取得元の確証がないため定時取得の成功とは断定できません。":
+    "取得イベントと保存時刻を照合してください。取得済み表示だけでは実行の適時性を保証しません。";
+  const status=a.code||"UNKNOWN",caption=status==="CAPTURED"?"代表値保存済み（現在の購入資格とは別）":
+    status==="NOT_APPLICABLE"?"対象外（休場理由を確認）":"未取得・欠測・未確認は推定補完しません。";
+  el.innerHTML='<h4>14:00取得証拠（保存時点）</h4>'+
+    '<p>状態：'+esc(status)+' / '+esc(caption)+'</p>'+
+    '<p>対象日：'+esc(a.date_jst||"--")+' / 採用した価格の時刻：'+esc(at)+'</p>'+
+    '<p>生成時刻：'+esc(generated)+' / 保存由来：'+esc(label)+'（'+esc(origin)+'）</p>'+
+    '<p>'+esc(originNote)+'</p>';
+}
 async function fetchJson(path){const r=await fetch(`${path}?v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}
-async function refreshData(silent=false){try{const [m,fund,common]=await Promise.all([fetchJson("market.json"),fetchJson("india_core.json").catch(()=>null),fetchJson("common_snapshot.json").catch(()=>null)]);const old=lastGenerated;market=m;indiaCore=fund;commonSnapshot=common;lastGenerated=m.generated_at_jst||null;renderAll();renderIndiaCoreTrend();if(!silent)toast(old&&old!==lastGenerated?"新しいデータを読み込みました":"最新保存データを読み込みました");return !!(old&&old!==lastGenerated)}catch(e){toast(`読込失敗: ${e.message}`,4500);return false}}
+async function refreshData(silent=false){try{const [m,fund,common]=await Promise.all([fetchJson("market.json"),fetchJson("india_core.json").catch(()=>null),fetchJson("common_snapshot.json").catch(()=>null)]);const old=lastGenerated,oldChartKey=candleSnapshotKey();
+    market=m;indiaCore=fund;commonSnapshot=common;lastGenerated=m.generated_at_jst||null;
+    if(oldChartKey!==candleSnapshotKey()){
+      candleLongRows=null;candleLongKey=null;
+      if(candlePeriod==="200")candlePeriod="60";
+      if(chartExperience)chartExperience.close();
+    }
+    renderAll();renderIndiaCoreTrend();if(!silent)toast(old&&old!==lastGenerated?"新しいデータを読み込みました":"最新保存データを読み込みました");return !!(old&&old!==lastGenerated)}catch(e){toast(`読込失敗: ${e.message}`,4500);return false}}
 const POLL_INTERVAL_MS=5000,POLL_MAX_ATTEMPTS=48;
 function startPolling(){if(pollTimer)clearInterval(pollTimer);let n=0;pollTimer=setInterval(async()=>{n++;if(await refreshData(true)){clearInterval(pollTimer);pollTimer=null;localStorage.removeItem("india1400.awaitUpdate");toast("更新完了を検知しました",4500);return}if(n>=POLL_MAX_ATTEMPTS){clearInterval(pollTimer);pollTimer=null;toast("反映確認が4分を超えました。GitHub実行結果を確認し、必要なら「最新データを読み込む」を押してください。",6500)}},POLL_INTERVAL_MS)}
 function openUpdate(){localStorage.setItem("india1400.awaitUpdate","1");window.open(REPO_WORKFLOW_URL,"_blank","noopener");toast("GitHubで Run workflow を実行してください。反映まで数分かかる場合があります。",5000);startPolling()}
@@ -997,7 +1033,20 @@ function renderIndicators(){
   renderDataTimes();
 }
 function renderForecast(){const f=market?.technical_forecast||{};setText("forecastWarning",f.warning||"");if(!f.available){setText("forecastBasis",f.message||"予測を算出できません。");return}setText("forecastBasis",`${f.basis} / 基準 ${f.basis_date} / 基準価格 ${fmt(f.basis_price,2)} / ${f.basis_consistency==="OK"?"時点統一 OK":"時点確認"} / 類似 ${f.analog_count}局面 / ${f.method}`)}
-function renderForecastVerification(){const v=market?.forecast_verification||{},hs=v.horizons||{};const card=(d)=>{const h=hs[String(d)]||{},n=Number(h.evaluated_count||0);if(!n)return `<div class="forecast"><div class="day">${d}営業日</div><div class="dir neutral">検証待ち</div><div class="range">評価 0件</div></div>`;return `<div class="forecast"><div class="day">${d}営業日</div><div class="dir">${n}件</div><div class="ret">誤差中央値 ${fmt(h.median_absolute_return_error_pct,2)}pt</div><div class="range">中央50%内 ${fmt(h.range_25_75_hit_pct,1)}%<br>方向一致 ${fmt(h.direction_match_pct,1)}%<br>標本 ${h.sample_adequacy||"--"}</div></div>`};$("verificationSummary").innerHTML=card(1)+card(3)+card(14);setText("verificationNote",`保存予測 ${v.forecast_count??0}件 / 検証待ち ${v.pending_count??0}件。 ${v.note||"14:00予測が蓄積すると、実際の値と照合して自動評価します。"}`)}
+function renderForecastVerification(){
+  const v=market?.forecast_verification||{},hs=v.horizons||{};
+  const card=d=>{
+    const h=hs[String(d)]||{},value=h.evaluated_count,n=Number.isInteger(value)&&value>=0?value:null;
+    if(n===null)return '<div class="forecast"><div class="day">'+d+'営業日</div><div class="dir neutral">評価件数不明</div><div class="range">正式評価の件数を確認できません。</div></div>';
+    const progress=Math.min(100,Math.round(n/30*100));
+    const phase=n<10?"蓄積中":n<30?"初期傾向":n<100?"レビュー可能":"100件到達";
+    const head='<div class="forecast"><div class="day">'+d+'営業日</div><div class="dir">'+n+'件</div><div class="ix-progress" role="progressbar" aria-valuenow="'+Math.min(n,30)+'" aria-valuemin="0" aria-valuemax="30" aria-label="'+d+'営業日のレビュー準備件数"><span class="ix-progress-fill" style="width:'+progress+'%"></span></div><div class="ix-progress-meta">'+phase+' / ロジック検証目安30件</div>';
+    if(n===0)return head+'<div class="range">検証待ち・予測精度は未評価</div></div>';
+    return head+'<div class="ret">誤差中央値 '+fmt(h.median_absolute_return_error_pct,2)+'pt</div><div class="range">中央50%内 '+fmt(h.range_25_75_hit_pct,1)+'%<br>方向一致 '+fmt(h.direction_match_pct,1)+'%<br>標本 '+(h.sample_adequacy||"未確認")+'</div></div>';
+  };
+  $("verificationSummary").innerHTML=card(1)+card(3)+card(14);
+  setText("verificationNote","保存予測 "+(v.forecast_count??"未確認")+"件 / 検証待ち "+(v.pending_count??"未確認")+"件。各期間30件でも自動採用しません。 "+(v.note||"将来の確定終値と照合して評価します。"));
+}
 function candlePath(points,key,x,y){let d="";points.forEach((p,i)=>{const v=Number(p[key]);if(!Number.isFinite(v))return;d+=(d?" L ":"M ")+x(i).toFixed(1)+" "+y(v).toFixed(1)});return d}
 function candlestickSvg(points,options){
   return typeof IndiaTechnicalCharts!=="undefined"?IndiaTechnicalCharts.candlestickChart(points,options):'<div class="history-wait">チャート表示部品を読み込めません。再読込してください。</div>';
@@ -1125,7 +1174,16 @@ async function importDeepDiveReviews(file){
 }
 
 function renderDeepDiveTrigger(){const card=$("deepDiveTriggerCard");if(!card||typeof evaluateDeepDiveTriggers!=="function")return;const ctx=currentDeepDiveTriggerContext(),eligible=decisionDisplayEligible(market?.trade_guide,market?.data_quality,market?.execution_plan),cls=ctx.level_code==="PRIORITY"?"ng":ctx.level_code==="RECOMMENDED"||!eligible?"warn":"ok";card.className="card hero "+cls;setText("deepDiveTriggerLevel",!eligible&&!ctx.active_count?"保存データではトリガーなし":ctx.level_label||"--");setText("deepDiveTriggerCount",ctx.active_count?ctx.active_count+"系統ON":"トリガーなし");$("deepDiveTriggerCount").className="pill "+cls;const cats=ctx.categories||[],tiles=cats.map(x=>{const state=!x.active?(eligible?"good":"warn"):x.severity>=2?"bad":"warn",status=!x.active?"非該当（保存時点）":x.severity>=2?"優先":"推奨",detail=x.detail||x.summary||"";return statusTileHtml(x.label||"--",x.active?"ON":"OFF",state,status,detail)});$("deepDiveTriggerCategories").innerHTML=tiles.join("");const reasons=(ctx.reasons||[]).slice(0,4);$("deepDiveTriggerReasons").innerHTML=reasons.length?reasons.map(x=>`<div class="reason"><span class="dot"></span><div>${x}</div></div>`).join(""):`<div class="note">保存時点のデータでは追加分析トリガーはありません。現在の鮮度・不足データは「参照データ時刻」と「為替の影響（参考）」で別途確認してください。品質正常や購入可能を意味しません。</div>`}
-function openQualityPanel(){const btn=document.querySelector('.tab[data-page="detail"]'),panel=$("qualityPanel");if(!btn||!panel)return;btn.click();panel.open=true;setTimeout(()=>{panel.scrollIntoView({behavior:"smooth",block:"start"});panel.querySelector("summary")?.focus({preventScroll:true})},220)}
+function openQualityPanel(target){
+  const btn=document.querySelector('.tab[data-page="detail"]'),panel=$("qualityPanel");if(!btn||!panel)return;
+  const id=typeof target==="string"&&["qualityReasons","dataTimes","captureEvidence"].includes(target)?target:"qualityTopSummary";
+  btn.click();panel.open=true;
+  setTimeout(()=>{
+    const el=$(id)||panel;
+    el.scrollIntoView({behavior:"smooth",block:"start"});
+    (el.hasAttribute("tabindex")?el:panel.querySelector("summary"))?.focus({preventScroll:true});
+  },220);
+}
 function openDeepDivePanel(){const btn=document.querySelector('.tab[data-page="detail"]');if(btn)btn.click();setTimeout(()=>$("deepDivePanel")?.scrollIntoView({behavior:"smooth",block:"start"}),220)}
 let updateDiagnosticText="";
 async function investigateUpdate(){
@@ -1151,8 +1209,15 @@ $("diagnosticBuildBtn").addEventListener("click",investigateUpdate);
 $("diagnosticCopyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(updateDiagnosticText);toast("調査結果・対策依頼をコピーしました")}catch(e){setText("diagnosticStatus","コピーできません。以下を選択してコピーしてください。\n"+updateDiagnosticText)}});
 $("diagnosticWorkflowBtn").addEventListener("click",()=>window.open(REPO_WORKFLOW_URL,"_blank","noopener"));
 $("diagnosticReloadBtn").addEventListener("click",()=>refreshData(false));
-function renderAll(){renderDecision();renderQualityOverview();renderReferenceTimes();renderMarketSupplement();renderPurchaseProgress();renderIndicators();renderForecast();renderForecastVerification();renderDetailChart();renderDetail();renderDeepDiveTrigger();renderDeepDiveReview();lastClockPresentationKey=clockPresentationKey()}
-$("qualityDetailsBtn").addEventListener("click",openQualityPanel);$("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);$("resetPurchaseBtn").addEventListener("click",resetPurchaseState);$("deepDiveBuildBtn").addEventListener("click",async()=>{await buildDeepDiveArtifact();renderDeepDiveReview()});$("deepDiveShareBtn").addEventListener("click",shareDeepDiveArtifact);$("deepDiveSaveBtn").addEventListener("click",saveDeepDiveArtifact);$("deepDiveCopyBtn").addEventListener("click",copyDeepDiveArtifact);$("deepDiveTriggerOpenBtn").addEventListener("click",openDeepDivePanel);document.querySelectorAll("[data-review-utility]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-review-utility]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected")}));$("deepDiveReviewSaveBtn").addEventListener("click",saveDeepDiveReview);$("deepDiveReviewCopyBtn").addEventListener("click",copyDeepDiveReviewHistory);$("deepDiveReviewBackupBtn").addEventListener("click",backupDeepDiveReviews);$("deepDiveReviewImportBtn").addEventListener("click",()=>$("deepDiveReviewImportFile").click());$("deepDiveReviewImportFile").addEventListener("change",async e=>{const file=e.target.files?.[0];e.target.value="";if(file)await importDeepDiveReviews(file)});let lastClockPresentationKey=null;
+function renderAll(){renderDecision();renderQualityOverview();renderCaptureEvidence();renderReferenceTimes();renderMarketSupplement();renderPurchaseProgress();renderIndicators();renderForecast();renderForecastVerification();renderDetailChart();renderDetail();renderDeepDiveTrigger();renderDeepDiveReview();lastClockPresentationKey=clockPresentationKey()}
+$("qualityDetailsBtn").addEventListener("click",()=>openQualityPanel());
+$("qualityTopSummary").addEventListener("click",e=>{
+  const tile=e.target.closest("[data-quality-target]");if(!tile)return;
+  const path={qc:"qualityReasons",freshness:"dataTimes",capture:"captureEvidence"};
+  const target=path[tile.dataset.qualityTarget];if(target)openQualityPanel(target);
+});
+$("candlePeriodSelect").addEventListener("change",changeCandlePeriod);
+if(chartExperience)chartExperience.bind();$("refreshBtn").addEventListener("click",()=>refreshData(false));$("updateBtn").addEventListener("click",openUpdate);$("resetPurchaseBtn").addEventListener("click",resetPurchaseState);$("deepDiveBuildBtn").addEventListener("click",async()=>{await buildDeepDiveArtifact();renderDeepDiveReview()});$("deepDiveShareBtn").addEventListener("click",shareDeepDiveArtifact);$("deepDiveSaveBtn").addEventListener("click",saveDeepDiveArtifact);$("deepDiveCopyBtn").addEventListener("click",copyDeepDiveArtifact);$("deepDiveTriggerOpenBtn").addEventListener("click",openDeepDivePanel);document.querySelectorAll("[data-review-utility]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-review-utility]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected")}));$("deepDiveReviewSaveBtn").addEventListener("click",saveDeepDiveReview);$("deepDiveReviewCopyBtn").addEventListener("click",copyDeepDiveReviewHistory);$("deepDiveReviewBackupBtn").addEventListener("click",backupDeepDiveReviews);$("deepDiveReviewImportBtn").addEventListener("click",()=>$("deepDiveReviewImportFile").click());$("deepDiveReviewImportFile").addEventListener("change",async e=>{const file=e.target.files?.[0];e.target.value="";if(file)await importDeepDiveReviews(file)});let lastClockPresentationKey=null;
 function clockPresentationKey(){return new Date(Date.now()+9*3600000).toISOString().slice(0,10)+"|"+(runtimeSnapshotFreshness().stale?"STALE":"CURRENT")+"|"+(decisionDisplayEligible(market?.trade_guide,market?.data_quality,market?.execution_plan)?"ELIGIBLE":"HOLD")}
 function renderClockTick(){
  if(!market)return;
