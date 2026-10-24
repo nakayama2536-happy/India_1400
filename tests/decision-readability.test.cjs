@@ -29,7 +29,7 @@ test('compact judgment retains dynamic action and all four always-visible safety
   }
   const status=hero.slice(hero.indexOf('class="statusline"'),hero.indexOf('id="nextAction"'));
   assert.doesNotMatch(status,/<details\b/,'quality, eligibility and forecast states cannot be hidden');
-  assert.match(html,/setText\("nextAction","次の確認:"/); // Remove prefix spacing as a visual-only change.
+  assert.match(html,/setText\("nextAction","次の確認："+cw\.action\)/); // Presentation prefix only; action source unchanged.
 });
 
 test('forecast reference warning, date and detailed provenance are retained',()=>{
@@ -97,7 +97,7 @@ test('quality states and next check are not sacrificed for shorter explanatory t
   assert.match(html,/function renderClockDependent\(\)/);
   assert.match(html,/const cw=checkWindowStatus\(\)/);
   assert.match(html,/setText\("checkWindowState",cw\.label\)/);
-  assert.match(html,/setText\("nextAction","次の確認:"+cw\.action\)/);
+  assert.match(html,/setText\("nextAction","次の確認："+cw\.action\)/);
   assert.match(html,/function runtimeSnapshotFreshness\(\)/);
   assert.match(html,/decisionDisplayEligible\(g,q,market\?\.execution_plan\)/);
   assert.match(html,/setText\("qualityGate",runtimeStale/);
