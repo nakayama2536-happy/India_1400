@@ -1,6 +1,9 @@
 /* India UI 5.48: opt-in chart expansion and evidence navigation. Presentation only. */
 .ix-expand{flex:0 0 auto;min-height:44px;border:1px solid #41618a;background:#192943;color:#dfeaff;border-radius:10px;padding:7px 11px;font-size:13px;font-weight:800;cursor:pointer}
 .ix-expand:focus-visible,.ix-period:focus-visible,.ix-quality-tile:focus-visible,.ix-modal button:focus-visible{outline:3px solid #70a9ff;outline-offset:2px}
+#page-indicators .chart-head{flex-wrap:wrap;row-gap:8px}
+#page-indicators .chart-head>.ix-expand{margin-left:auto}
+#page-indicators .indicator-heading-right{flex-wrap:wrap;min-width:0}
 .ix-chart-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:5px 0 9px}
 .ix-period-label{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;font-weight:700}
 .ix-period{color:var(--text);background:#192943;border:1px solid #41618a;border-radius:10px;min-height:44px;padding:8px 10px;font-size:14px;font-weight:750}
