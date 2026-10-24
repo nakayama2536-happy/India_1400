@@ -62,28 +62,62 @@
     if(String(period)==='30')return detail.candles.slice(-30);
     return detail.candles.slice(-60);
   }
-  function createController(win){
+  const EXPANDED_HEIGHTS=Object.freeze({
+    indiaCoreTrendChart:480,niftyChart:320,rsiChart:260,macdChart:260,detailCandleChart:350
+  });
+  function expandedGeometry(id,viewportWidth,viewportHeight,zoom,baseWidth=0){
+    const factor=Math.max(1,Math.min(2.5,Math.round(Number(zoom||1)*100)/100));
+    const width=Math.min(4200,Math.ceil(Math.max(180,Number(viewportWidth)||0,Number(baseWidth)||0)*factor));
+    const room=Math.max(190,(Number(viewportHeight)||760)-200);
+    const height=Math.min(EXPANDED_HEIGHTS[id]||320,room);
+    return {width,height,zoom:factor};
+  }
+  function createController(win,options={}){
     const doc=win.document;
-    let overlay=null,lastFocus=null,active='',zoom=1,baseWidth=0,pinch=null;
-    const clamp=v=>Math.max(1,Math.min(2.5,Math.round(v*100)/100));
+    let overlay=null,lastFocus=null,active='',zoom=1,baseWidth=0,pinch=null,pinchFrame=0;
+    const renderExpanded=typeof options.renderExpandedChart==='function'?options.renderExpandedChart:null;
     function close(){
       if(!overlay||overlay.hidden)return;
       overlay.hidden=true;doc.body.classList.remove('ix-modal-open');
       pinch=null;active='';
+      if(pinchFrame&&win.cancelAnimationFrame)win.cancelAnimationFrame(pinchFrame);
+      pinchFrame=0;
       if(lastFocus&&typeof lastFocus.focus==='function')lastFocus.focus({preventScroll:true});
       lastFocus=null;
     }
     function applyZoom(next,latest=false){
-      if(!overlay)return;
-      zoom=clamp(next);
+      if(!overlay||overlay.hidden||!active)return;
       const body=overlay.querySelector('.ix-modal-body'),content=overlay.querySelector('.ix-modal-content');
-      const available=Math.max(1,body.clientWidth);
       const oldMax=Math.max(0,body.scrollWidth-body.clientWidth);
       const ratio=oldMax?body.scrollLeft/oldMax:1;
-      content.style.width=Math.ceil(Math.max(available,baseWidth)*zoom)+'px';
+      const shape=expandedGeometry(active,body.clientWidth,win.innerHeight,next,baseWidth);
+      zoom=shape.zoom;
+      content.style.width=shape.width+'px';
+      content.style.setProperty('--ix-chart-height',shape.height+'px');
+      // A wider drawing frame with the SAME Y-height, never width:auto
+      // scaling of a fixed-viewBox SVG (which enlarged the whole iPhone page).
+      const width=Math.max(180,shape.width-16); // existing horizontal padding
+      if(renderExpanded){
+        try {
+          const markup=renderExpanded(active,width,shape.height);
+          if(typeof markup!=='string'||!/^<svg\b/.test(markup.trim()))throw Error('chart-unavailable');
+          content.innerHTML=markup; // output of existing trusted display-only renderer
+        }catch(_){
+          content.textContent='保存データを確認できないため拡大表示を保留しています。';
+        }
+      }
       overlay.querySelector('.ix-zoom-label').textContent=Math.round(zoom*100)+'%';
-      const max=Math.max(0,content.offsetWidth-body.clientWidth);
+      const max=Math.max(0,body.scrollWidth-body.clientWidth);
       body.scrollLeft=latest?max:max*ratio;
+    }
+    function schedulePinch(){
+      if(pinchFrame)return;
+      const callback=()=>{
+        pinchFrame=0;
+        if(pinch&&overlay&&!overlay.hidden)applyZoom(pinch.zoom*pinch.latestRatio);
+      };
+      if(win.requestAnimationFrame)pinchFrame=win.requestAnimationFrame(callback);
+      else callback();
     }
     function ensure(){
       if(overlay)return overlay;
@@ -94,7 +128,7 @@
       overlay.setAttribute('role','dialog');
       overlay.setAttribute('aria-modal','true');
       overlay.setAttribute('aria-labelledby','ixModalTitle');
-      overlay.innerHTML='<section class="ix-modal-panel"><header class="ix-modal-head"><strong id="ixModalTitle">グラフ拡大</strong><button type="button" class="ix-close" data-ix-close>閉じる</button></header><div class="ix-modal-tools"><button type="button" data-ix-zoom="-1" aria-label="縮小">−</button><span class="ix-zoom-label" aria-live="polite">100%</span><button type="button" data-ix-zoom="1" aria-label="拡大">＋</button><button type="button" data-ix-fit>画面に合わせる</button></div><div class="ix-modal-body" tabindex="0" aria-label="拡大グラフ。横スクロール可能"><div class="ix-modal-content"></div></div><p class="ix-modal-note">表示中の保存データのみを拡大します。売買判定・保存値は変更しません。</p></section>';
+      overlay.innerHTML='<section class="ix-modal-panel"><header class="ix-modal-head"><strong id="ixModalTitle">グラフ拡大</strong><button type="button" class="ix-close" data-ix-close>閉じる</button></header><div class="ix-modal-tools"><button type="button" data-ix-zoom="-1" aria-label="縮小">−</button><span class="ix-zoom-label" aria-live="polite">100%</span><button type="button" data-ix-zoom="1" aria-label="拡大">＋</button><button type="button" data-ix-fit>画面に合わせる</button></div><div class="ix-modal-body" tabindex="0" aria-label="拡大グラフ。横スクロール可能"><div class="ix-modal-content"></div></div><p class="ix-modal-note">グラフを横方向に拡大します。高さは固定です。左右のスクロールで値動きを確認できます。売買判定・保存値は変更しません。</p></section>';
       doc.body.appendChild(overlay);
       overlay.addEventListener('click',e=>{
         if(e.target===overlay||e.target.closest('[data-ix-close]')){close();return;}
@@ -104,15 +138,29 @@
       });
       const body=overlay.querySelector('.ix-modal-body');
       const distance=ts=>Math.hypot(ts[0].clientX-ts[1].clientX,ts[0].clientY-ts[1].clientY);
+      // On iOS the browser can otherwise zoom the entire PWA (including
+      // the dialog header) instead of only the selected chart. Suppress
+      // Safari's legacy gesture defaults only while this dialog is open.
+      for(const type of ['gesturestart','gesturechange']){
+        overlay.addEventListener(type,e=>{if(!overlay.hidden)e.preventDefault();},{passive:false});
+      }
       body.addEventListener('touchstart',e=>{
-        if(e.touches.length===2)pinch={distance:distance(e.touches),zoom};
-      },{passive:true});
+        if(e.touches.length===2){
+          e.preventDefault();
+          pinch={distance:distance(e.touches),zoom,latestRatio:1};
+        }
+      },{passive:false});
       body.addEventListener('touchmove',e=>{
         if(e.touches.length!==2||!pinch||pinch.distance<=0)return;
-        e.preventDefault();applyZoom(pinch.zoom*distance(e.touches)/pinch.distance);
+        e.preventDefault();
+        pinch.latestRatio=distance(e.touches)/pinch.distance;
+        schedulePinch();
       },{passive:false});
       for(const type of ['touchend','touchcancel'])body.addEventListener(type,e=>{
         if(e.touches.length<2)pinch=null;
+      },{passive:true});
+      win.addEventListener('resize',()=>{
+        if(overlay&&!overlay.hidden)applyZoom(zoom,false);
       },{passive:true});
       doc.addEventListener('keydown',e=>{
         if(overlay.hidden)return;
@@ -154,5 +202,5 @@
     }
     return Object.freeze({open,close,bind,active:()=>active});
   }
-  return Object.freeze({validateLongCandles,rowsForPeriod,createController});
+  return Object.freeze({validateLongCandles,rowsForPeriod,expandedGeometry,createController});
 });

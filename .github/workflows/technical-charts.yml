@@ -18,4 +18,4 @@ jobs:
         run: |
           node --check technical-charts.js
           node --check chart-experience.js
-          node --test tests/indicator-charts.test.cjs tests/technical-charts.test.cjs tests/chart-experience.test.cjs
+          node --test tests/indicator-charts.test.cjs tests/technical-charts.test.cjs tests/chart-experience.test.cjs tests/chart-zoom-mobile.test.cjs

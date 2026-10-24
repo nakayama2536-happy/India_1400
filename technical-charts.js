@@ -41,8 +41,17 @@
     return {min,max,step,ticks};
   }
   function frame(rows, values, kind, options) {
-    const w = Math.max(180, Math.min(1600, finite(options.width) && Number(options.width) > 0 ? Number(options.width) : 360));
-    const h = kind === 'nifty' ? 216 : kind === 'candle' ? 294 : kind === 'rsi' ? 142 : 148;
+    // The embedded view keeps the original 1600px bound. A user-opened
+    // viewport may scroll horizontally through a wider saved 200-row chart.
+    const expanded = finite(options.height) && Number(options.height) > 0;
+    const widthLimit = expanded ? 4200 : 1600;
+    const w = Math.max(180, Math.min(widthLimit, finite(options.width) && Number(options.width) > 0 ? Number(options.width) : 360));
+    const defaultHeight = kind === 'nifty' ? 216 : kind === 'candle' ? 294 : kind === 'rsi' ? 142 : 148;
+    // An opt-in expanded view can use a taller drawing area without scaling
+    // SVG labels or changing the normal embedded chart geometry.
+    const requestedHeight = finite(options.height) ? Number(options.height) : NaN;
+    const h = Number.isFinite(requestedHeight) && requestedHeight >= 190 ?
+      Math.min(500, Math.round(requestedHeight)) : defaultHeight;
     const left = 10, right = 59, top = 14, bottom = 25;
     let scale = niceScale(values);
     if (kind === 'rsi') scale = {min:0,max:100,ticks:[0,30,50,70,100],step:20};
