@@ -2,7 +2,7 @@
 
 Date: 2026-10-25 JST.
 Public baseline main: `59cc0a26653f51023fb66c1b9afd09b65b571c53` (UI 5.51).
-Status: branch実装候補（PR・CI・配信・実機受入は別に記録）。
+Status (2026-10-25 07:52 JST): **PR #97 merged, final-head 9/9 CI PASS, Pages deployment SUCCESS after safe re-run, live 4-file HTTP hashes MATCH. iPhone 17実機の最終受入は未確認。**
 
 ## 利用者の課題と根拠
 
@@ -59,3 +59,32 @@ Cloudflare、外部トリガー、14:00自然取得/Burn-in、正式売買・レ
 - 同ブランチの初回読取り検証 [run 40113524086](https://github.com/nakayama2536-happy/India_1400/actions/runs/40113524086) はChromiumデバッガの起動待ち不足で失敗。検証専用workflowの待機・診断を修正後、アプリ候補コード変更なしで再検証PASS。
 - 既存CIの `Decision Reasons Contract` による全Nodeは221/221 PASS、Security / Purchase / Cache / Chart / Deep Dive / Review History / Publication Manifest成功。**PR Validationは最終PR headの実行完了を別に確認**し、合格するまでmain反映しない。
 - ChromiumとCIはiPhone実機の文字設定・PWAキャッシュ・端末内記録保持の受入ではない。旧履歴や個人保存値を操作しない。
+
+## 正式反映・公開実証記録（2026-10-25 JST）
+
+本記録はコード採用・自動試験・配信・実機確認を区別する。過去に未完了だったPagesの状態を「いつか完了」と推定せず、実際の再実行と公開ファイルを照合した。
+
+| Gate | 証拠 | 判定 |
+|---|---|---|
+| 画面変更 | Public [PR #97](https://github.com/nakayama2536-happy/India_1400/pull/97) / reviewed head `ee84590c25a089988b63bbc6b16b2c164edb3af2` | MERGED。UI 5.52、commit `b63fe3cabe5a3a00983455c7b8b5a3d88c11f7d1` |
+| 最終PR検証 | Final head 9/9 workflow families SUCCESS、全Node 221/221 PASS。Cache / Purchase / Security / Technical Chart / Deep Dive / Review History / Publication Manifest / Decision Reasons / PR Validation | PASS |
+| 幅別実描画 | 隔離 [Chromium run #40113701870](https://github.com/nakayama2536-happy/India_1400/actions/runs/40113701870) | 320/375/393/402/430pxで7カード・14pxラベル/QC・17–20px値・公式取得元が欠落なし。これはSafari実機ではない |
+| main追加検証 | `b63fe3ca...`のPR Validation、Security、Cache、Technical Chart、Deep Dive、Decision Reasons、Publication ManifestすべてSUCCESS | PASS |
+| Review History main run | [run #40114094341](https://github.com/nakayama2536-happy/India_1400/actions/runs/40114094341) | 当初cancelled、2026-10-25 JST再実行（attempt 2）SUCCESS。購入・レビュー記録を破壊する操作なし |
+| Public安全配信 | [Pages run #40114094344](https://github.com/nakayama2536-happy/India_1400/actions/runs/40114094344) | 初回attempt 1はキャンセル。validate step（public delivery gate 23 tests / unsafe fixture拒否）は成功していたが後段がskip。attempt 2再実行でvalidate→artifact→Pages deployすべてSUCCESS。正確な初回キャンセル原因は未確定 |
+| 最終UI関連manifest | 後続main `2c40bed5c85980ee8ac58d58e48ec38e7bce263f` | `publication_manifest.json`だけ更新、Version SHA-256を5.52に合わせている。市場/購入/評価のJSONは変更していない |
+| 公開HTTPバイト一致 | 独立・読取専用 [run #40140292259](https://github.com/nakayama2536-happy/India_1400/actions/runs/40140292259) | 2026-10-25 07:51 JST、GitHub Pagesの`index.html`、`VERSION`、`sw.js`、`manifest.webmanifest`がソース版とSHA-256で一致。PASS |
+| iPhone17端末受入 | Safari/ホーム画面PWAで既存画面・購入記録を再確認 | **DEVICE_PENDING**。配信完了とiPhoneキャッシュ反映・操作・個人記録を混同しない |
+| 自然市場/正式採用 | Private 14:00 GitHub-only取込 / DECISION Burn-in / 予測評価 / 公式NAV source契約 | **対象外/未検証**。今回のUI配信で完了へ変更しない |
+
+公開ファイルのSHA-256証拠：
+- `index.html`: 167153 bytes / `9592072cdae3416726a3c751d92b76cf6b5319e2a58978e58a03c74973e913f4`
+- `VERSION`: 119 bytes / `2b9a04302801191489ff1cbf56ccdf690caa767f809c110bdc96145cfde573fc`
+- `sw.js`: 3617 bytes / `674f57219993b593bde3ff706234f667d39e0587f6bc9e205aeedcf76b51f739`
+- `manifest.webmanifest`: 774 bytes / `adb35d1bfc9da7bde2175b6da0ef36f871aa58b70f816d305457003082596f75`
+
+### 残る実機の最終確認
+
+同じiPhone 17の判断画面で、公開UI版がv5.52となっているか、NAV周辺7カードのラベル/品質状態/補足/取得元/時刻の読める大きさ、タブ操作、既存購入履歴・レビュー記録が保持されるかを確認する。消去・アンインストール・リセットは不要であり実施しない。iOS画面の確認結果を受けるまでDEVICE_PASSとしない。
+
+初回Pages未配信時にはHTTP hash不一致（旧UI 5.51）が観測されていたが、今回の独立検証で4/4一致に回復した。初回cancel理由の特定やGitHub schedule/外部triggerの本番採否変更はこの表示PRでは実施しない。
