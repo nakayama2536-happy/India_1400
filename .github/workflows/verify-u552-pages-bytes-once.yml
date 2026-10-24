@@ -1,0 +1,54 @@
+name: Verify India UI 5.52 Public Pages Bytes Once
+on:
+  push:
+    branches: ['verify/u552-public-pages-20261025']
+    paths: ['.github/workflows/verify-u552-pages-bytes-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-pages:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u552-public-pages-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin UI 5.52 published candidate exactly
+        run: |
+          git merge-base --is-ancestor b63fe3cabe5a3a00983455c7b8b5a3d88c11f7d1 HEAD
+          test "$(git diff --name-only b63fe3cabe5a3a00983455c7b8b5a3d88c11f7d1 HEAD)" = ".github/workflows/verify-u552-pages-bytes-once.yml"
+          grep -q '^UI_VERSION=5.52$' VERSION
+      - name: Compare live Pages main files and published HTTP bytes
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request, urlopen
+          from pathlib import Path
+          import time, hashlib
+          base='https://nakayama2536-happy.github.io/India_1400/'
+          for file in ('index.html','VERSION','sw.js','manifest.webmanifest'):
+              expected=Path(file).read_bytes()
+              expected_sha=hashlib.sha256(expected).hexdigest()
+              suffix=('' if file=='index.html' else file)
+              url=base+suffix+'?v=5.52&verify='+file.replace('.','_')
+              reason=''
+              for attempt in range(1,8):
+                  try:
+                      request=Request(url,headers={'Cache-Control':'no-cache','Pragma':'no-cache','User-Agent':'India-UI552-ReadOnly-Pages-Verify'})
+                      with urlopen(request,timeout=15) as response:
+                          assert response.status==200,(file,response.status)
+                          actual=response.read()
+                      actual_sha=hashlib.sha256(actual).hexdigest()
+                      if actual_sha==expected_sha:
+                          print('PAGES_EXACT_FILE_MATCH',file,'bytes',len(actual),'sha256',actual_sha)
+                          break
+                      reason='hash mismatch expected '+expected_sha+' actual '+actual_sha
+                  except Exception as e:
+                      reason=str(e)
+                  print('PAGES_VERIFY_RETRY',file,attempt,reason)
+                  if attempt<7:time.sleep(5)
+              else:
+                  raise AssertionError('PAGES_BYTE_MISMATCH_OR_UNAVAILABLE '+file+' '+reason)
+          print('UI552_PUBLIC_PAGES_BYTES_PASS: HTML, VERSION, SW and manifest equal pinned main. Does not prove iPhone Safari cache or personal purchase records.')
+          PY
