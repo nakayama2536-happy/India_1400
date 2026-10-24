@@ -571,7 +571,18 @@ function coreTrendSvg(rows,levels=[],options={}){
   const xAt=i=>p.l+(W-p.l-p.r)*(i/Math.max(1,xs.length-1)),yAt=v=>p.t+(H-p.t-p.b)*(1-(v-lo)/(hi-lo||1));
   const pts=xs.map((x,i)=>xAt(i).toFixed(1)+","+yAt(Number(x.nav_yen)).toFixed(1)).join(" ");
   const grid=[0,.25,.5,.75,1].map(t=>{const v=lo+(hi-lo)*(1-t),y=p.t+(H-p.t-p.b)*t;return`<line class="gridline" x1="${p.l}" y1="${y}" x2="${W-p.r}" y2="${y}"/><text text-anchor="end" x="${p.l-12}" y="${y+7}">${Math.round(v).toLocaleString("ja-JP")}</text>`}).join("");
-  const ticks=[...new Set([0,Math.floor((xs.length-1)/2),xs.length-1])].map(i=>`<text text-anchor="${i===0?"start":i===xs.length-1?"end":"middle"}" x="${xAt(i)}" y="${H-8}">${referenceText(fmtJstShort(xs[i].date))}</text>`).join("");
+  // Fund NAV trend uses the same display-only date readability rule as the
+  // NIFTY expanded chart. Choose labels from observed NAV dates, never from
+  // generated calendar days, and preserve three embedded dates unchanged.
+  const expandedDates=Number.isFinite(Number(options.height))&&Number(options.height)>0;
+  let dateMarks;
+  if(expandedDates){
+    const slot=(W-p.l-p.r)/Math.max(1,xs.length-1);
+    const stride=Math.max(1,Math.ceil(96/Math.max(1,slot)));
+    dateMarks=[];
+    for(let i=xs.length-1;i>=0;i-=stride)dateMarks.unshift(i);
+  }else dateMarks=[...new Set([0,Math.floor((xs.length-1)/2),xs.length-1])];
+  const ticks=dateMarks.map((i,j)=>`<text text-anchor="${j===0?"start":j===dateMarks.length-1?"end":"middle"}" x="${xAt(i)}" y="${H-8}">${referenceText(fmtJstShort(xs[i].date))}</text>`).join("");
   const support=levels.map((s,i)=>{const y=yAt(s.value),label=s.kind==="support"?"S"+(i+1):"安値";return`<line class="support-line ${s.kind}" x1="${p.l}" y1="${y}" x2="${W-p.r}" y2="${y}"/><text class="support-label ${s.kind}" x="${p.l+8}" y="${Math.max(p.t+22,y-12)}">${label} ${fmt(s.value,0)}</text>`+s.touches.map(t=>`<circle class="support-point ${s.kind}" cx="${xAt(t.index)}" cy="${yAt(t.value)}" r="5"/>`).join("")}).join("");
   return`<svg class="chart core-trend-chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="インド・コア基準価額トレンド・下値目安は参考表示">${grid}${support}<polyline class="line-core" points="${pts}"/>${ticks}</svg>`;
 }
