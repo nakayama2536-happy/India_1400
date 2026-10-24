@@ -112,6 +112,9 @@ jobs:
             const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++n;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
             try{
               await cdp('Page.enable');
+    // Prevent this isolated readonly test browser from registering a real PWA worker.
+    // The production service worker source/cache contract is tested separately.
+    await cdp('Page.addScriptToEvaluateOnNewDocument',{source:"Object.defineProperty(navigator,'serviceWorker',{configurable:true,value:{register:()=>Promise.resolve({}),addEventListener:()=>{}}})"});
               for(const [width,height,dpr]of[[320,700,2],[375,812,3],[393,852,3],[402,874,3],[430,932,3]]){
                 await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:dpr,mobile:true,screenWidth:width,screenHeight:height});
                 await cdp('Page.navigate',{url:'http://127.0.0.1:9893/index.html?ui553='+width});
