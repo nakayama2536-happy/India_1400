@@ -27,7 +27,7 @@
     if(raw.schema_version!==1||typeof raw.method_version!=='string'||raw.method_version!==detail.method_version)
       return reject('履歴の方式・版が現在のチャートと一致しません。');
     const xs=raw.records;
-    if(!Array.isArray(xs)||xs.length<detail.candles.length||xs.length>250)
+    if(!Array.isArray(xs)||xs.length<200||xs.length>250||xs.length<detail.candles.length)
       return reject('長期OHLC履歴の件数を確認できません。');
     let prev='';
     for(const row of xs){
