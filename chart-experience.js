@@ -76,7 +76,6 @@
     const doc=win.document;
     let overlay=null,lastFocus=null,active='',zoom=1,baseWidth=0,pinch=null,pinchFrame=0;
     const renderExpanded=typeof options.renderExpandedChart==='function'?options.renderExpandedChart:null;
-    const clamp=v=>Math.max(1,Math.min(2.5,Math.round(v*100)/100));
     function close(){
       if(!overlay||overlay.hidden)return;
       overlay.hidden=true;doc.body.classList.remove('ix-modal-open');
@@ -111,7 +110,7 @@
       const max=Math.max(0,body.scrollWidth-body.clientWidth);
       body.scrollLeft=latest?max:max*ratio;
     }
-    function schedulePinch(next){
+    function schedulePinch(){
       if(pinchFrame)return;
       const callback=()=>{
         pinchFrame=0;
@@ -129,7 +128,7 @@
       overlay.setAttribute('role','dialog');
       overlay.setAttribute('aria-modal','true');
       overlay.setAttribute('aria-labelledby','ixModalTitle');
-      overlay.innerHTML='<section class="ix-modal-panel"><header class="ix-modal-head"><strong id="ixModalTitle">グラフ拡大</strong><button type="button" class="ix-close" data-ix-close>閉じる</button></header><div class="ix-modal-tools"><button type="button" data-ix-zoom="-1" aria-label="縮小">−</button><span class="ix-zoom-label" aria-live="polite">100%</span><button type="button" data-ix-zoom="1" aria-label="拡大">＋</button><button type="button" data-ix-fit>画面に合わせる</button></div><div class="ix-modal-body" tabindex="0" aria-label="拡大グラフ。横スクロール可能"><div class="ix-modal-content"></div></div><p class="ix-modal-note">表示中の保存データのみを拡大します。売買判定・保存値は変更しません。</p></section>';
+      overlay.innerHTML='<section class="ix-modal-panel"><header class="ix-modal-head"><strong id="ixModalTitle">グラフ拡大</strong><button type="button" class="ix-close" data-ix-close>閉じる</button></header><div class="ix-modal-tools"><button type="button" data-ix-zoom="-1" aria-label="縮小">−</button><span class="ix-zoom-label" aria-live="polite">100%</span><button type="button" data-ix-zoom="1" aria-label="拡大">＋</button><button type="button" data-ix-fit>画面に合わせる</button></div><div class="ix-modal-body" tabindex="0" aria-label="拡大グラフ。横スクロール可能"><div class="ix-modal-content"></div></div><p class="ix-modal-note">グラフを横方向に拡大します。高さは固定です。左右のスクロールで値動きを確認できます。売買判定・保存値は変更しません。</p></section>';
       doc.body.appendChild(overlay);
       overlay.addEventListener('click',e=>{
         if(e.target===overlay||e.target.closest('[data-ix-close]')){close();return;}
