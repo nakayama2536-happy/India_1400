@@ -112,16 +112,16 @@ test('invalid or missing dates still hold chart; no inferred dates or source fet
   assert.doesNotMatch(source,/\bfetch\s*\(|\blocalStorage\b|\bsessionStorage\b|GITHUB_TOKEN/);
 });
 
-test('UI 5.51 retains all app cache and safe publication version bindings',()=>{
+test('UI 5.52 retains all app cache and safe publication version bindings',()=>{
   const html=fs.readFileSync('index.html','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
   const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
   const version=fs.readFileSync('VERSION','utf8');
-  assert.match(version,/UI_VERSION=5\.51/);
-  assert.match(html,/v5\.51/);
-  assert.match(sw,/india1400-v5-51-/);
-  assert.match(sw,/\?v=5\.51/);
-  assert.match(manifest.start_url,/v=5\.51/);
+  assert.match(version,/UI_VERSION=5\.52/);
+  assert.match(html,/v5\.52/);
+  assert.match(sw,/india1400-v5-52-/);
+  assert.match(sw,/\?v=5\.52/);
+  assert.match(manifest.start_url,/v=5\.52/);
   assert.match(html,/renderExpandedChart\(id,width,height\)/);
   assert.match(html,/data-ix-expand="niftyChart"/);
   assert.match(html,/data-ix-expand="rsiChart"/);

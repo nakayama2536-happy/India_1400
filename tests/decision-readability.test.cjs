@@ -115,11 +115,11 @@ test('large values fit independently of global forecast-review cards',()=>{
 });
 
 test('versioned PWA shell only changes display, not private or market sources',()=>{
-  assert.match(version,/UI_VERSION=5\.51/);
-  assert.match(html,/v5\.51/);
-  assert.match(manifest.start_url,/v=5\.51/);
-  assert.match(sw,/india1400-v5-51-/);
-  assert.match(sw,/"\.\/\?v=5\.51"/);
+  assert.match(version,/UI_VERSION=5\.52/);
+  assert.match(html,/v5\.52/);
+  assert.match(manifest.start_url,/v=5\.52/);
+  assert.match(sw,/india1400-v5-52-/);
+  assert.match(sw,/"\.\/\?v=5\.52"/);
   assert.match(sw,/key\.startsWith\(CACHE_PREFIX\)/);
   assert.doesNotMatch(sw,/caches\.match\s*\(/);
   assert.doesNotMatch(sw,/caches\.keys\(\)[\s\S]*localStorage\.clear/);
