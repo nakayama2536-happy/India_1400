@@ -17,6 +17,7 @@ At 2026-10-24 21:57 JST the user supplied an iPhone Safari screenshot of the NIF
 - The embedded chart is untouched: it still has first/middle/last labels. Expanded 100–250% uses X slot width and observed-record count to choose a tick stride `max(1, ceil(86 / ((plotRight-left)/rows.length)))`.
 - Labels are `MM/DD` from the **saved dates**, never fabricated calendar days. Latest date stays included, so at 250% the rightmost iPhone viewport contains multiple dates. The exact number depends on width and number of recorded sessions.
 - Existing one-axis-date positioning remains shared for 30-session NIFTY closing prices, Wilder RSI, and MACD. 30/60/200 OHLC charts retain all verified data and missing-MA behavior. One faint vertical guide, unchanged color/reference semantics.
+- The 6-month India Core NAV chart uses its **existing saved fund observations** for expanded-only adaptive dates as well (96px minimum X spacing); its normal three-date presentation and support-line computation are unchanged. Fund NAV dates are never substituted for NIFTY dates.
 - This is an axis annotation only. No recalculation, thresholds, judgment `formal_action`, purchase progress, fund NAV, external providers, GitHub schedule/guard/14:00 window, method_version, Public payload or private account data are modified.
 
 ## Test/operational gates
