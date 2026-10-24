@@ -2,7 +2,7 @@
 
 Date: 2026-10-24 JST. Baseline Public main: `002d61ed69f02b9d806fac409de800a3d60ec281` (UI 5.49).
 
-Status: display-only PR candidate; **not automatically adopted, merged or published**.
+Status (2026-10-24 22:29 JST): **PR #92 merged to Public main as UI 5.50; Pages deployment workflow succeeded. Direct HTTP bytes and iPhone Safari acceptance not yet verified.**
 
 ## User evidence and why-three
 
@@ -29,7 +29,7 @@ At 2026-10-24 21:57 JST the user supplied an iPhone Safari screenshot of the NIF
 
 ## Change and rollback boundary
 
-Version bump: UI 5.49 → 5.50 with corresponding own PWA cache namespace and manifest. Core `APP_VERSION=5.7`, rules, data, adoption contracts and PENDING-014 remain unchanged. This branch does not merge, push main, deploy, invoke market workflows, or modify external services.
+Version bump: UI 5.49 → 5.50 with corresponding own PWA cache namespace and manifest. Core `APP_VERSION=5.7`, rules, data, adoption contracts and PENDING-014 remain unchanged. During candidate preparation the branch did not merge, deploy, invoke market workflows or modify external services. After separate user authorization on 2026-10-24 22:26 JST, display-only PR #92 was merged and its Pages deployment succeeded. No Private Core or external settings were changed.
 
 Rollback if rejected: drop the display-only branch/PR; no JSON/purchase history/other PWA cache changes. If a deployed version later needs reversal, use a forward-only review/PR rather than clearing Safari storage.
 
@@ -40,4 +40,30 @@ Rollback if rejected: drop the display-only branch/PR; no JSON/purchase history/
   - 320/375px: `10/12`, `10/16`, `10/23`.
   - 393/430px: `10/09`, `10/14`, `10/19`, `10/23`.
 - Midpoint-scroll also retained 4 visible dates without collision. Minimum visible label gap ranged **45–82 CSS px** across the tested scenarios, fixed plot height stayed at 320px, title/close remained within viewport, and every label matched a saved observed date. No calendar interpolation.
-- **Limitation:** these are Chromium phone-width layout checks, not real iPhone Safari/PWA operation or independent market evidence. Device acceptance and main/Pages publication remain separate gates. No buy/sell logic, missing-data handling, forecast methods, market schedule or purchase records are changed.
+- **Limitation:** these are Chromium phone-width layout checks, not real iPhone Safari/PWA operation or independent market evidence. Device acceptance remains a separate gate; main merge and Pages deployment results are recorded below. No buy/sell logic, missing-data handling, forecast methods, market schedule or purchase records are changed.
+
+## Publication evidence after explicit authorization — 2026-10-24 JST
+
+| Gate | Evidence | Result |
+|---|---|---|
+| Separate user authorization | Conversation 2026-10-24 22:26 JST: 「承認します。続けてください」 | Granted for PR #92 release continuation |
+| Candidate final head | Public PR [#92](https://github.com/nakayama2536-happy/India_1400/pull/92) at `9b0fe62538c87bcff6141b8f3af2487a5a5d4aa0` | 9/9 PR workflow families PASS (including 206/206 full Node and 58/58 technical chart tests) |
+| Public main | Squash merge commit [`3c4481d54bad854fdf5b93d0f29d171a138e07ab`](https://github.com/nakayama2536-happy/India_1400/commit/3c4481d54bad854fdf5b93d0f29d171a138e07ab) | MERGED at 22:28 JST. 8/8 post-merge functional/safety CI families PASS on this SHA |
+| Publication gate | [Pages run 40098304748](https://github.com/nakayama2536-happy/India_1400/actions/runs/40098304748), same merged head SHA | Pre-deploy public safety, Pages artifact build and Pages deployment all SUCCESS at 22:29 JST |
+| Follow-up manifest | [`0b637ba85bc64f3f1f465c32889732f261fcba8b`](https://github.com/nakayama2536-happy/India_1400/commit/0b637ba85bc64f3f1f465c32889732f261fcba8b) | Only `publication_manifest.json` changed: publication_id and VERSION SHA-256, no UI calculation/purchase data |
+| Live HTTP | `https://nakayama2536-happy.github.io/India_1400/` | Direct GET of deployed files **NOT VERIFIED**: current inspection environment cannot resolve/retrieve Pages host. The workflow's success does not prove user's device has loaded 5.50 |
+| Real iPhone Safari/PWA | User device test after install/update | **PENDING**. Chromium screenshot result is not device acceptance |
+
+### Device acceptance: safe manual observation, no reset or record deletion
+
+1. Open the usual iPhone home-screen PWA or Safari view. Confirm visible version **v5.50**; if still v5.49, perform a normal reload/reopen. Do not clear Safari/PWA site data or uninstall.
+2. Under **指標**, expand NIFTY to **250%** and scroll to the latest/rightmost edge. Expect multiple saved dates (not only `10/23` for the 2026-10-23 saved sample), with final saved date visible and no overlapping labels.
+3. Pan to the middle. Verify stable fixed vertical scale, horizontal-only zoom, readable Y tick labels, visible close/title, one faint date guide, and unchanged RSI 50 / MACD zero / support reference.
+4. Verify RSI, MACD and the optional 60/validated 200-bar OHLC similarly. Verify India Core NAV enlarged dates independently; fund date is not an NIFTY trading date.
+5. Verify **購入状況** and review-history entries still appear unchanged, **without any save, reset or destructive operation**. A successful UI screenshot/CI does not establish persistence integrity unless the existing entries can be re-read on the actual device.
+
+### Remaining boundaries and next review
+
+- This release only improves *when* a saved point occurred, not the number of factual market observations. Data is accumulated via ordinary market updates only: no fabricated earlier NIFTY quotes, backfilled 14:00 representative values, forecast rows, or weekend data.
+- Existing Private Core `APP_VERSION=5.7`, 14:00 runtime/representative-quote contract, PENDING-014 GitHub-only scheduling evidence, security boundary, purchase local storage and trading eligibility remain unchanged.
+- **Done:** code, branch merge, main CI, publication workflow success. **Not done:** direct deployed-file byte match, actual iPhone Safari acceptance, market-day natural 14:00 / DECISION Burn-in. Those are independent gates.
