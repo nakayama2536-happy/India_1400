@@ -201,3 +201,22 @@ test('display-only fix neither writes nor backfills nor touches other PWA storag
   assert.match(index,/candleSnapshotKey\(\)/);
   assert.match(index,/EXTERNAL_TRIGGER/);
 });
+
+test('detached dialog retains RSI 50, final NIFTY point, MACD and support labels',()=>{
+  const css=fs.readFileSync('chart-experience.css','utf8');
+  for(const selector of [
+    '.ix-modal .chart text.guide-reference-label',
+    '.ix-modal .chart .guide.guide-reference',
+    '.ix-modal .chart .last-nifty-dot',
+    '.ix-modal .chart .support-visual',
+    '.ix-modal .chart.chart-nifty text.support-label',
+    '.ix-modal .chart .macd-positive',
+    '.ix-modal .chart .macd-negative',
+    '.ix-modal .chart.core-trend-chart text'
+  ])assert.ok(css.includes(selector),selector+' must have a scoped display style');
+  assert.match(css,/\.ix-modal \.chart text\.guide-reference-label\{[^}]*font-size:11px/);
+  assert.match(css,/\.ix-modal \.chart \.last-nifty-dot\{fill:var\(--c-nifty\)/);
+  assert.match(css,/\.ix-modal \.chart \.macd-positive\{fill:#4fbeaf\}/);
+  assert.match(css,/\.ix-modal \.chart \.macd-negative\{fill:#bc8da0\}/);
+  assert.doesNotMatch(css,/html\s*\{[^}]*zoom:/);
+});
