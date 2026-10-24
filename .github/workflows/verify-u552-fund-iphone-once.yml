@@ -32,7 +32,10 @@ jobs:
           const chrome=['/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>fs.existsSync(x))||'google-chrome';
           const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'india-ui552-'));
           const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu',
-            '--remote-debugging-port=9232','--remote-allow-origins=*','--user-data-dir='+temporary,'about:blank'],{stdio:'ignore'});
+            '--remote-debugging-port=9232','--remote-allow-origins=*','--user-data-dir='+temporary,'about:blank'],{stdio:['ignore','pipe','pipe']});
+          let chromeDiag='';
+          proc.stderr.on('data',x=>{chromeDiag=(chromeDiag+String(x)).slice(-2500)});
+          proc.on('exit',(code,signal)=>{console.log('CHROME_EXIT',code,signal,chromeDiag.slice(-1000))});
           async function inspect(){
            for(let n=0;n<100;n++){
              if(document.querySelectorAll('#indiaCoreCard .fund-status-grid .status-tile').length===7)break;
@@ -87,7 +90,9 @@ jobs:
            return JSON.stringify(result);
           }
           async function verify(){
-            for(let i=0;i<50;i++){try{await(await fetch('http://127.0.0.1:9232/json/version')).json();break}catch(_){await sleep(120)}}
+            let debuggerReady=false;
+            for(let i=0;i<150;i++){try{await(await fetch('http://127.0.0.1:9232/json/version')).json();debuggerReady=true;break}catch(_){if(proc.exitCode!==null)break;await sleep(150)}}
+            if(!debuggerReady)throw Error('CHROME_DEBUGGER_NOT_READY exit='+proc.exitCode+' '+chromeDiag.slice(-1000));
             const target=await(await fetch('http://127.0.0.1:9232/json/new?about:blank',{method:'PUT'})).json();
             const ws=new WebSocket(target.webSocketDebuggerUrl);
             await new Promise((resolve,reject)=>{ws.addEventListener('open',resolve,{once:true});ws.addEventListener('error',reject,{once:true})});
