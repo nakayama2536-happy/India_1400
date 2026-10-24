@@ -1,0 +1,82 @@
+name: Verify v5.48 Pages Once
+on:
+  push:
+    branches: ['verify/v548-pages-20261024']
+    paths: ['.github/workflows/verify-v548-pages-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-deployed-bytes:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/v548-pages-20261024' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 85f3c7d0778c6a2eb5d5f443b6c57103a19fc231
+          persist-credentials: false
+      - name: Verify approved release and Node regression without network mutation
+        run: |
+          test "$(git rev-parse HEAD)" = 85f3c7d0778c6a2eb5d5f443b6c57103a19fc231
+          node --check chart-experience.js
+          node --test tests/*.test.cjs
+      - name: Compare deployed HTTP response bytes against pinned approved release
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          from urllib.parse import urlsplit
+          from datetime import datetime, timezone
+          import hashlib
+          import json
+          import time
+
+          base = 'https://nakayama2536-happy.github.io/India_1400/'
+          expected_sha = '85f3c7d0778c6a2eb5d5f443b6c57103a19fc231'
+          files = [
+              'index.html', 'VERSION', 'manifest.webmanifest', 'sw.js',
+              'chart-experience.js', 'chart-experience.css', 'technical-charts.js',
+              'decision-reasons.js', 'decision-reasons.css',
+              'review-history.js', 'deep-dive.js', 'deep-dive-bundle.js',
+          ]
+          probes = [(name,name) for name in files] + [('', 'index.html'), ('?v=5.48', 'index.html')]
+          assert 'UI_VERSION=5.48' in Path('VERSION').read_text(encoding='utf-8')
+          assert 'chart-experience.js' in Path('sw.js').read_text(encoding='utf-8')
+          assert 'chart-experience.css' in Path('sw.js').read_text(encoding='utf-8')
+          failures=[]
+          for relative,src in probes:
+              expected=Path(src).read_bytes()
+              expected_hash=hashlib.sha256(expected).hexdigest()
+              name=relative or '/'
+              reason='NOT_ATTEMPTED'
+              for attempt in range(3):
+                  try:
+                      req=Request(base+relative,headers={
+                          'Cache-Control':'no-cache',
+                          'User-Agent':'India-14-check-approved-release-5.48'
+                      })
+                      with urlopen(req,timeout=16) as resp:
+                          target=urlsplit(resp.geturl())
+                          assert target.scheme=='https' and target.netloc=='nakayama2536-happy.github.io'
+                          assert target.path.startswith('/India_1400/')
+                          status=resp.status
+                          data=resp.read(1000000)
+                      digest=hashlib.sha256(data).hexdigest()
+                      if status==200 and data==expected:
+                          print(json.dumps({'path':name,'status':status,'bytes':len(data),'sha256':digest,'matches_release':True}),flush=True)
+                          reason=None
+                          break
+                      reason='HTTP_OR_BYTES_MISMATCH status='+str(status)+' sha256='+digest
+                  except Exception as exc:
+                      reason=type(exc).__name__+': '+str(exc)
+                  if attempt<2:
+                      time.sleep(4)
+              if reason:
+                  failures.append({'path':name,'expected_sha256':expected_hash,'reason':reason})
+          print('CHECKED_AT_UTC='+datetime.now(timezone.utc).isoformat(),flush=True)
+          if failures:
+              print(json.dumps({'failures':failures}),flush=True)
+              raise SystemExit('UI_548_PAGES_STATIC_BYTES_NOT_VERIFIED')
+          print('LIVE_PAGES_STATIC_BYTES_PASS: 12 assets and 2 entry URLs equal '+expected_sha,flush=True)
+          print('Not proof of iPhone/device acceptance, market natural capture, or dynamic JSON freshness.',flush=True)
+          PY
