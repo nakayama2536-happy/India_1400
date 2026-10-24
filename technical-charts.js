@@ -50,7 +50,7 @@
     // An opt-in expanded view can use a taller drawing area without scaling
     // SVG labels or changing the normal embedded chart geometry.
     const requestedHeight = finite(options.height) ? Number(options.height) : NaN;
-    const h = Number.isFinite(requestedHeight) && requestedHeight >= defaultHeight ?
+    const h = Number.isFinite(requestedHeight) && requestedHeight >= 190 ?
       Math.min(500, Math.round(requestedHeight)) : defaultHeight;
     const left = 10, right = 59, top = 14, bottom = 25;
     let scale = niceScale(values);
