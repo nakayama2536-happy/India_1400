@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Assert isolated verifier is pinned to the approved candidate head
         run: |
           git merge-base --is-ancestor b19ef9585753bd3a9f319da0b8876351d74f4cbd HEAD
