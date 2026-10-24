@@ -1,0 +1,53 @@
+name: Verify India UI 5.53 Live Pages Bytes Once
+on:
+  push:
+    branches: ['verify/u553-public-bytes-20261025']
+    paths: ['.github/workflows/verify-u553-public-bytes-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-pages:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u553-public-bytes-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin main source and isolate verifier from public delivery
+        run: |
+          git merge-base --is-ancestor 5fa27a823e338012b4ad4bfee825188d4d6cf165 HEAD
+          test "$(git diff --name-only 5fa27a823e338012b4ad4bfee825188d4d6cf165 HEAD)" = ".github/workflows/verify-u553-public-bytes-once.yml"
+          grep -q '^UI_VERSION=5.53$' VERSION
+      - name: Verify exact deployed HTML/version/worker/manifest against main
+        run: |
+          python3 - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          base='https://nakayama2536-happy.github.io/India_1400/'
+          for item in ('index.html','VERSION','sw.js','manifest.webmanifest'):
+              expected=Path(item).read_bytes()
+              sha=hashlib.sha256(expected).hexdigest()
+              url=base+('' if item=='index.html' else item)+'?v=5.53&verify='+item.replace('.','_')
+              error=None
+              for attempt in range(1,8):
+                  try:
+                      req=Request(url,headers={'Cache-Control':'no-cache','Pragma':'no-cache','User-Agent':'India-UI553-ReadOnly-Verify'})
+                      with urlopen(req,timeout=12) as response:
+                          assert response.status==200,(item,response.status)
+                          actual=response.read()
+                      got=hashlib.sha256(actual).hexdigest()
+                      if got==sha:
+                          print('UI553_LIVE_FILE_MATCH',item,'bytes',len(actual),'sha256',got)
+                          break
+                      error=f'hash mismatch expected {sha} got {got}'
+                  except Exception as exc:
+                      error=str(exc)
+                  print('UI553_PAGES_RETRY',item,attempt,error)
+                  if attempt<7:time.sleep(5)
+              else:
+                  raise AssertionError(f'UI553_PAGES_BYTE_CHECK_FAILED {item}: {error}')
+          print('UI553_PUBLIC_BYTES_PASS: all four live files equal committed source. iPhone Safari/PWA device acceptance remains pending.')
+          PY
