@@ -1,0 +1,41 @@
+/* India UI 5.48: opt-in chart expansion and evidence navigation. Presentation only. */
+.ix-expand{flex:0 0 auto;min-height:44px;border:1px solid #41618a;background:#192943;color:#dfeaff;border-radius:10px;padding:7px 11px;font-size:13px;font-weight:800;cursor:pointer}
+.ix-expand:focus-visible,.ix-period:focus-visible,.ix-quality-tile:focus-visible,.ix-modal button:focus-visible{outline:3px solid #70a9ff;outline-offset:2px}
+.ix-chart-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:5px 0 9px}
+.ix-period-label{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;font-weight:700}
+.ix-period{color:var(--text);background:#192943;border:1px solid #41618a;border-radius:10px;min-height:44px;padding:8px 10px;font-size:14px;font-weight:750}
+.ix-period-feedback{font-size:12px;color:var(--muted);line-height:1.6;margin:6px 0;min-height:18px}
+.ix-period-feedback.ix-warning{color:var(--warn)}
+.candle-wrap{overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}
+.candle-wrap.ix-long-candles .candle-chart{width:1500px;min-width:1500px;height:294px;max-width:none}
+.ix-long-candles~.detail-chart-legend .series-ma5,.ix-long-candles~.detail-chart-legend .series-ma25,.ix-long-candles~.detail-chart-legend .series-ma75{display:none}
+.ix-quality-tile{width:100%;display:block;text-align:left;color:inherit;font:inherit;cursor:pointer;min-height:54px}
+.ix-quality-tile:hover{background:#142740}
+.ix-quality-tile:after{content:'詳細 ›';display:block;font-size:10px;font-weight:650;color:var(--accent);margin-top:4px}
+.ix-evidence{margin:8px 0 13px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card2);font-size:12px;line-height:1.7}
+.ix-evidence h4{font-size:13px;margin:0 0 5px;color:var(--text)}
+.ix-evidence p{margin:2px 0;color:var(--muted);overflow-wrap:anywhere}
+.ix-evidence:focus-visible,#qualityReasons:focus-visible,#dataTimes:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.ix-progress{height:7px;background:#263854;border-radius:10px;overflow:hidden;margin:7px 0 5px}
+.ix-progress-fill{display:block;height:100%;background:var(--accent);border-radius:10px;max-width:100%}
+.ix-progress-meta{font-size:11px;color:var(--muted);line-height:1.55}
+.ix-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(1,7,16,.92);padding:max(12px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.ix-modal[hidden]{display:none!important}
+body.ix-modal-open{overflow:hidden}
+.ix-modal-panel{display:flex;flex-direction:column;width:min(100%,850px);height:min(92dvh,800px);min-height:260px;border:1px solid #385879;border-radius:17px;background:#0c192b;overflow:hidden;box-shadow:0 22px 75px rgba(0,0,0,.4)}
+.ix-modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#10233b}
+.ix-modal-head strong{font-size:17px;line-height:1.4}
+.ix-modal button{color:var(--text);background:#1a304d;border:1px solid #49698c;border-radius:10px;min-height:44px;padding:9px 12px;font-size:14px;font-weight:750}
+.ix-modal-tools{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;padding:7px 10px;border-bottom:1px solid #2d405b}
+.ix-zoom-label{font-size:14px;min-width:52px;text-align:center;font-variant-numeric:tabular-nums;font-weight:800}
+.ix-modal-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+.ix-modal-body:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.ix-modal-content{min-width:100%;padding:10px 8px;box-sizing:border-box}
+.ix-modal-content svg{display:block;width:100%!important;max-width:none!important;height:auto!important;min-height:150px;aspect-ratio:auto!important}
+.ix-modal-note{margin:0;padding:8px 12px;background:#10233b;color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:430px){
+  .ix-chart-toolbar{align-items:stretch}
+  .ix-modal{padding-left:5px;padding-right:5px}
+  .ix-modal-panel{height:95dvh;border-radius:12px}
+}
+@media(prefers-reduced-motion:reduce){.ix-modal *{scroll-behavior:auto!important}}
