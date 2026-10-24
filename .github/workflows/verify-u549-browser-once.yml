@@ -32,7 +32,7 @@ jobs:
           .chart .gridline{stroke:#3d536b}.chart .guide{stroke:#8395ae}.chart .guide-reference{stroke:#f4c14b}
           </style><link rel="stylesheet" href="/chart-experience.css"></head><body>
           <button type="button" data-ix-expand="rsiChart" id="trigger">RSIを拡大</button>
-          <div id="rsiChart" style="width:355px"></div><pre id="result">pending</pre>
+          <div id="rsiChart" style="max-width:355px;width:100%"></div><pre id="result">pending</pre>
           <script src="/technical-charts.js"></script>
           <script src="/chart-experience.js"></script>
           <script>
