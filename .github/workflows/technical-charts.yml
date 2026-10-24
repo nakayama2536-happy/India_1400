@@ -17,4 +17,5 @@ jobs:
       - name: Validate display-only renderer and integration contracts
         run: |
           node --check technical-charts.js
-          node --test tests/indicator-charts.test.cjs tests/technical-charts.test.cjs
+          node --check chart-experience.js
+          node --test tests/indicator-charts.test.cjs tests/technical-charts.test.cjs tests/chart-experience.test.cjs
