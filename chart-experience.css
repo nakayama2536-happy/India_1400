@@ -37,6 +37,34 @@ body.ix-modal-open{overflow:hidden}
 .ix-modal-content{min-width:100%;padding:10px 8px;box-sizing:border-box}
 .ix-modal-content svg{display:block;width:100%!important;max-width:none!important;height:var(--ix-chart-height,300px)!important;aspect-ratio:auto!important}
 .ix-modal-note{flex:0 0 auto;margin:0;padding:8px 12px;background:#10233b;color:var(--muted);font-size:12px;line-height:1.5}
+/* The dialog lives under body, not inside #page-indicators. Mirror its
+ * presentation-only indicators styling so the RSI 50, support annotations,
+ * last-close marker and MACD bars never revert to browser defaults. */
+.ix-modal .chart:not(.core-trend-chart) text,.ix-modal .candle-chart text{font-size:11px;fill:#a5b4ca;font-variant-numeric:tabular-nums;stroke:none}
+.ix-modal .chart .gridline,.ix-modal .candle-chart .gridline{stroke:#32445e;stroke-width:.85;opacity:.68;vector-effect:non-scaling-stroke}
+.ix-modal .chart .weekline,.ix-modal .candle-chart .weekline{stroke:#3b4e69;opacity:.35;vector-effect:non-scaling-stroke}
+.ix-modal .chart .line-main{stroke-width:2.3;vector-effect:non-scaling-stroke}
+.ix-modal .chart .line-ma5,.ix-modal .chart .line-ma25{stroke-width:1.75;vector-effect:non-scaling-stroke}
+.ix-modal .chart .line-ma75{stroke-width:1.4;opacity:.8;stroke-dasharray:5 4;vector-effect:non-scaling-stroke}
+.ix-modal .chart .line-rsi{stroke-width:2.6;vector-effect:non-scaling-stroke}
+.ix-modal .chart .guide{stroke:#788ba4;stroke-width:1;stroke-dasharray:3 5;opacity:.45;vector-effect:non-scaling-stroke}
+.ix-modal .chart .guide.guide-reference{stroke:#c0b48c;opacity:.7;stroke-width:1.15;stroke-dasharray:5 5;vector-effect:non-scaling-stroke}
+.ix-modal .chart text.guide-reference-label{fill:#c8c1aa;font-weight:700;font-size:11px;stroke:none}
+.ix-modal .chart .support-visual{stroke:#8da9da;stroke-dasharray:5 5;opacity:.9;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.ix-modal .chart .last-nifty-dot{fill:var(--c-nifty);stroke:#0b1627;stroke-width:2.1;vector-effect:non-scaling-stroke}
+.ix-modal .chart .zero-axis{stroke:#8ea2bc;stroke-width:1.25;opacity:.85;vector-effect:non-scaling-stroke}
+.ix-modal .chart .macd-positive{fill:#4fbeaf}
+.ix-modal .chart .macd-negative{fill:#bc8da0}
+.ix-modal .chart .support-label-bg{fill:#0b1627;fill-opacity:.96}
+.ix-modal .chart.chart-nifty text.support-label{fill:#adc5eb;font-size:11px;font-weight:650;stroke:none}
+.ix-modal .chart .support-label-link{stroke:#8da9da;stroke-width:.8;opacity:.65;vector-effect:non-scaling-stroke}
+.ix-modal .candle-chart [class^="wick-"]{stroke-width:1;vector-effect:non-scaling-stroke}
+.ix-modal .candle-chart [class^="body-"]{stroke:none}
+.ix-modal .candle-chart .ma5,.ix-modal .candle-chart .ma25{stroke-width:1.5;vector-effect:non-scaling-stroke}
+.ix-modal .candle-chart .ma75{stroke-width:1.2;stroke-dasharray:5 4;opacity:.8;vector-effect:non-scaling-stroke}
+.ix-modal .chart.core-trend-chart text{font-size:14px}
+.ix-modal .chart.core-trend-chart text.support-label{font-size:14px}
+
 @media(max-width:430px){
   .ix-chart-toolbar{align-items:stretch}
   .ix-modal{padding-left:5px;padding-right:5px}
