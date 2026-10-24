@@ -2,7 +2,7 @@
 
 Date: 2026-10-24 JST. Baseline Public main: `002d61ed69f02b9d806fac409de800a3d60ec281` (UI 5.49).
 
-Status (2026-10-24 22:29 JST): **PR #92 merged to Public main as UI 5.50; Pages deployment workflow succeeded. Direct HTTP bytes and iPhone Safari acceptance not yet verified.**
+Status (2026-10-24 22:51 JST device screenshot): **UI 5.50 merged and deployed; NIFTY expanded date-axis visibly confirmed on a user iPhone at 225%. Full device interaction, other charts, local records and direct public-byte verification remain pending.**
 
 ## User evidence and why-three
 
@@ -52,7 +52,7 @@ Rollback if rejected: drop the display-only branch/PR; no JSON/purchase history/
 | Publication gate | [Pages run 40098304748](https://github.com/nakayama2536-happy/India_1400/actions/runs/40098304748), same merged head SHA | Pre-deploy public safety, Pages artifact build and Pages deployment all SUCCESS at 22:29 JST |
 | Follow-up manifest | [`0b637ba85bc64f3f1f465c32889732f261fcba8b`](https://github.com/nakayama2536-happy/India_1400/commit/0b637ba85bc64f3f1f465c32889732f261fcba8b) | Only `publication_manifest.json` changed: publication_id and VERSION SHA-256, no UI calculation/purchase data |
 | Live HTTP | `https://nakayama2536-happy.github.io/India_1400/` | Direct GET of deployed files **NOT VERIFIED**: current inspection environment cannot resolve/retrieve Pages host. The workflow's success does not prove user's device has loaded 5.50 |
-| Real iPhone Safari/PWA | User device test after install/update | **PENDING**. Chromium screenshot result is not device acceptance |
+| Real iPhone Safari/PWA | User iPhone screenshot (screen clock 22:51, 2026-10-24 conversation) | **PARTIAL DEVICE EVIDENCE**: version v5.50 and 225% NIFTY date-axis visually verified. Gesture behavior, 250%, other charts and local storage remain PENDING. Browser vs home-screen mode not independently established |
 
 ### Device acceptance: safe manual observation, no reset or record deletion
 
@@ -66,4 +66,23 @@ Rollback if rejected: drop the display-only branch/PR; no JSON/purchase history/
 
 - This release only improves *when* a saved point occurred, not the number of factual market observations. Data is accumulated via ordinary market updates only: no fabricated earlier NIFTY quotes, backfilled 14:00 representative values, forecast rows, or weekend data.
 - Existing Private Core `APP_VERSION=5.7`, 14:00 runtime/representative-quote contract, PENDING-014 GitHub-only scheduling evidence, security boundary, purchase local storage and trading eligibility remain unchanged.
-- **Done:** code, branch merge, main CI, publication workflow success. **Not done:** direct deployed-file byte match, actual iPhone Safari acceptance, market-day natural 14:00 / DECISION Burn-in. Those are independent gates.
+- **Done:** code, branch merge, main CI, publication workflow success, user-iPhone **225% NIFTY expanded-date visual evidence**. **Not done:** direct deployed-file byte match, complete Safari/PWA interactive acceptance across other charts and persisted records, market-day natural 14:00 / DECISION Burn-in. Those are independent gates.
+
+## User iPhone screenshot: expanded NIFTY date axis — 2026-10-24 22:51 JST (screen clock)
+
+User provided one actual iPhone display screenshot in the ongoing conversation after UI 5.50 release. The image is **not** copied to this Public repository and no personal user record is published.
+
+**Directly visible (PASS for this observation only):**
+- App header has `v5.50`. Expanded dialog is titled `NIFTY 50 トレンド`.
+- Magnification control displays **225%**, not 250%. Saved date-axis labels **`10/12`, `10/16`, `10/23`** appear together with the newest observed date. This resolves the prior visually evidenced right-edge condition with only `10/23` visible, at the tested 225% magnification.
+- Price Y-axis annotations, NIFTY line, three MA/reference lines, and **`安値目安 22,232`** label are visible without obvious overlap in this static frame.
+- Header/close, +/- controls and `画面に合わせる` are visible. A partially clipped date fragment at the very left boundary is consistent with horizontal panning; this one screenshot is not sufficient evidence of a defect, so no code change is authorized merely from the fragment.
+
+**Not demonstrated by this single screenshot (remain DEVICE_PENDING):**
+- 250% on the actual iPhone, repeated left-right panning, pinch/fit/close behavior, dynamic vertical-height stability, iPhone Safari browser mode vs PWA home-screen mode, or persistence across reopen.
+- RSI/MACD, 60/validated-200 OHLC, India Core NAV enlarged dates, tab navigation and review-history/backup behavior.
+- User's pre-existing purchase/review entries and preservation of other apps' caches; **do not reset, uninstall, clear site data or modify purchase records to test this**.
+- Direct HTTP artifact byte equality; a display with v5.50 establishes that this device rendered the new shell, not the exact hash of every public file.
+- Natural 14:00 GitHub-only capture, DECISION-phase Burn-in, or forecast evaluation adequacy.
+
+**Decision:** accept the specific **iPhone 225% NIFTY X-axis date visibility** result as visual evidence; keep full PENDING-019–022 device acceptance and Private PENDING-014/026 open. Prioritize operating reliability and data accumulation over further stylistic chart changes. No code, Core data, formal trading condition, external setting or user history changes.
