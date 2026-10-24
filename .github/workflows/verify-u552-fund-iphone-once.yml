@@ -1,0 +1,115 @@
+name: Verify India UI 5.52 Fund Readability Once
+on:
+  push:
+    branches: ['verify/u552-fund-iphone-20261025']
+    paths: ['.github/workflows/verify-u552-fund-iphone-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-fund-mobile:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u552-fund-iphone-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin PR source; never include this workflow in production
+        run: |
+          git merge-base --is-ancestor 9c1357a3a6aa7720c8b27da0a199fcb17e37eb84 HEAD
+          test "$(git diff --name-only 9c1357a3a6aa7720c8b27da0a199fcb17e37eb84 HEAD)" = ".github/workflows/verify-u552-fund-iphone-once.yml"
+          node --test tests/fund-readability.test.cjs
+      - name: Read-only Chromium geometry across iPhone CSS widths
+        run: |
+          python3 -m http.server 9890 --bind 127.0.0.1 >/tmp/india-u552-browser-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          node <<'JS'
+          'use strict';
+          const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const chrome=['/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>fs.existsSync(x))||'google-chrome';
+          const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'india-ui552-'));
+          const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu',
+            '--remote-debugging-port=9232','--remote-allow-origins=*','--user-data-dir='+temporary,'about:blank'],{stdio:'ignore'});
+          async function inspect(){
+           for(let n=0;n<100;n++){
+             if(document.querySelectorAll('#indiaCoreCard .fund-status-grid .status-tile').length===7)break;
+             await new Promise(resolve=>setTimeout(resolve,120));
+           }
+           const root=document.querySelector('#indiaCoreCard');
+           const card=document.querySelector('.india-core-latest-card');
+           const tiles=[...document.querySelectorAll('#indiaCoreCard .fund-status-grid .status-tile')];
+           const grid=root?.querySelector('.fund-status-grid');
+           const get=(node)=>node?Number.parseFloat(getComputedStyle(node).fontSize):0;
+           const fit=(node)=>node?.scrollWidth<=node?.clientWidth+2;
+           const text=(node)=>node?.textContent?.trim()||'';
+           const fields=tiles.map(tile=>{
+             const label=tile.querySelector('.status-tile-label');
+             const value=tile.querySelector('.status-tile-value');
+             const status=tile.querySelector('.status-tile-status');
+             const detail=tile.querySelector('.status-tile-detail');
+             return {label:text(label),value:text(value),status:text(status),detail:text(detail),
+               fonts:{label:get(label),value:get(value),status:get(status),detail:detail?get(detail):null},
+               fits:[label,value,status,detail].filter(Boolean).every(fit),
+               visible:tile.getBoundingClientRect().height>60};
+           });
+           const main=root?.querySelector('.fund-main');
+           const name=root?.querySelector('.fund-name');
+           const nav=root?.querySelector('.fund-nav');
+           const change=root?.querySelector('.fund-change');
+           const meta=root?.querySelector('.fund-meta');
+           const source=root?.querySelector('.fund-source');
+           const header=card?.querySelector('h2');
+           const info=card?.querySelector('details.supplement > summary');
+           const detailSource=[...root?.querySelectorAll('.fund-meta span')||[]];
+           const labels=fields.map(x=>x.label);
+           const expected=['基準日','純資産総額','MA25','MA75','RSI14','MACD','25/75日線'];
+           const matrix={name:get(name),nav:get(nav),change:get(change),meta:get(meta),link:get(source),header:get(header),summary:get(info)};
+           const infoCards=fields.every(x=>x.fonts.label>=14&&x.fonts.value>=17&&x.fonts.status>=14&&(x.fonts.detail===null||x.fonts.detail>=14)&&x.fits&&x.visible);
+           const actualColumns=getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+           const result={width:innerWidth,height:innerHeight,version:document.querySelector('.version-badge')?.textContent,
+             gridColumns:actualColumns,labels,fields,fonts:matrix,navText:text(nav),changeText:text(change),
+             sourceText:text(source),sourceUrl:source?.getAttribute('href'),
+             sourceLine:text(meta),sourceLinesFit:detailSource.every(fit),
+             textFit:[name,nav,change,meta].every(fit),
+             horizontalOverflow:document.documentElement.scrollWidth-innerWidth,
+             qualityEvidencePreserved:fields.every(x=>x.status==='データ確認済み'||x.status==='要確認'),
+             pageHasOldPurchaseTabs:document.querySelectorAll('nav.tabs .tab').length===5
+           };
+           result.pass=!!root&&!!main&&!!card&&tiles.length===7&&
+             expected.every((value,i)=>labels[i]===value)&&result.version==='v5.52'&&
+             result.gridColumns===2&&infoCards&&result.qualityEvidencePreserved&&
+             matrix.name>=15&&matrix.nav>=29&&matrix.change>=17&&matrix.meta>=14&&matrix.link>=14&&
+             matrix.header>=20&&matrix.summary>=16&&source?.getAttribute('href')?.startsWith('http')&&
+             result.textFit&&result.sourceLinesFit&&result.pageHasOldPurchaseTabs&&result.horizontalOverflow<=2;
+           return JSON.stringify(result);
+          }
+          async function verify(){
+            for(let i=0;i<50;i++){try{await(await fetch('http://127.0.0.1:9232/json/version')).json();break}catch(_){await sleep(120)}}
+            const target=await(await fetch('http://127.0.0.1:9232/json/new?about:blank',{method:'PUT'})).json();
+            const ws=new WebSocket(target.webSocketDebuggerUrl);
+            await new Promise((resolve,reject)=>{ws.addEventListener('open',resolve,{once:true});ws.addEventListener('error',reject,{once:true})});
+            let serial=0;const waits=new Map();
+            ws.addEventListener('message',ev=>{const r=JSON.parse(ev.data);if(!r.id)return;const p=waits.get(r.id);if(p){waits.delete(r.id);r.error?p.reject(Error(JSON.stringify(r.error))):p.resolve(r.result)}});
+            const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++serial;waits.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+            try{
+              await cdp('Page.enable');
+              for(const [width,height,dpr] of [[320,700,2],[375,812,3],[393,852,3],[402,874,3],[430,932,3]]){
+                await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:dpr,mobile:true,screenWidth:width,screenHeight:height});
+                await cdp('Page.navigate',{url:'http://127.0.0.1:9890/index.html?u552='+width});
+                await sleep(400);
+                const exp='('+inspect.toString()+')()';
+                const data=await cdp('Runtime.evaluate',{expression:exp,awaitPromise:true,returnByValue:true});
+                const raw=data?.result?.value;
+                if(!raw||!raw.startsWith('{'))throw Error('NO_BROWSER_RESULT '+width+' '+JSON.stringify(data).slice(0,1200));
+                const result=JSON.parse(raw);
+                console.log('FUND_MOBILE_VISUAL '+JSON.stringify(result));
+                if(result.width!==width||!result.pass)throw Error('FUND_UI552_LAYOUT_FAIL '+width);
+              }
+              console.log('UI552_FUND_BROWSER_PASS: 320,375,393,402,430px, 7 saved QC tiles, 14px descriptions, no clipping. Not iPhone Safari acceptance.');
+            }finally{ws.close()}
+          }
+          verify().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>proc.kill('SIGTERM'));
+          JS
