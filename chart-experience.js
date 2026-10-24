@@ -101,7 +101,7 @@
       if(renderExpanded){
         try {
           const markup=renderExpanded(active,width,shape.height);
-          if(typeof markup!=='string'||!/^<svg\\b/.test(markup.trim()))throw Error('chart-unavailable');
+          if(typeof markup!=='string'||!/^<svg\b/.test(markup.trim()))throw Error('chart-unavailable');
           content.innerHTML=markup; // output of existing trusted display-only renderer
         }catch(_){
           content.textContent='保存データを確認できないため拡大表示を保留しています。';
