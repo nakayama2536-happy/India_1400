@@ -368,7 +368,7 @@
     <details id="niftyDetailPanel" class="card">
       <summary>NIFTY 詳細チャートを見る</summary>
       <div class="body">
-        <div class="chart-head detail-chart-heading"><div class="chart-title">日足ローソク足＋移動平均</div><div id="detailCandleMeta" class="chart-meta">--</div><button type="button" class="ix-expand" data-ix-expand="detailCandleChart" aria-label="日足ローソク足を拡大">拡大</button></div>
+        <div class="chart-head detail-chart-heading"><div id="detailCandleTitle" class="chart-title">日足ローソク足＋移動平均</div><div id="detailCandleMeta" class="chart-meta">--</div><button type="button" class="ix-expand" data-ix-expand="detailCandleChart" aria-label="日足ローソク足を拡大">拡大</button></div>
         <div class="ix-chart-toolbar"><label for="candlePeriodSelect" class="ix-period-label">表示期間 <select id="candlePeriodSelect" class="ix-period"><option value="30">30本</option><option value="60" selected>60本</option><option value="200">200本（長期）</option></select></label><span class="small">確定日足・長期は照合後に表示</span></div>
         <div class="candle-wrap" id="candleScrollWrap"><div id="detailCandleChart">--</div></div>
         <div id="candlePeriodFeedback" class="ix-period-feedback" role="status" aria-live="polite">直近60本を表示します。</div>
@@ -1090,6 +1090,7 @@ function renderDetailChart(){
     candlePeriod==="30"?base.slice(-30):base.slice(-60);
   const drawable=!!(d.available&&!mismatch&&(candlePeriod!=="200"||longOk)&&rows.length>=10);
   const long=drawable&&candlePeriod==="200";
+  setText("detailCandleTitle",long?"日足ローソク足（確定四本値）":"日足ローソク足＋移動平均");
   const errors=(Array.isArray(d.source_reports)?d.source_reports:[]).filter(x=>x.status==="error").map(x=>x.source+": "+x.error);
   const titleDate=String(d.latest_ohlc_date||"--").replaceAll("-","/");
   setText("detailCandleMeta",drawable?`直近 ${rows.length}本 / 四本値確定 ${titleDate}${basisDiff?" / 参考（基準日不一致）":""}`:
