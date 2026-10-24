@@ -171,8 +171,14 @@
       if (yo===yc) out+=`<line class="wick-${cls}" x1="${num(px-bw/2)}" y1="${num(yo)}" x2="${num(px+bw/2)}" y2="${num(yo)}"/>`;
       else out+=`<rect class="body-${cls}" x="${num(px-bw/2)}" y="${num(Math.min(yo,yc))}" width="${num(bw)}" height="${num(Math.abs(yc-yo))}"/>`;
     });
-    for(const key of ['ma5','ma25','ma75']) out+=`<path class="${key}" d="${path(rows,key,f,true)}" fill="none"/>`;
-    return svg(f,'candle',out,'NIFTY日足ローソク足と移動平均・価格目盛り');
+    let hasAverage=false;
+    for(const key of ['ma5','ma25','ma75']) {
+      const observedPath=path(rows,key,f,true);
+      if(!observedPath)continue; // Unrecorded long history must not draw empty MA guides.
+      hasAverage=true;
+      out+=`<path class="${key}" d="${observedPath}" fill="none"/>`;
+    }
+    return svg(f,'candle',out,hasAverage?'NIFTY日足ローソク足と移動平均・価格目盛り':'NIFTY日足ローソク足・確定四本値のみ（移動平均未収録）');
   }
   return Object.freeze({finite,validRows,latestPoint,niceScale,lineChart,candlestickChart});
 });
