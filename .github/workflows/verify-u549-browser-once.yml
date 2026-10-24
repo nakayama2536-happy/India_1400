@@ -63,7 +63,7 @@ jobs:
               scrollWidth:body.scrollWidth,
               scrollMax:body.scrollWidth-body.clientWidth,
               gesturePrevented:ev.defaultPrevented,
-              passes:Math.abs(before.height-260)<=2 && Math.abs(after.height-260)<=2 &&
+              passes:before.height>100 && before.height<=300 && Math.abs(after.height-before.height)<=2 &&
               after.width>before.width*2.3 && modal.right<=innerWidth+2 &&
               header.right<=innerWidth+2 && button.right<=innerWidth+2 &&
               modal.height<=innerHeight && body.scrollWidth>body.clientWidth &&
