@@ -1,7 +1,7 @@
 # India UI 5.51 — 判断画面の文字と情報量をiPhone 17向けに調整
 
 Date: 2026-10-25 JST. Public main baseline: `74d0876ae3148e068f04e6acda25015b9814c901` (UI 5.50).
-Status: code/test PR candidate. Merged/Pages/iPhone DEVICE_PASSは別ゲート。
+Status (2026-10-25 JST): UI 5.51 code MERGED / PR & main CI PASS / GitHub Pages deploy SUCCESS / public HTTP bytes MATCH. iPhone 17 DEVICE_PASSは未確認。
 
 ## 目的と利用者証拠
 
@@ -39,3 +39,31 @@ PWA自身の前版cacheのみを既存prefixルールで管理する。storage r
 6. 14:00自然保存、DECISION Burn-in、予測評価10/30/100件、公式NAV取得、Brent正式sourceは今回の完了範囲外。
 
 復旧が必要なら、検証済み前版との差分PRでCSS/静的表示だけを戻す。Service Worker/cacheの全消去や個人保存値の初期化は禁止。
+
+## 採用・公開実証 — 2026-10-25 JST
+
+| Gate | 確認証拠 | 結果 |
+|---|---|---|
+| 表示仕様と利用者承認 | 2026-10-24〜25会話。デザイン画像で「見やすくなりました」、その後「実装を進めてください」 | 表示専用の採用範囲として実装 |
+| UIコード / PR | Public [PR #95](https://github.com/nakayama2536-happy/India_1400/pull/95) / head `dfa7b68e8aa5fe45fba5a1edd865e54441a98c98` | MERGED。code merge `94fd79085ea1a1434cb532f5ca894ee4a286e940` |
+| PR CI | 9/9 PASS。全Node [run 40106297303](https://github.com/nakayama2536-happy/India_1400/actions/runs/40106297303) 214/214 PASS | PASS |
+| 実ブラウザー幅 | 独立・読取専用 [run 40106607614](https://github.com/nakayama2536-happy/India_1400/actions/runs/40106607614)。code `dfa7b68e...` と verifier workflowのみ差分 | Chromium 320/375/402/430pxでPASS |
+| 長い休場文言 | 各幅で実DOMへ「本日は休場のため売買判定の対象外です」を一時的な表示fixtureとして設定 | すべて2行以上に折り返し、文字/ページの横方向はみ出しなし。元の市況・判断入力は変更なし |
+| 下部ナビ | Chromium各幅で5項目、13/13.69/14.67/15px、タップ高50pxを測定 | 文字・予測レンジ・4状態pillとも欠けなし |
+| main CI | merge `94fd79085ea1...` のPR Validation / Security / Purchase / Cache / Technical Chart / Deep Dive / Review History / Decision ReasonsはすべてSUCCESS | PASS |
+| Pages | [deploy run 40106768046](https://github.com/nakayama2536-happy/India_1400/actions/runs/40106768046)、main mergeをheadとして独立安全gate→artifact→deploy | SUCCESS |
+| manifest | 後続 `ddc439c30c0623b4b9781648d925dbfa27538d79` | publication_manifest.jsonだけを更新。UI・売買計算/利用者記録不変 |
+| 本番HTTP実体 | [独立・読取専用 run 40106904139](https://github.com/nakayama2536-happy/India_1400/actions/runs/40106904139) | **PASS**：Pages `index.html`、`VERSION`、`sw.js`、`manifest.webmanifest` が正本のSHA-256とbyte一致 |
+| iPhone Safari/PWA | 公開版を利用者のiPhone17で実測し、旧cacheからの更新・購入記録・他アプリ隔離を確認 | **DEVICE_PENDING**。ブラウザーCIやHTTP一致だけでPASSにしない |
+
+本番HTTPの照合済みbytes/hash：
+- `index.html` 163,548 bytes / `2050eece26707a9f2fc3f95e3a9d8329cf4857e4a4c81c767097f7dd64f417ad`
+- `VERSION` 119 bytes / `cb232d2dd25b6d2645668252b0395bc3baa73a97b998a8a79db1869b0dba10b2`
+- `sw.js` 3,612 bytes / `25f5e3ecdc406f8e07718d8e58289149c4eb4614da323d87fdff81487c4a358b`
+- `manifest.webmanifest` 753 bytes / `f036078385b7d74f537de759932f67884deaf438253c2e2f4a2f0083e8a12ed8`
+
+## 次の検証（端末と運用は別ゲート）
+
+iPhone 17ホーム画面PWAを通常の方法で開き、v5.51、判断文・5タブ・予測カードの視認性を確認する。購入状況の既存記録、レビュー履歴の再読込・別アプリのcache保持を必要時に実機で確認する。**SafariのWebサイトデータ削除、PWAアンインストール、記録resetは禁止。**
+
+Private PENDING-014（14:00自然実行遅延、GitHub-only成功と外部起動由来の区別）、PENDING-026（予測forward実証）、PENDING-019〜022（実機受入）はOPENのまま。実測証拠がない状態を完了扱いしない。
