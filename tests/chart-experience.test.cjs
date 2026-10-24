@@ -109,14 +109,14 @@ test('main index exposes 5 expanded charts, period selection, evidence navigatio
   assert.match(html,/30件でも自動採用しません/);
   assert.doesNotMatch(html,/data-page="quality"/);
 });
-test('UI 5.51 deploy shell and stylesheet remain app-scoped',()=>{
+test('UI 5.52 deploy shell and stylesheet remain app-scoped',()=>{
   const html=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8');
   const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
   const version=fs.readFileSync('VERSION','utf8');
-  assert.match(version,/UI_VERSION=5\.51/);
-  assert.match(html,/v5\.51/);
-  assert.match(manifest.start_url,/v=5\.51/);
-  assert.match(sw,/india1400-v5-51-/);
+  assert.match(version,/UI_VERSION=5\.52/);
+  assert.match(html,/v5\.52/);
+  assert.match(manifest.start_url,/v=5\.52/);
+  assert.match(sw,/india1400-v5-52-/);
   for(const name of ['chart-experience.js','chart-experience.css']){
     assert.ok(html.includes(name));
     assert.ok(sw.includes('"'+name+'"'));
