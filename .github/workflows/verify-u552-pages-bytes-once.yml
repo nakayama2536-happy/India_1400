@@ -52,3 +52,4 @@ jobs:
                   raise AssertionError('PAGES_BYTE_MISMATCH_OR_UNAVAILABLE '+file+' '+reason)
           print('UI552_PUBLIC_PAGES_BYTES_PASS: HTML, VERSION, SW and manifest equal pinned main. Does not prove iPhone Safari cache or personal purchase records.')
           PY
+# Read-only retry following successful Pages workflow 40114094344 attempt 2; no production change.
