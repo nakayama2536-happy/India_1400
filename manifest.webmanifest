@@ -1,8 +1,8 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "description": "インド株14:00定点確認 v5.52・読みやすい判断・インドコア情報・日付見やすい拡大チャート・30/60/200本表示・判断理由・データ品質",
-  "start_url": "./?v=5.52",
+  "description": "インド株14:00定点確認 v5.53・iPhoneで読みやすい判断/参照/為替/市場補足・基準価額トレンド・判断理由・データ品質",
+  "start_url": "./?v=5.53",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
