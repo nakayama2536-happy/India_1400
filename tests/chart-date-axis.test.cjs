@@ -127,3 +127,34 @@ test('UI 5.50 retains all app cache and safe publication version bindings',()=>{
   assert.match(html,/data-ix-expand="rsiChart"/);
   assert.doesNotMatch(sw,/caches\.match\s*\(/);
 });
+
+test('expanded fund NAV trend also labels multiple actual dates without changing original three',()=>{
+  const vm=require('node:vm');
+  const html=fs.readFileSync('index.html','utf8');
+  const a=html.indexOf('function coreTrendSvg('),b=html.indexOf('\nasync function ensureIndiaCoreHistory()',a);
+  assert.ok(a>=0&&b>a);
+  const sandbox=vm.createContext({
+    hasFiniteValue:v=>v!==null&&v!==undefined&&Number.isFinite(Number(v)),
+    fmt:v=>Number(v).toLocaleString('ja-JP'),
+    referenceText:String,
+    fmtJstShort:v=>{const s=String(v).split('-');return Number(s[1])+'/'+Number(s[2]);}
+  });
+  vm.runInContext(html.slice(a,b),sandbox);
+  const input=JSON.parse(fs.readFileSync('india_core_history.json','utf8')).records.slice(-130);
+  const before=JSON.stringify(input),fn=vm.runInContext('coreTrendSvg',sandbox);
+  const pattern=/<text text-anchor="(?:start|middle|end)" x="([\d.]+)" y="[\d.]+">(\d{1,2}\/\d{1,2})<\/text>/g;
+  const extract=svg=>[...svg.matchAll(pattern)].map(m=>({x:Number(m[1]),date:m[2]}));
+  const embedded=extract(fn(input));
+  assert.equal(embedded.length,3);
+  const g=experience.expandedGeometry('indiaCoreTrendChart',375,812,2.5);
+  const displayed=extract(fn(input,[],{width:g.width-16,height:g.height}));
+  assert.ok(displayed.length>3);
+  assert.equal(displayed.at(-1).date,'10/23');
+  const visible=displayed.filter(x=>x.x>=g.width-16-375);
+  assert.ok(visible.length>=3,JSON.stringify(visible));
+  for(let i=1;i<displayed.length;i++)assert.ok(displayed[i].x-displayed[i-1].x>=92);
+  assert.ok(displayed.every(x=>input.some(p=>{
+    const d=p.date.split('-');return Number(d[1])+'/'+Number(d[2])===x.date;
+  })));
+  assert.equal(JSON.stringify(input),before);
+});
