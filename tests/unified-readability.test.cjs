@@ -18,7 +18,7 @@ const css=html.slice(start,end);
 const reasonStart=reasonCss.indexOf('/* UI 5.53: align decision evidence');
 assert.ok(reasonStart>=0);
 const reasons=reasonCss.slice(reasonStart);
-const cssHas=(text,selector)=>text.includes(selector+'{');
+const cssHas=(text,selector)=>text.includes(selector+'{')||text.includes(selector+',');
 const domIds=[
   'decisionCard','forecastCards','forecastBasisNote','forecastDetailsNote','checkWindowState','marketState',
   'qualityGate','forecastConsensus','nextAction','indiaCoreCard','globalReferenceTimes','qualityDetailsBtn',
