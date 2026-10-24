@@ -1,0 +1,97 @@
+name: Verify UI 5.51 Readability Once
+on:
+  push:
+    branches: ['verify/u551-iphone-readability-browser-20261025']
+    paths: ['.github/workflows/verify-u551-iphone-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-mobile-layout:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u551-iphone-readability-browser-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin candidate and deterministic UI test
+        run: |
+          git merge-base --is-ancestor dfa7b68e8aa5fe45fba5a1edd865e54441a98c98 HEAD
+          test "$(git diff --name-only dfa7b68e8aa5fe45fba5a1edd865e54441a98c98 HEAD)" = ".github/workflows/verify-u551-iphone-once.yml"
+          node --test tests/decision-readability.test.cjs
+      - name: Read-only real Chromium iPhone-width layout check
+        run: |
+          python3 -m http.server 9879 --bind 127.0.0.1 >/tmp/india-ui551-local-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          node <<'JS'
+          'use strict';
+          const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const chrome=['/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>fs.existsSync(x))||'google-chrome';
+          const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'india-ui551-'));
+          const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu',
+            '--remote-debugging-port=9231','--remote-allow-origins=*','--user-data-dir='+temporary,'about:blank'],{stdio:'ignore'});
+          async function verify(){
+            for(let t=0;t<50;t++){try{await(await fetch('http://127.0.0.1:9231/json/version')).json();break}catch(_){await sleep(120)}}
+            const target=await(await fetch('http://127.0.0.1:9231/json/new?about:blank',{method:'PUT'})).json();
+            const ws=new WebSocket(target.webSocketDebuggerUrl);
+            await new Promise((res,rej)=>{ws.addEventListener('open',res,{once:true});ws.addEventListener('error',rej,{once:true})});
+            let next=0;const pending=new Map();
+            ws.addEventListener('message',ev=>{const r=JSON.parse(ev.data);if(!r.id)return;const p=pending.get(r.id);if(p){pending.delete(r.id);r.error?p.reject(Error(JSON.stringify(r.error))):p.resolve(r.result)}});
+            const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++next;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+            const expression=String.raw`(async()=>{
+              for(let tries=0;tries<55;tries++){
+                if(document.querySelector('#forecastCards .ret-value') && document.querySelector('#actionLabel')?.textContent!=='読込中')break;
+                await new Promise(resolve=>setTimeout(resolve,100));
+              }
+              const root=document.querySelector('#decisionCard'),title=document.querySelector('.title-row .version-badge'),
+                main=document.querySelector('#actionLabel'),forecast=[...document.querySelectorAll('#forecastCards .forecast')],
+                tabs=[...document.querySelectorAll('.tabs .tab')],pillIds=['checkWindowState','marketState','qualityGate','forecastConsensus'],
+                pills=pillIds.map(id=>document.getElementById(id)),
+                visible=el=>!!el && !!el.getBoundingClientRect().height && getComputedStyle(el).visibility!=='hidden';
+              const cardRanges=forecast.map(x=>({text:x.querySelector('.range')?.textContent||'',
+                fits:!!x.querySelector('.range') && x.querySelector('.range').scrollWidth<=x.querySelector('.range').clientWidth+2,
+                ret:x.querySelector('.ret-value')?.textContent||'',
+                retFits:!!x.querySelector('.ret-value') && x.querySelector('.ret-value').scrollWidth<=x.querySelector('.ret-value').clientWidth+2}));
+              const tabLayout=tabs.map(x=>({label:x.textContent.trim(),fontSize:Number.parseFloat(getComputedStyle(x).fontSize),
+                rectWidth:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height,
+                textFits:x.scrollWidth<=x.clientWidth+2}));
+              const result={
+                width:innerWidth,height:innerHeight,version:title?.textContent.trim(),
+                action:main?.textContent,actionWeight:getComputedStyle(main).fontWeight,
+                actionSize:Number.parseFloat(getComputedStyle(main).fontSize),
+                tabs:tabLayout,forecastCards:cardRanges,
+                pills:pills.map(x=>({text:x?.textContent,visible:visible(x)})),
+                referenceVisible:visible(document.getElementById('forecastBasisNote')),
+                warningVisible:document.querySelector('.forecast-footnote')?.textContent.includes('売買条件ではありません'),
+                nextVisible:visible(document.querySelector('#nextAction'))&&document.querySelector('#nextAction')?.textContent.includes('次の確認：'),
+                detailsExists:visible(document.querySelector('.decision-more > summary')),
+                horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+              };
+              const labels=['判断','購入状況','指標','予測','管理'];
+              result.pass=result.version==='v5.51'&&result.actionWeight==='600'&&result.actionSize>=25&&result.actionSize<=31&&
+                tabs.length===5&&tabs.every((t,i)=>t.textContent.trim()===labels[i])&&tabLayout.every(x=>x.fontSize>=13&&x.fontSize<=15.1&&x.height>=49&&x.textFits)&&
+                forecast.length===3&&cardRanges.every(x=>x.ret.length&&x.text.includes('参考度')&&x.retFits&&x.fits)&&
+                pills.every(visible)&&result.warningVisible&&result.referenceVisible&&result.nextVisible&&result.detailsExists&&result.horizontalOverflow<=2;
+              return JSON.stringify(result);
+            })()`;
+            try{
+              await cdp('Page.enable');
+              for(const [width,height,dpr] of [[320,700,2],[375,812,3],[402,874,3],[430,932,3]]){
+                await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:dpr,mobile:true,screenWidth:width,screenHeight:height});
+                await cdp('Page.navigate',{url:'http://127.0.0.1:9879/index.html?ui551='+width});
+                await sleep(450);
+                const p=await cdp('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});
+                const raw=p?.result?.value;
+                if(!raw?.startsWith('{'))throw Error('BROWSER_MISSING_RESULT '+width+' '+JSON.stringify(p).slice(0,1000));
+                const report=JSON.parse(raw);
+                console.log('UI551_MOBILE_VISUAL '+JSON.stringify(report));
+                if(report.width!==width||report.pass!==true)throw Error('UI551_LAYOUT_FAILED '+width);
+              }
+              console.log('UI551_BROWSER_RESPONSIVE_PASS: actual local Chromium DOM at 320,375,402,430 CSS px. NOT iPhone Safari device acceptance.');
+            }finally{ws.close()}
+          }
+          verify().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>proc.kill('SIGTERM'));
+          JS
