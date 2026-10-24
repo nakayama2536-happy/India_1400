@@ -2,7 +2,7 @@
 
 Date: 2026-10-25 JST
 Public baseline main: `05a2a36c20947d7f97690e5c2e80cd130952d299` (UI 5.52)
-Status: 表示専用PR候補。main、公開HTTP、iPhone端末受入は独立した検証条件。
+Status (2026-10-25 JST): **UI 5.53 PR #99 MERGED / final CI 9/9 PASS / Pages deploy SUCCESS / live public HTTP bytes 4/4 MATCH. iPhone17 DEVICE_PASS is pending.**
 
 ## 目的と実機証拠
 
@@ -53,3 +53,30 @@ Status: 表示専用PR候補。main、公開HTTP、iPhone端末受入は独立�
 PENDING-014 GitHub-only自然14:00取得/DECISION Burn-in、各期間のforward予測評価、正式NAVの源泉/更新日/品質照合、正式売買採用と定期レポート停止ゲートは本UI改修と独立。
 
 表示に問題がある場合、前版UI 5.52のCSS/版へ安全な前進修正PRで戻す。既存市場JSON、利用者記録、端末cacheを全削除しない。
+
+## 配信と実証（2026-10-25 JST）
+
+| ゲート | 実証 | 結果 |
+|---|---|---|
+| 変更申請/承認範囲 | 利用者が実機10画面で表示統一を依頼。表示専用の変更として[PR #99](https://github.com/nakayama2536-happy/India_1400/pull/99)を作成 | ユーザー指示の範囲で実装。売買ロジック等は対象外 |
+| PR最終head | `8f669f79637b619baa6e265d276b9c6f9ba8fce6` | 9/9必須CI成功。全Node 227/227 PASS、Security/Purchase/Cache/Review History/Technical Chart/Deep Dive/Publication Manifest/PR Validationを確認 |
+| 実ブラウザ表示 | 別の未マージ隔離workflow [run 40142780546](https://github.com/nakayama2536-happy/India_1400/actions/runs/40142780546)が上記候補コードを読取検証 | Chromium 320/375/393/402/430px、参照11タイル、GPT4、為替4、市場補足5、判断理由9状態の文字と折り返しを確認。横はみ出し0、5タブ50px |
+| main反映 | Public PR #99 squash merge `1a4155f15718b17040a37ab99a08b9083dcdf83e` | MERGED。main後続CI 9系統すべて成功 |
+| Publication Manifest | main後続 `5fa27a823e338012b4ad4bfee825188d4d6cf165` | `publication_manifest.json`のみ更新。UI計算/公開データ・ユーザー記録は不変 |
+| GitHub Pages | [run 40142861800](https://github.com/nakayama2536-happy/India_1400/actions/runs/40142861800) | Public safety gate→artifact build→Pages deploy、すべてSUCCESS |
+| 実配信ファイル | [独立読取HTTP run 40142941549](https://github.com/nakayama2536-happy/India_1400/actions/runs/40142941549) | `index.html`、`VERSION`、`sw.js`、`manifest.webmanifest` がGit正本とSHA-256で完全一致（4/4 PASS） |
+| iPhone 17 Safari/PWA | ユーザー本人の実機利用・再読込/起動時の状態と記録を照合 | **DEVICE_PENDING**。実DOM検証とPages配信から受入済みと推定しない |
+| 通常市場での自然実行/正式判断 | Private PENDING-014、予測forward評価、Common採用ゲート | このCSS改修により完了扱いしない |
+
+独立HTTP検証で確認した公開ファイル：
+
+- `index.html` 173,328 bytes / SHA-256 `dedad0b3f64181e39c6555e71aefbbcc08ee166f112f503478a98e7e953376af`
+- `VERSION` 119 bytes / SHA-256 `bcd29e583e656274db17fe1648433adbf09d037fff6bdcab0d1fe493a36add37`
+- `sw.js` 3,611 bytes / SHA-256 `7a61a15471db9269424062f6a00de3212b5585a5c673bb698f40ef801fb9455f`
+- `manifest.webmanifest` 753 bytes / SHA-256 `02de66747a4a1981af2e1e1da22d9f39ac16a737b60af47ac1615fe8c64964af`
+
+### 完了後の端末受入
+
+iPhone 17ホーム画面PWA（通常利用環境）でv5.53表示を確認し、参照時刻・GPTトリガー・為替・14:00市場補足・判断理由の各ラベル/値/注記と色が欠けず、展開・閉じる・スクロールが正常かを確認する。購入状況/レビュー履歴の既存ローカル記録が保持されているかを非破壊で再読取する。**アプリ削除、Safariサイトデータ全削除、localStorage/IndexedDBクリア、購入記録リセットは行わない。**
+
+隔離Chromium検証中の最初のrunは、PWA制御者変更に伴うページ再ロードと検証workflowのYAMLインデント問題で失敗した。隔離workflowのみ修正して[run 40142780546](https://github.com/nakayama2536-happy/India_1400/actions/runs/40142780546)を成功させた。実アプリコード・市場データの追加修正はしていない。
