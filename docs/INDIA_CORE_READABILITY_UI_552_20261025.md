@@ -49,3 +49,13 @@ iPhone17のスクリーンショットで、インド・コア最新情報の「
 - 実機iPhone17縦画面の最終確認は別ゲート。画像やCIは実機の旧キャッシュ更新・操作性・購入記録保持を証明しない。
 
 Cloudflare、外部トリガー、14:00自然取得/Burn-in、正式売買・レポート廃止の採否は今回の範囲外。復旧が必要なら新PRで表示変更のみを戻し、端末の保存領域を初期化しない。
+
+## Chromium実ブラウザ検証結果（PR候補、2026-10-25 JST）
+
+- 検証対象コード：Public PR #97 候補 `9c1357a3a6aa7720c8b27da0a199fcb17e37eb84`。
+- 読取り専用隔離 [run 40113701870](https://github.com/nakayama2536-happy/India_1400/actions/runs/40113701870) **SUCCESS**。検証ブランチは対象コードと専用workflowだけ差分があり、mainへ採用せずPagesへ配信しない。
+- Chromeの実DOMを320 / 375 / 393 / 402 / 430 CSS pxで検査。7カードの見出し・数値・品質状態・補足説明がすべて表示され、14px・17〜19px設定が反映済み。カード数と順序、2列レイアウト、取得元リンク、詳細開閉16px、NAV/前日比、5タブを確認。
+- いずれの幅でも文字の横切れとページ全体の横はみ出しなし。公式ファンド `14,992円`、`-237円 (-1.56%)`、`139.00億円`、MA25/75、RSI14、MACD、DCの保存済み公開値を、値を書き換えずに表示。データ品質状態も元の「データ確認済み」のまま。実市場の現在値を検証したわけではない。
+- 同ブランチの初回読取り検証 [run 40113524086](https://github.com/nakayama2536-happy/India_1400/actions/runs/40113524086) はChromiumデバッガの起動待ち不足で失敗。検証専用workflowの待機・診断を修正後、アプリ候補コード変更なしで再検証PASS。
+- 既存CIの `Decision Reasons Contract` による全Nodeは221/221 PASS、Security / Purchase / Cache / Chart / Deep Dive / Review History / Publication Manifest成功。**PR Validationは最終PR headの実行完了を別に確認**し、合格するまでmain反映しない。
+- ChromiumとCIはiPhone実機の文字設定・PWAキャッシュ・端末内記録保持の受入ではない。旧履歴や個人保存値を操作しない。
