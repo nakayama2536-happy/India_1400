@@ -130,11 +130,11 @@ test('missing official NAV does not create zero or certify a value',()=>{
 });
 
 test('PWA version consistency and cache isolation persist through readability revision',()=>{
-  assert.match(version,/UI_VERSION=5\.53/);
-  assert.match(html,/India 14:00 Check v5\.53/);
-  assert.match(manifest.start_url,/v=5\.53/);
-  assert.match(sw,/india1400-v5-53-/);
-  assert.match(sw,/"\.\/\?v=5\.53"/);
+  assert.match(version,/UI_VERSION=5\.54/);
+  assert.match(html,/India 14:00 Check v5\.54/);
+  assert.match(manifest.start_url,/v=5\.54/);
+  assert.match(sw,/india1400-v5-54-/);
+  assert.match(sw,/"\.\/\?v=5\.54"/);
   assert.match(sw,/key\.startsWith\(CACHE_PREFIX\)/);
   assert.doesNotMatch(sw,/caches\.match\s*\(/);
   assert.match(html,/id="purchaseProgress"/);

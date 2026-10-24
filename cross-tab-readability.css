@@ -1,0 +1,131 @@
+/* UI 5.54: iPhone 17 cross-tab readability; presentation only. */
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail){--ui54-head:21px;--ui54-label:14px;--ui54-value:18px;--ui54-body:14px}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail)>.card{padding:clamp(15px,4vw,19px)}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) .card>h2,
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) details.card>summary{font-size:var(--ui54-head);font-weight:750;line-height:1.45}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) .note,
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) .small{font-size:var(--ui54-body);line-height:1.7;overflow-wrap:anywhere}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) details.supplement>summary{font-size:16px;line-height:1.55;font-weight:720;min-height:46px;padding:13px 14px}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) details.supplement>.body,
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) details.card>.body{font-size:14px;line-height:1.75;padding:0 14px 16px;overflow-wrap:anywhere}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) summary:focus-visible,
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) .primary,
+:is(#page-purchase,#page-indicators,#page-forecast,#page-detail) .secondary{min-height:48px;font-size:15px;line-height:1.45}
+
+/* Purchase: execution records and market readiness remain distinct. */
+#page-purchase #purchaseProgress{gap:9px}
+#page-purchase #purchaseProgress .tranche-toggle{min-width:0;min-height:100px;padding:12px 5px;gap:5px;overflow-wrap:anywhere}
+#page-purchase #purchaseProgress .tname{font-size:14px;line-height:1.4}
+#page-purchase #purchaseProgress .tstate{font-size:clamp(14px,3.65vw,17px);line-height:1.4;overflow-wrap:anywhere}
+#page-purchase #purchaseProgress .tdate{font-size:14px;line-height:1.45;font-weight:650;overflow-wrap:anywhere}
+#page-purchase .local-only{font-size:14px;line-height:1.65;color:#b9c8dc;overflow-wrap:anywhere}
+#page-purchase .next-check{padding:14px;margin-top:13px}
+#page-purchase .next-check .label{font-size:14px;line-height:1.5}
+#page-purchase .next-check .value{font-size:clamp(18px,5vw,22px);font-weight:750;line-height:1.45;overflow-wrap:anywhere}
+#page-purchase .tranche-plan{gap:12px}
+#page-purchase .tranche-plan-card{padding:14px;border-radius:14px}
+#page-purchase .tranche-plan-card .tranche-plan-title{font-size:17px;line-height:1.55;overflow-wrap:anywhere}
+#page-purchase .tranche-record-status{line-height:1.35;font-weight:780}
+#page-purchase .tranche-record-source,
+#page-purchase .tranche-plan-card .tranche-plan-state,
+#page-purchase .tranche-plan-card .tranche-plan-reason{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+#page-purchase .tranche-plan-card .tranche-plan-next{font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+#page-purchase .condition-row{grid-template-columns:24px minmax(0,1fr);gap:9px;padding:12px 0;font-size:14px;line-height:1.6}
+#page-purchase .condition-label{font-size:15px;line-height:1.55}
+#page-purchase .condition-detail{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+
+/* Indicators: axis geometry and expanded charts are intentionally untouched. */
+#page-indicators .indicators-panel .indicator-section-heading h2{font-size:21px;line-height:1.45;font-weight:750}
+#page-indicators .indicators-panel .indicator-section-note,
+#page-indicators .indicators-panel .chart-meta{font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+#page-indicators .indicators-panel .chart-title{font-size:18px;line-height:1.5;font-weight:750;overflow-wrap:anywhere}
+#page-indicators .indicators-panel .indicator-last-close{font-size:19px;line-height:1.4}
+#page-indicators .indicators-panel .chart-head{gap:10px}
+#page-indicators .indicators-panel .legend,
+#page-indicators .detail-chart-legend{font-size:13px;line-height:1.6;gap:9px 13px}
+#page-indicators .indicators-panel .chart-note,
+#page-indicators .external-help,
+#page-indicators .chart-guide-note{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+#page-indicators .indicators-panel .indicator-values>summary{font-size:16px;line-height:1.55;min-height:46px;padding:13px 14px}
+#page-indicators #niftyMetrics .metric,
+#page-indicators #externalMetrics .metric{min-width:0;padding:12px}
+#page-indicators #niftyMetrics .metric .label,
+#page-indicators #externalMetrics .metric .label{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+#page-indicators #niftyMetrics .metric .value,
+#page-indicators #externalMetrics .metric .value{font-size:18px;line-height:1.4;overflow-wrap:anywhere}
+#page-indicators #niftyMetrics .metric .detail,
+#page-indicators #externalMetrics .metric .detail{font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+#page-indicators .chart-help>summary{font-size:14px;line-height:1.6;min-height:46px;padding:12px 0;flex-wrap:wrap}
+#page-indicators .chart-help>.body{font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+#page-indicators .ix-expand{font-size:16px;min-height:46px}
+#page-indicators .ix-period-label,
+#page-indicators .ix-period-feedback,
+#page-indicators .ix-chart-toolbar .small{font-size:14px;line-height:1.6}
+#page-indicators #niftyDetailPanel .chart-title{font-size:16px;line-height:1.5}
+#page-indicators #niftyDetailPanel .chart-meta{font-size:14px;line-height:1.6;text-align:left;overflow-wrap:anywhere}
+#page-indicators .history-wait{font-size:14px}
+
+/* Forecast: 1/3/14-day verification stays visible and never implies permission to trade. */
+#page-forecast #verificationSummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#page-forecast #verificationSummary>.forecast:last-child{grid-column:1/-1}
+#page-forecast #verificationSummary .forecast{min-width:0;padding:14px 11px;text-align:left}
+#page-forecast #verificationSummary .day{font-size:15px;line-height:1.5;color:#c5d3e7}
+#page-forecast #verificationSummary .dir{font-size:clamp(18px,5vw,24px);line-height:1.4;font-weight:750;margin:7px 0}
+#page-forecast #verificationSummary .ret{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+#page-forecast #verificationSummary .range,
+#page-forecast #verificationSummary .ix-progress-meta{font-size:14px;line-height:1.65;color:#b9c8dc;overflow-wrap:anywhere}
+#page-forecast #verificationSummary .ix-progress{margin:11px 0 8px}
+#page-forecast #verificationNote{font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+
+/* Management: preserve quality colors, missing-status evidence, and personal records. */
+#page-detail .quality-section h3{font-size:18px;line-height:1.5;margin:10px 0}
+#page-detail .quality-top-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:13px}
+#page-detail .quality-top-summary .ix-quality-tile:last-child{grid-column:1/-1}
+#page-detail .quality-top-summary .ix-quality-tile{min-width:0;min-height:76px;padding:12px;border-radius:12px;overflow-wrap:anywhere}
+#page-detail .quality-top-summary .ix-quality-tile span{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+#page-detail .quality-top-summary .ix-quality-tile b{font-size:17px;line-height:1.45;overflow-wrap:anywhere}
+#page-detail .quality-top-summary .ix-quality-tile:after{font-size:13px;line-height:1.5;margin-top:7px}
+#page-detail .ix-evidence{padding:13px;font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+#page-detail .ix-evidence h4{font-size:17px;line-height:1.5}
+#page-detail .ix-evidence p{font-size:14px;line-height:1.7}
+#page-detail .source-row{grid-template-columns:minmax(88px,0.8fr) minmax(0,1.6fr);gap:11px;padding:13px 0;font-size:14px;line-height:1.65}
+#page-detail .source-name,
+#page-detail .ref-time{font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+#page-detail .source-detail,
+#page-detail .ref-age,
+#page-detail .ref-sub,
+#page-detail .ref-provider{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+#page-detail .ref-badge{font-size:12px;padding:4px 8px;line-height:1.4}
+#page-detail .reason{font-size:14px;line-height:1.65;padding:11px 0}
+#page-detail .deep-dive-actions{gap:12px}
+#page-detail .deep-dive-actions button,
+#page-detail .review-actions button{min-width:0;min-height:50px;font-size:16px;line-height:1.45;white-space:normal;overflow-wrap:anywhere}
+#page-detail .deep-dive-status,
+#page-detail .review-state,
+#page-detail .review-warning{font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+#page-detail .review-utility-grid{gap:8px}
+#page-detail .review-utility{min-width:0;min-height:50px;padding:12px 5px;font-size:15px;line-height:1.4;white-space:normal}
+#page-detail .review-note{font-size:16px;line-height:1.6;min-height:104px}
+#page-detail .review-actions{gap:9px}
+
+/* Two-column small phone, three-column wide display; very narrow phones stack. */
+@media(min-width:600px){
+  #page-forecast #verificationSummary{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #page-forecast #verificationSummary>.forecast:last-child{grid-column:auto}
+  #page-detail .quality-top-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #page-detail .quality-top-summary .ix-quality-tile:last-child{grid-column:auto}
+}
+@media(max-width:359px){
+  #page-purchase #purchaseProgress{gap:5px}
+  #page-purchase #purchaseProgress .tranche-toggle{padding:10px 3px}
+  #page-forecast #verificationSummary{grid-template-columns:1fr}
+  #page-forecast #verificationSummary>.forecast:last-child{grid-column:auto}
+  #page-detail .quality-top-summary{grid-template-columns:1fr}
+  #page-detail .quality-top-summary .ix-quality-tile:last-child{grid-column:auto}
+  #page-detail .source-row{grid-template-columns:minmax(80px,0.85fr) minmax(0,1.4fr);gap:8px}
+}
+
+/* The secondary-chart mobile rule is more specific than the common metadata rule. */
+#page-indicators .indicators-panel .indicator-secondary .chart-meta{font-size:14px;line-height:1.6;color:#b9c8dc;overflow-wrap:anywhere}
+#page-indicators .ix-period{font-size:15px;min-height:46px}

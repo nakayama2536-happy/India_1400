@@ -123,13 +123,13 @@ test('detailed disclosures are retained, but made legible without changing marke
 });
 
 test('5.53 release remains confined to own cache and UI; all source contracts unchanged',()=>{
-  assert.match(version,/UI_VERSION=5\.53/);
+  assert.match(version,/UI_VERSION=5\.54/);
   assert.match(version,/APP_VERSION=5\.7/);
   assert.match(version,/DECISION_GATE_VERSION=5\.1-gate-1/);
-  assert.match(html,/India 14:00 Check v5\.53/);
-  assert.match(manifest.start_url,/v=5\.53/);
-  assert.match(sw,/india1400-v5-53-/);
-  assert.match(sw,/"\.\/\?v=5\.53"/);
+  assert.match(html,/India 14:00 Check v5\.54/);
+  assert.match(manifest.start_url,/v=5\.54/);
+  assert.match(sw,/india1400-v5-54-/);
+  assert.match(sw,/"\.\/\?v=5\.54"/);
   assert.match(sw,/key\.startsWith\(CACHE_PREFIX\)/);
   assert.doesNotMatch(sw,/caches\.match\s*\(/);
   assert.match(html,/id="purchaseProgress"/);

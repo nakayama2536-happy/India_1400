@@ -1,5 +1,13 @@
 # Changelog
 
+## UI v5.54 — 2026-10-25 (4-tab readability rollout)
+
+- v5.53判断タブの文字階層を購入状況・指標・予測・管理へ展開。新しいスコープ限定CSSと回帰テストを追加。
+- 購入記録の日付・保留理由、指標グラフ周辺、予測検証1/3/14営業日、管理の品質/取得/深掘り操作の視認性を向上。
+- Private Core・売買/予測・14:00判定・取得・公開市場データ・個人購入/評価記録は変更しない。iPhone17実機受入は別ゲート。
+- Tracking: Issue #101 / docs/CROSS_TAB_READABILITY_UI_554_20261025.md.
+
+
 ## UI v5.46 candidate — 2026-10-21
 
 - Issue #87: compact saved decision conditions; remove exact duplicate reasons.
