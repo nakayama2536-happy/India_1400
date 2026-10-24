@@ -1,0 +1,137 @@
+name: Verify India UI 5.53 Mobile Once
+on:
+  push:
+    branches: ['verify/u553-unified-mobile-chrome-20261025']
+    paths: ['.github/workflows/verify-u553-mobile-once.yml']
+permissions:
+  contents: read
+jobs:
+  visual-check:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u553-unified-mobile-chrome-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin candidate and keep isolated workflow out of release
+        run: |
+          git merge-base --is-ancestor 8f669f79637b619baa6e265d276b9c6f9ba8fce6 HEAD
+          test "$(git diff --name-only 8f669f79637b619baa6e265d276b9c6f9ba8fce6 HEAD)" = ".github/workflows/verify-u553-mobile-once.yml"
+          node --test tests/unified-readability.test.cjs
+      - name: Read-only Chromium actual DOM checks for phone viewports
+        run: |
+          python3 -m http.server 9893 --bind 127.0.0.1 >/tmp/ui553-localserver.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          node <<'JS'
+          'use strict';
+          const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const chrome=['/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>fs.existsSync(x))||'google-chrome';
+          const temp=fs.mkdtempSync(path.join(os.tmpdir(),'india-u553-chrome-'));
+          const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu',
+           '--remote-debugging-port=9233','--remote-allow-origins=*','--user-data-dir='+temp,'about:blank'],{stdio:['ignore','ignore','pipe']});
+          let diag='';
+          proc.stderr.on('data',x=>{diag=(diag+String(x)).slice(-1800)});
+          async function inspect(){
+            for(let tries=0;tries<80;tries++){
+              if(document.querySelectorAll('#globalReferenceTimes .ref-compact-item').length>=8 &&
+                 document.querySelectorAll('#deepDiveTriggerCategories .status-tile').length===4 &&
+                 document.querySelectorAll('#yenMetrics .status-tile').length===4 &&
+                 document.querySelectorAll('#decisionReasonsPanel .dr-row').length>=4)break;
+              await new Promise(r=>setTimeout(r,130));
+            }
+            const market=document.querySelector('#marketSupplementMetrics');
+            const marketDetails=market?.closest('details.card');
+            if(marketDetails)marketDetails.open=true;
+            await new Promise(r=>requestAnimationFrame(r));
+            const $=(sel)=>document.querySelector(sel);
+            const all=(sel)=>[...document.querySelectorAll(sel)];
+            const size=(el)=>el?parseFloat(getComputedStyle(el).fontSize):0;
+            const fits=(el)=>!el||el.scrollWidth<=el.clientWidth+2;
+            const count=(sel)=>all(sel).length;
+            const group=(sel,label,val,status,detail)=>{
+              const cards=all(sel);
+              const cells=cards.map(el=>{
+                const slots=[el.querySelector(label),el.querySelector(val),el.querySelector(status),el.querySelector(detail)].filter(Boolean);
+                return {font:slots.map(size),fit:slots.every(fits),text:slots.map(n=>n.textContent.trim().slice(0,65))};
+              });
+              return {count:cards.length,cells,fit:cells.every(x=>x.fit),fontOK:cells.every(x=>x.font[0]>=13.5 && x.font[1]>=16 && x.font[2]>=13.5 && (x.font.length<4 || x.font[3]>=12.5))};
+            };
+            const ref=group('#globalReferenceTimes .ref-compact-item','.ref-compact-label','.ref-compact-time','.ref-compact-status','.ref-compact-detail');
+            const deep=group('#deepDiveTriggerCategories .status-tile','.status-tile-label','.status-tile-value','.status-tile-status','.status-tile-detail');
+            const yen=group('#yenMetrics .status-tile','.status-tile-label','.status-tile-value','.status-tile-status','.status-tile-detail');
+            const metrics=all('#marketSupplementMetrics .metric').map(el=>{
+              const arr=['.label','.value','.detail'].map(sel=>el.querySelector(sel));
+              return {font:arr.map(size),fit:arr.every(fits),text:arr.map(x=>x?.textContent?.trim().slice(0,50))};
+            });
+            const reasons={
+              labels:all('#decisionReasonsPanel .dr-label').map(x=>({font:size(x),fit:fits(x)})),
+              states:all('#decisionReasonsPanel .dr-state').map(x=>({font:size(x),fit:fits(x)})),
+              values:all('#decisionReasonsPanel .dr-value').map(x=>({font:size(x),fit:fits(x)})),
+              methodSize:size($('#decisionReasonsPanel .dr-method-body')),
+              warningSize:size($('#decisionReasonsPanel .dr-alerts'))
+            };
+            const cols=(sel)=>getComputedStyle($(sel)).gridTemplateColumns.split(' ').filter(Boolean).length;
+            const tabs=all('nav.tabs .tab').map(x=>({font:size(x),height:x.getBoundingClientRect().height,fit:fits(x)}));
+            const result={
+              width:innerWidth,height:innerHeight,version:$('.version-badge')?.textContent.trim(),
+              columns:{reference:cols('#globalReferenceTimes'),gpt:cols('#deepDiveTriggerCategories'),fx:cols('#yenMetrics')},
+              ref,deep,yen,metrics,reasons,tabs,
+              extra:{yenSummary:size($('#yenSummary')),marketStatus:size($('#marketSupplementStatus')),
+                deepNote:size($('.deep-trigger-note')),decisionFootnote:size($('.forecast-footnote')),
+                forexDetail:size($('#yenMetrics')?.closest('.card')?.querySelector('details.supplement .body'))},
+              pageOverflow:document.documentElement.scrollWidth-innerWidth
+            };
+            result.pass=result.version==='v5.53'&&ref.count>=8&&ref.fontOK&&ref.fit&&
+              deep.count===4&&deep.fontOK&&deep.fit&&
+              yen.count===4&&yen.fontOK&&yen.fit&&
+              metrics.length>=4&&metrics.every(x=>x.fit&&x.font[0]>=14&&x.font[1]>=18&&x.font[2]>=14)&&
+              reasons.labels.length>=4&&reasons.states.length>=4&&
+              reasons.labels.every(x=>x.font>=15&&x.fit)&&reasons.states.every(x=>x.font>=14&&x.fit)&&
+              reasons.values.every(x=>x.font>=14&&x.fit)&&
+              result.extra.yenSummary>=14&&result.extra.marketStatus>=14&&result.extra.deepNote>=14&&
+              result.extra.decisionFootnote>=14&&result.extra.forexDetail>=14&&
+              result.columns.reference===2&&result.columns.gpt===2&&result.columns.fx===2&&
+              tabs.length===5&&tabs.every(x=>x.font>=13&&x.height>=49&&x.fit)&&result.pageOverflow<=2;
+            // Only structural measurements and already-public market labels are read;
+            // no purchase/review data are accessed or modified.
+            return JSON.stringify(result);
+          }
+          async function verify(){
+            let ready=false;
+            for(let n=0;n<160;n++){try{await(await fetch('http://127.0.0.1:9233/json/version')).json();ready=true;break}catch(_){if(proc.exitCode!==null)break;await sleep(150)}}
+            if(!ready)throw Error('CHROME_NOT_READY exit='+proc.exitCode+' '+diag.slice(-850));
+            const target=await(await fetch('http://127.0.0.1:9233/json/new?about:blank',{method:'PUT'})).json();
+            const ws=new WebSocket(target.webSocketDebuggerUrl);
+            await new Promise((res,rej)=>{ws.addEventListener('open',res,{once:true});ws.addEventListener('error',rej,{once:true})});
+            let n=0;const pending=new Map();
+            ws.addEventListener('message',ev=>{const v=JSON.parse(ev.data);if(!v.id)return;const p=pending.get(v.id);if(p){pending.delete(v.id);v.error?p.reject(Error(JSON.stringify(v.error))):p.resolve(v.result)}});
+            const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++n;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+            try{
+              await cdp('Page.enable');
+              for(const [width,height,dpr]of[[320,700,2],[375,812,3],[393,852,3],[402,874,3],[430,932,3]]){
+                await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:dpr,mobile:true,screenWidth:width,screenHeight:height});
+                await cdp('Page.navigate',{url:'http://127.0.0.1:9893/index.html?ui553='+width});
+                await sleep(550);
+                const data=await cdp('Runtime.evaluate',{expression:'('+inspect.toString()+')()',awaitPromise:true,returnByValue:true});
+                const raw=data?.result?.value;
+                if(!raw||!raw.startsWith('{'))throw Error('NO_UI553_BROWSER_RESULT '+width+' '+JSON.stringify(data).slice(0,900));
+                const r=JSON.parse(raw);
+                console.log('UI553_MOBILE_DOM '+JSON.stringify({
+                  width:r.width,version:r.version,cols:r.columns,
+                  reference:r.ref.count,gpt:r.deep.count,fx:r.yen.count,market:r.metrics.length,
+                  reasonStates:r.reasons.states.length,details:r.extra,tabs:r.tabs,pageOverflow:r.pageOverflow,
+                  allFit:[r.ref.fit,r.deep.fit,r.yen.fit,r.metrics.every(x=>x.fit)],
+                  failure:r.pass?null:{ref:r.ref.fontOK,deep:r.deep.fontOK,fx:r.yen.fontOK,reasonFonts:r.reasons,
+                    metricFonts:r.metrics.map(x=>x.font)}
+                }));
+                if(!r.pass)throw Error('UI553_MOBILE_DOM_FAILED '+width);
+              }
+              console.log('UI553_BROWSER_PASS: real local Chromium 320,375,393,402,430 CSS px; five content regions and formal reasons. Not actual Safari DEVICE_PASS.');
+            }finally{ws.close()}
+          }
+          verify().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>proc.kill('SIGTERM'));
+          JS
