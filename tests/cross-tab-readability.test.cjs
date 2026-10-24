@@ -42,7 +42,7 @@ test('purchase keeps stage-by-stage local records and enlarges the execution dat
   assert.match(p,new RegExp('id="'+id+'"'));
  }
  assert.match(rule('#page-purchase #purchaseProgress .tranche-toggle'),/min-height:100px/);
- assert.match(rule('#page-purchase #purchaseProgress .tdate'),/font-size:12px/);
+ assert.match(rule('#page-purchase #purchaseProgress .tdate'),/font-size:14px/);
  assert.match(rule('#page-purchase .tranche-plan-card .tranche-plan-next'),/font-size:15px/);
  assert.match(rule('#page-purchase .condition-detail'),/font-size:14px/);
  assert.match(html,/const PURCHASE_STATE_KEY="india1400\.purchaseProgress\.v1"/);

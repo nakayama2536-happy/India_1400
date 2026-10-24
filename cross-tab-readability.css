@@ -18,7 +18,7 @@
 #page-purchase #purchaseProgress .tranche-toggle{min-width:0;min-height:100px;padding:12px 5px;gap:5px;overflow-wrap:anywhere}
 #page-purchase #purchaseProgress .tname{font-size:14px;line-height:1.4}
 #page-purchase #purchaseProgress .tstate{font-size:clamp(14px,3.65vw,17px);line-height:1.4;overflow-wrap:anywhere}
-#page-purchase #purchaseProgress .tdate{font-size:12px;line-height:1.45;font-weight:650;overflow-wrap:anywhere}
+#page-purchase #purchaseProgress .tdate{font-size:14px;line-height:1.45;font-weight:650;overflow-wrap:anywhere}
 #page-purchase .local-only{font-size:14px;line-height:1.65;color:#b9c8dc;overflow-wrap:anywhere}
 #page-purchase .next-check{padding:14px;margin-top:13px}
 #page-purchase .next-check .label{font-size:14px;line-height:1.5}
