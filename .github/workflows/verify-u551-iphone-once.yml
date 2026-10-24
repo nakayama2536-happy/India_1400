@@ -58,6 +58,15 @@ jobs:
               const tabLayout=tabs.map(x=>({label:x.textContent.trim(),fontSize:Number.parseFloat(getComputedStyle(x).fontSize),
                 rectWidth:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height,
                 textFits:x.scrollWidth<=x.clientWidth+2}));
+              // Layout-only fixture: a later date may correctly show a held decision.
+              const originalAction=main?.textContent;
+              if(main)main.textContent='本日は休場のため売買判定の対象外です';
+              const holidayFixture={
+                wraps:!!main && main.getBoundingClientRect().height>=Number.parseFloat(getComputedStyle(main).lineHeight)*2-1,
+                fits:!!main && main.scrollWidth<=main.clientWidth+2,
+                pageFits:document.documentElement.scrollWidth-innerWidth<=2
+              };
+              if(main)main.textContent=originalAction;
               const result={
                 width:innerWidth,height:innerHeight,version:title?.textContent.trim(),
                 action:main?.textContent,actionWeight:getComputedStyle(main).fontWeight,
@@ -68,13 +77,13 @@ jobs:
                 warningVisible:document.querySelector('.forecast-footnote')?.textContent.includes('売買条件ではありません'),
                 nextVisible:visible(document.querySelector('#nextAction'))&&document.querySelector('#nextAction')?.textContent.includes('次の確認：'),
                 detailsExists:visible(document.querySelector('.decision-more > summary')),
-                horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+                holidayFixture,horizontalOverflow:document.documentElement.scrollWidth-innerWidth
               };
               const labels=['判断','購入状況','指標','予測','管理'];
               result.pass=result.version==='v5.51'&&result.actionWeight==='600'&&result.actionSize>=25&&result.actionSize<=31&&
                 tabs.length===5&&tabs.every((t,i)=>t.textContent.trim()===labels[i])&&tabLayout.every(x=>x.fontSize>=13&&x.fontSize<=15.1&&x.height>=49&&x.textFits)&&
                 forecast.length===3&&cardRanges.every(x=>x.ret.length&&x.text.includes('参考度')&&x.retFits&&x.fits)&&
-                pills.every(visible)&&result.warningVisible&&result.referenceVisible&&result.nextVisible&&result.detailsExists&&result.horizontalOverflow<=2;
+                pills.every(visible)&&result.warningVisible&&result.referenceVisible&&result.nextVisible&&result.detailsExists&&holidayFixture.wraps&&holidayFixture.fits&&holidayFixture.pageFits&&result.horizontalOverflow<=2;
               return JSON.stringify(result);
             })()`;
             try{
