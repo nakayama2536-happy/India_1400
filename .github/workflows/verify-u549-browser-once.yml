@@ -1,0 +1,100 @@
+name: Verify UI 5.49 Chart Zoom Browser Once
+on:
+  push:
+    branches: ['verify/u549-zoom-browser-20261024']
+    paths: ['.github/workflows/verify-u549-browser-once.yml']
+permissions:
+  contents: read
+jobs:
+  chrome-layout:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u549-zoom-browser-20261024'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Assert isolated verifier is pinned to the approved candidate head
+        run: |
+          git merge-base --is-ancestor b19ef9585753bd3a9f319da0b8876351d74f4cbd HEAD
+          test "$(git diff --name-only b19ef9585753bd3a9f319da0b8876351d74f4cbd HEAD)" = ".github/workflows/verify-u549-browser-once.yml"
+          node --check chart-experience.js
+          node --test tests/chart-zoom-mobile.test.cjs
+      - name: Test real browser chart dimensions without any public deployment
+        run: |
+          cat > .zoom-browser-fixture.html <<'HTML'
+          <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <style>
+          :root{--line:#263854;--muted:#9eb0c8;--text:#f4f7fb;--accent:#70a9ff;--c-nifty:#70a9ff;--c-rsi:#59d8ff;--c-ma5:#f4c14b;--c-ma25:#29c777;--c-ma75:#ff7272}
+          *{box-sizing:border-box}body{margin:0;background:#07111f;color:#fff;font:14px sans-serif}
+          .chart{width:100%;height:auto;display:block}.chart .line-rsi{stroke:#59d8ff;stroke-width:2.3;fill:none}.chart text{font-size:11px;fill:#a5b4ca}
+          .chart .gridline{stroke:#3d536b}.chart .guide{stroke:#8395ae}.chart .guide-reference{stroke:#f4c14b}
+          </style><link rel="stylesheet" href="/chart-experience.css"></head><body>
+          <button type="button" data-ix-expand="rsiChart" id="trigger">RSIを拡大</button>
+          <div id="rsiChart" style="width:355px"></div><pre id="result">pending</pre>
+          <script src="/technical-charts.js"></script>
+          <script src="/chart-experience.js"></script>
+          <script>
+          const rows=Array.from({length:30},(_,i)=>({date:'2026-09-'+String(i+1).padStart(2,'0'),value:48+9*Math.sin(i/4)}));
+          const series=[{key:'value',cls:'line-rsi'}];
+          document.getElementById('rsiChart').innerHTML=IndiaTechnicalCharts.lineChart(rows,series,[],{kind:'rsi',width:355});
+          const controller=IndiaChartExperience.createController(window,{
+            renderExpandedChart:(id,w,h)=>IndiaTechnicalCharts.lineChart(rows,series,[],{kind:'rsi',width:w,height:h})
+          });
+          controller.bind();
+          function bounds(el){const r=el.getBoundingClientRect();return{left:r.left,right:r.right,width:r.width,height:r.height,top:r.top,bottom:r.bottom};}
+          setTimeout(()=>{
+            document.getElementById('trigger').click();
+            const overlay=document.getElementById('ixChartOverlay');
+            const before=bounds(overlay.querySelector('.ix-modal-content svg'));
+            for(let i=0;i<6;i++)overlay.querySelector('[data-ix-zoom="1"]').click();
+            const panel=overlay.querySelector('.ix-modal-panel'),head=overlay.querySelector('.ix-modal-head');
+            const close=overlay.querySelector('.ix-close'),body=overlay.querySelector('.ix-modal-body');
+            const svg=overlay.querySelector('.ix-modal-content svg');
+            const after=bounds(svg),modal=bounds(panel),header=bounds(head),button=bounds(close);
+            const guide=svg.querySelector('.guide-reference-label');
+            const ev=new Event('gesturestart',{bubbles:true,cancelable:true});
+            overlay.dispatchEvent(ev);
+            const p={viewport:{width:innerWidth,height:innerHeight},before,after,modal,header,close:button,
+              body:bounds(body),zoom:overlay.querySelector('.ix-zoom-label').textContent,
+              coloredRsi:getComputedStyle(svg.querySelector('.line-rsi')).stroke,
+              guideColor:getComputedStyle(guide).fill,
+              scrollWidth:body.scrollWidth,
+              scrollMax:body.scrollWidth-body.clientWidth,
+              gesturePrevented:ev.defaultPrevented,
+              passes:Math.abs(before.height-260)<=2 && Math.abs(after.height-260)<=2 &&
+              after.width>before.width*2.3 && modal.right<=innerWidth+2 &&
+              header.right<=innerWidth+2 && button.right<=innerWidth+2 &&
+              modal.height<=innerHeight && body.scrollWidth>body.clientWidth &&
+              ev.defaultPrevented && overlay.querySelector('.ix-zoom-label').textContent==='250%'};
+            document.getElementById('result').textContent=JSON.stringify(p);
+          },120);
+          </script></body></html>
+          HTML
+          python3 -m http.server 9876 --bind 127.0.0.1 >/tmp/zoom-http.txt 2>&1 &
+          PID=$!
+          trap 'kill "$PID" 2>/dev/null || true' EXIT
+          python3 - <<'PY'
+          import html, json, re, subprocess, shutil, time
+          from urllib.request import urlopen
+          chrome=next((shutil.which(n) for n in ['google-chrome','google-chrome-stable','chromium'] if shutil.which(n)),None)
+          if not chrome: raise SystemExit('CHROME_UNAVAILABLE: cannot claim browser pass')
+          for _ in range(20):
+              try:
+                  urlopen('http://127.0.0.1:9876/.zoom-browser-fixture.html',timeout=1).read(30)
+                  break
+              except Exception: time.sleep(.2)
+          else: raise SystemExit('LOCAL_FIXTURE_UNAVAILABLE')
+          for size in ['500,844','844,430']:
+              args=[chrome,'--headless=new','--no-sandbox','--disable-dev-shm-usage',
+                    '--disable-gpu','--hide-scrollbars','--window-size='+size,
+                    '--virtual-time-budget=4000','--dump-dom',
+                    'http://127.0.0.1:9876/.zoom-browser-fixture.html']
+              r=subprocess.run(args,capture_output=True,text=True,timeout=50)
+              match=re.search(r'<pre id="result">([^<]+)</pre>',r.stdout)
+              if not match: raise SystemExit('CHROME_DOM_RESULT_MISSING '+size+' '+r.stdout[-1000:]+' STDERR '+r.stderr[-500:])
+              d=json.loads(html.unescape(match.group(1)))
+              print('BROWSER_ZOOM_DIMENSIONS '+size+' '+json.dumps(d,ensure_ascii=False),flush=True)
+              if not d['passes']: raise SystemExit('BROWSER_ZOOM_GEOMETRY_FAIL '+size)
+          print('BROWSER_ZOOM_LAYOUT_PASS: UI 5.49 current candidate, real Chromium geometry in two orientations. NOT IPHONE ACCEPTANCE.',flush=True)
+          PY
