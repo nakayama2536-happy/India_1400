@@ -31,3 +31,12 @@ At 2026-10-24 21:57 JST the user supplied an iPhone Safari screenshot of the NIF
 Version bump: UI 5.49 → 5.50 with corresponding own PWA cache namespace and manifest. Core `APP_VERSION=5.7`, rules, data, adoption contracts and PENDING-014 remain unchanged. This branch does not merge, push main, deploy, invoke market workflows, or modify external services.
 
 Rollback if rejected: drop the display-only branch/PR; no JSON/purchase history/other PWA cache changes. If a deployed version later needs reversal, use a forward-only review/PR rather than clearing Safari storage.
+
+## Isolated Chromium device-width verification
+
+- [Read-only Actions run 40097040420](https://github.com/nakayama2536-happy/India_1400/actions/runs/40097040420) **SUCCESS** on 2026-10-24 JST, with source code pinned to the UI 5.50 PR head `415e3e602e1059a1d4c5e1c8fe8bf4bd98fcab09`. Branch `verify/u550-dates-browser-20261024` differs from that PR head **only by its isolated verification workflow**, is not merged, and does not deploy Pages.
+- Real Chromium DOM rendering using the saved Public NIFTY 30-date sequence. CDP device emulation covered CSS widths **320, 375, 393, 430** (DPR 2–3). Standard embedded chart retained exactly 3 labels (`09/09`, `09/30`, `10/23`). The enlarged, rightmost **250%** viewport displayed:
+  - 320/375px: `10/12`, `10/16`, `10/23`.
+  - 393/430px: `10/09`, `10/14`, `10/19`, `10/23`.
+- Midpoint-scroll also retained 4 visible dates without collision. Minimum visible label gap ranged **45–82 CSS px** across the tested scenarios, fixed plot height stayed at 320px, title/close remained within viewport, and every label matched a saved observed date. No calendar interpolation.
+- **Limitation:** these are Chromium phone-width layout checks, not real iPhone Safari/PWA operation or independent market evidence. Device acceptance and main/Pages publication remain separate gates. No buy/sell logic, missing-data handling, forecast methods, market schedule or purchase records are changed.
