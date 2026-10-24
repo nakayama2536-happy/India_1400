@@ -89,9 +89,9 @@ test('PWA UI version is synchronized and manifest describes the updated chart',(
  const version=fs.readFileSync('VERSION','utf8');
  const sw=fs.readFileSync('sw.js','utf8');
  const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
- assert.match(version,/UI_VERSION=5\.49/);
- assert.match(sw,/india1400-v5-49-/);
- assert.match(sw,/\?v=5\.49/);
- assert.match(manifest.start_url,/v=5\.49/);
- assert.match(html,/v5\.49/);
+ assert.match(version,/UI_VERSION=5\.50/);
+ assert.match(sw,/india1400-v5-50-/);
+ assert.match(sw,/\?v=5\.50/);
+ assert.match(manifest.start_url,/v=5\.50/);
+ assert.match(html,/v5\.50/);
 });

@@ -66,11 +66,25 @@
     const count = rows.length;
     const x = i => left + (i + .5) * (plotRight - left) / Math.max(1, count);
     const y = v => top + (scale.max - Number(v)) * (plotBottom - top) / (scale.max - scale.min);
-    return {w,h,left,plotRight,top,plotBottom,scale,x,y};
+    return {w,h,left,plotRight,top,plotBottom,scale,x,y,expanded};
   }
   function axisText(value, step) {
     const digits = step >= 1 ? 0 : Math.min(6, Math.ceil(-Math.log10(step)) + 1);
     return Number(value).toLocaleString('ja-JP', {maximumFractionDigits:digits});
+  }
+  // Show more observed dates only in user-expanded charts. Anchor ticks to
+  // the newest saved trading session so the rightmost 250% viewport still has
+  // multiple calendar labels instead of only the final date. No interpolation.
+  function dateTickIndices(f, rows) {
+    const last = rows.length - 1;
+    if (last < 0) return [];
+    if (!f.expanded || rows.length < 4)
+      return [...new Set([0, Math.floor(last/2), last])];
+    const cellWidth = (f.plotRight - f.left) / rows.length;
+    const stride = Math.max(1, Math.ceil(86 / Math.max(1, cellWidth)));
+    const marks = [];
+    for(let i = last; i >= 0; i -= stride) marks.unshift(i);
+    return marks;
   }
   function grid(f, rows, kind) {
     let out = '';
@@ -79,11 +93,15 @@
       out += `<line class="${cls}" x1="${f.left}" y1="${num(py)}" x2="${num(f.plotRight)}" y2="${num(py)}"/>`;
       out += `<text class="${kind === 'rsi' && value === 50 ? 'guide-reference-label' : 'axis-label'}" x="${num(f.plotRight+7)}" y="${num(py+4)}">${axisText(value,f.scale.step)}</text>`;
     }
-    // Three shared date positions, not a dense mesh of weekly decoration.
-    const marks = [...new Set([0, Math.floor((rows.length-1)/2), rows.length-1])];
+    const marks = dateTickIndices(f, rows);
+    const middle = marks[Math.floor((marks.length-1)/2)];
     for (let j=0; j<marks.length; j++) {
       const i=marks[j], px=f.x(i), anchor=j===0?'start':j===marks.length-1?'end':'middle';
-      if (j===1) out += `<line class="weekline" x1="${num(px)}" y1="${f.top}" x2="${num(px)}" y2="${f.plotBottom}"/>`;
+      // Keep only one subtle vertical guide; added dates do not clutter
+      // price/support/RSI/MACD values with a full daily vertical grid.
+      if ((!f.expanded && j===1) ||
+          (f.expanded && i===middle && i!==0 && i!==rows.length-1))
+        out += `<line class="weekline" x1="${num(px)}" y1="${f.top}" x2="${num(px)}" y2="${f.plotBottom}"/>`;
       out += `<text x="${num(px)}" y="${f.h-5}" text-anchor="${anchor}">${dateLabel(rows[i].date)}</text>`;
     }
     return out;
