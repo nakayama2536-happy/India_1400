@@ -220,3 +220,40 @@ test('detached dialog retains RSI 50, final NIFTY point, MACD and support labels
   assert.match(css,/\.ix-modal \.chart \.macd-negative\{fill:#bc8da0\}/);
   assert.doesNotMatch(css,/html\s*\{[^}]*zoom:/);
 });
+
+test('landscape viewport Y geometry uses the same height as the modal CSS even below normal chart height',()=>{
+  const viewHeight=390,viewWidth=844;
+  const cases=[
+    ['rsiChart','rsi',market.chart_data.nifty.rsi14,[{key:'value',cls:'line-rsi'}]],
+    ['macdChart','macd',market.chart_data.nifty.macd_hist,[{key:'value',cls:'line-macd'}]],
+    ['niftyChart','nifty',market.chart_data.nifty.price,[{key:'close',cls:'line-main'}]],
+  ];
+  for(const [id,kind,rows,series] of cases){
+    const shape=display.expandedGeometry(id,viewWidth,viewHeight,2.5);
+    assert.equal(shape.height,190,id+' should fit short viewport');
+    const markup=charts.lineChart(rows,series,[],{kind,width:shape.width-16,height:shape.height});
+    assert.match(markup,/height="190" viewBox="0 0 /);
+    assert.match(markup,/ 190" preserveAspectRatio=/,'SVG and CSS height must match');
+  }
+  const candleRows=display.validateLongCandles(longHistory,market.detail_chart).rows;
+  const geom=display.expandedGeometry('detailCandleChart',viewWidth,viewHeight,2.5,1500);
+  assert.equal(geom.height,190);
+  assert.match(charts.candlestickChart(candleRows,{width:geom.width-16,height:geom.height}),/height="190"/);
+  const a=index.indexOf('function coreTrendSvg('),b=index.indexOf('\nasync function ensureIndiaCoreHistory()',a);
+  const sandbox=vm.createContext({hasFiniteValue:x=>typeof x==='number'&&Number.isFinite(x),
+    fmt:String,fmtJstShort:String,referenceText:String});
+  vm.runInContext(index.slice(a,b),sandbox);
+  const rows=[1000,1080,990,1050].map((nav_yen,i)=>({date:'2026-10-0'+(i+1),nav_yen}));
+  const fund=display.expandedGeometry('indiaCoreTrendChart',viewWidth,viewHeight,2.5);
+  assert.equal(fund.height,190);
+  assert.match(vm.runInContext('coreTrendSvg',sandbox)(rows,[],{width:fund.width,height:fund.height}),/viewBox="0 0 \d+ 190"/);
+});
+test('detached indicators dialog inherits the same subdued series palette as the embedded tab',()=>{
+  const css=fs.readFileSync('chart-experience.css','utf8');
+  const expected=['--c-nifty:#80b6ff','--c-ma5:#dfb255','--c-ma25:#35baa5','--c-ma75:#8b9ab0','--c-macd:#ad9bd9'];
+  for(const token of expected){
+    assert.ok(index.includes(token),'inline indicator palette should define '+token);
+    assert.ok(css.includes(token),'standalone modal should reuse '+token);
+  }
+  assert.match(css,/\.ix-modal\{--c-nifty:/);
+});
