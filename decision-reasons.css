@@ -30,3 +30,75 @@
 .decision-reasons .dr-method-body p{margin:0 0 9px}
 .decision-reasons .dr-timestamp{font-variant-numeric:tabular-nums}
 @media(max-width:360px){.decision-reasons .dr-count{padding:9px}.decision-reasons .dr-label{font-size:13px}.decision-reasons .dr-state{padding-left:6px;padding-right:6px}.decision-reasons .dr-row{padding:9px 0}}
+
+
+/* UI 5.53: align decision evidence with the iPhone 17 typography scale.
+   Scoped to the reasons panel; never change met/unknown states or source data. */
+#page-decision .decision-reasons .dr-basis,
+#page-decision .decision-reasons .dr-reference{
+  font-size:14px;line-height:1.7;overflow-wrap:anywhere
+}
+#page-decision .decision-reasons .dr-counts{gap:10px;margin-bottom:16px}
+#page-decision .decision-reasons .dr-count{
+  padding:12px;border-radius:12px;
+  font-size:14px;line-height:1.5;min-width:0
+}
+#page-decision .decision-reasons .dr-count strong{
+  font-size:clamp(23px,6vw,26px);font-weight:800
+}
+#page-decision .decision-reasons .dr-count small{
+  font-size:14px;line-height:1.5
+}
+#page-decision .decision-reasons .dr-section{
+  margin-top:16px
+}
+#page-decision .decision-reasons .dr-section h3{
+  font-size:17px;line-height:1.5;flex-wrap:wrap;margin-bottom:5px
+}
+#page-decision .decision-reasons .dr-section h3 span{
+  font-size:14px;line-height:1.5
+}
+#page-decision .decision-reasons .dr-row{
+  padding:12px 0;min-width:0
+}
+#page-decision .decision-reasons .dr-row-head{
+  min-width:0;gap:8px
+}
+#page-decision .decision-reasons .dr-label{
+  font-size:16px;line-height:1.55;
+  font-weight:720;overflow-wrap:anywhere
+}
+#page-decision .decision-reasons .dr-state{
+  min-width:65px;max-width:45%;font-size:14px;
+  padding:5px 8px;line-height:1.45;font-weight:720;
+  white-space:normal;overflow-wrap:anywhere
+}
+#page-decision .decision-reasons .dr-value{
+  font-size:14px;line-height:1.7;margin-top:5px;
+  color:#b8c8df;overflow-wrap:anywhere
+}
+#page-decision .decision-reasons .dr-alerts{
+  font-size:14px;line-height:1.7;
+  padding:12px 13px;margin:12px 0;
+  overflow-wrap:anywhere
+}
+#page-decision .decision-reasons .dr-alerts p,
+#page-decision .decision-reasons .dr-extra p{
+  margin-bottom:8px
+}
+#page-decision .decision-reasons .dr-extra,
+#page-decision .decision-reasons .dr-none{
+  font-size:14px;line-height:1.7
+}
+#page-decision .decision-reasons .dr-fold>summary{
+  font-size:16px;line-height:1.55;
+  min-height:46px;padding:13px 3px
+}
+#page-decision .decision-reasons .dr-method-body{
+  font-size:14px;line-height:1.75;
+  padding:0 3px 12px;overflow-wrap:anywhere
+}
+@media(max-width:359px){
+  #page-decision .decision-reasons .dr-label{font-size:15px}
+  #page-decision .decision-reasons .dr-state{min-width:58px;padding:5px 6px}
+}
