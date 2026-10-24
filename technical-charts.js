@@ -84,9 +84,6 @@
     const stride = Math.max(1, Math.ceil(86 / Math.max(1, cellWidth)));
     const marks = [];
     for(let i = last; i >= 0; i -= stride) marks.unshift(i);
-    // The first point is optional: adding it too close to the next date
-    // would create overlapping labels on small iPhones.
-    if (marks[0] !== 0 && f.x(marks[0]) - f.x(0) >= 86) marks.unshift(0);
     return marks;
   }
   function grid(f, rows, kind) {
@@ -102,7 +99,8 @@
       const i=marks[j], px=f.x(i), anchor=j===0?'start':j===marks.length-1?'end':'middle';
       // Keep only one subtle vertical guide; added dates do not clutter
       // price/support/RSI/MACD values with a full daily vertical grid.
-      if (i===middle && i!==0 && i!==rows.length-1)
+      if ((!f.expanded && j===1) ||
+          (f.expanded && i===middle && i!==0 && i!==rows.length-1))
         out += `<line class="weekline" x1="${num(px)}" y1="${f.top}" x2="${num(px)}" y2="${f.plotBottom}"/>`;
       out += `<text x="${num(px)}" y="${f.h-5}" text-anchor="${anchor}">${dateLabel(rows[i].date)}</text>`;
     }
