@@ -1,0 +1,75 @@
+/* UI 5.55: actionable controls are blue, raised, and have an affordance.
+   Read-only values remain flat. Quality/eligibility colors are unchanged. */
+.app{--ui55-action-bg:#1d3556;--ui55-action-edge:#638fc3;--ui55-action-text:#f0f6ff}
+.app :is(.metric,.forecast,.status-tile,.ref-compact-item,.note,.next-check,.tranche-plan-card,.fund-main,.fund-stat,.ix-evidence,.source-row,.dr-count,.dr-row,.review-state,.review-warning){box-shadow:none}
+.app .statusline .pill,.app .deep-trigger-head .pill{border-radius:8px;box-shadow:none}
+#page-decision .next-action{border-color:#3b4e67;border-left:3px solid #7e94b3;border-radius:9px;background:#0e1b2c;box-shadow:none}
+
+/* Regular actions have a raised blue surface and a right-hand action cue. */
+.app button.primary:not(:disabled),.app button.secondary:not(:disabled){
+ position:relative;min-height:50px;border-radius:12px;border:1px solid var(--ui55-action-edge);
+ box-shadow:0 3px 0 #101d30;font-weight:750;line-height:1.45;overflow-wrap:anywhere;
+ -webkit-tap-highlight-color:rgba(112,169,255,.22);touch-action:manipulation
+}
+.app button.primary:not(:disabled){background:#83baff;color:#071626;border-color:#c1dcff}
+.app button.secondary:not(:disabled){background:var(--ui55-action-bg);color:var(--ui55-action-text)}
+.app button:is(.primary,.secondary):not(:disabled)::after{content:"›";display:inline-block;margin-left:7px;font-size:1.3em;font-weight:800;line-height:.8;vertical-align:baseline;color:inherit}
+.app button:is(.primary,.secondary):disabled{box-shadow:none;background:#142237;border-color:#304258;color:#96a9bf}
+.app button:is(.primary,.secondary):disabled::after{content:none}
+@media(hover:hover){
+ .app button.primary:not(:disabled):hover{background:#9bcaff}
+ .app button.secondary:not(:disabled):hover{background:#29476d;border-color:#96bcf0}
+}
+.app button:is(.primary,.secondary):not(:disabled):active{box-shadow:0 1px 0 #101d30;transform:translateY(2px)}
+
+/* Expansion buttons are distinct from the graphs they control. */
+.app button.ix-expand{background:var(--ui55-action-bg);border:1.5px solid var(--ui55-action-edge);color:var(--ui55-action-text);border-radius:10px;box-shadow:0 2px 0 #101d30;min-height:46px;padding:9px 12px}
+.app button.ix-expand::after{content:" ⤢";color:#b7d8ff;font-size:17px;font-weight:750}
+.app .ix-modal button:not(:disabled){background:#224365;border-color:#729dcf;color:#f1f7ff;min-height:44px}
+#page-indicators .ix-period{background:#1a3354;border:1.5px solid var(--ui55-action-edge);color:#f1f7ff;border-radius:10px;min-height:46px}
+
+/* Disclosures: always display + (closed) or - (open). Do not alter their content. */
+.app .page details:not(.chart-help)>summary{
+ position:relative;list-style:none;padding-right:49px!important;min-height:48px;
+ border:1px solid #496c95;border-radius:10px;background:#172b45;color:#e5effe;
+ cursor:pointer;-webkit-tap-highlight-color:rgba(112,169,255,.20)
+}
+.app .page details:not(.chart-help)>summary::-webkit-details-marker{display:none}
+.app .page details:not(.chart-help)>summary::marker{content:""}
+.app .page details:not(.chart-help)>summary::after{
+ content:"＋";position:absolute;right:11px;top:50%;transform:translateY(-50%);
+ display:grid;place-items:center;width:29px;height:29px;border:1px solid #6b96cc;
+ border-radius:8px;background:#254667;color:#e7f2ff;font-size:18px;font-weight:700;line-height:1
+}
+.app .page details[open]:not(.chart-help)>summary::after{content:"−"}
+.app .page details.chart-help>summary{min-height:48px;padding:10px 12px;border:1px solid #496c95;border-radius:10px;background:#172b45;align-items:center;cursor:pointer}
+.app .page .chart-help-action{padding:4px 7px;border-radius:7px;background:#254667;border:1px solid #648dbf;color:#e6f0ff;font-size:13px}
+.app .page details>summary:focus-visible,.app button:focus-visible,.app select:focus-visible,.app textarea:focus-visible{outline:3px solid #93c0ff;outline-offset:3px}
+
+/* The three purchase-state tiles really are buttons and can change local records. */
+#purchaseProgress .tranche-toggle{border-width:2px;min-height:123px;box-shadow:0 3px 0 #12273e;cursor:pointer;touch-action:manipulation}
+#purchaseProgress .tranche-toggle::after{display:inline-block;margin-top:5px;padding:4px 7px;border:1px solid #729ecd;border-radius:7px;background:#1b3a5c;color:#e5f0ff;font-size:12px;line-height:1.35;font-weight:750}
+#purchaseProgress .tranche-toggle.pending::after{content:"記録する ›"}
+#purchaseProgress .tranche-toggle.done::after{content:"変更する ›"}
+#purchaseProgress .tranche-toggle:active{transform:translateY(2px);box-shadow:0 1px 0 #12273e}
+
+/* Quality tiles are clickable: retain their quality-colored borders. */
+#page-detail .quality-top-summary button.ix-quality-tile{box-shadow:0 3px 0 #12273e;border-width:2px;cursor:pointer;touch-action:manipulation}
+#page-detail .quality-top-summary button.ix-quality-tile::after{
+ content:"詳細を見る ›";display:inline-block;padding:5px 9px;margin-top:10px;
+ border:1px solid #729ecd;border-radius:8px;background:#1a395a;color:#e5f1ff;
+ font-size:14px;font-weight:750;line-height:1.4
+}
+#page-detail .quality-top-summary button.ix-quality-tile:active{transform:translateY(2px);box-shadow:0 1px 0 #12273e}
+
+/* Rating choices are selectable controls, not passive status labels. */
+#page-detail button.review-utility{background:var(--ui55-action-bg);border:1.5px solid var(--ui55-action-edge);color:var(--ui55-action-text);box-shadow:0 2px 0 #12273e;cursor:pointer}
+#page-detail button.review-utility::before{content:"○";display:inline-block;margin-right:6px;font-size:17px;font-weight:700}
+#page-detail button.review-utility.selected{background:#dbeafe;border-color:#9dc6ff;color:#091a31}
+#page-detail button.review-utility.selected::before{content:"✓"}
+
+/* Navigation is unmistakably tappable, and the active tab remains obvious. */
+.tabs .tab{border:1px solid #31455e;background:#0e1d32;color:#b3c5dc;border-radius:12px;touch-action:manipulation;-webkit-tap-highlight-color:rgba(112,169,255,.22)}
+.tabs .tab.active{border-color:#6595d3;background:#203c62;color:#f4f8ff;box-shadow:inset 0 -3px 0 #83baff}
+.app a.fund-source{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+@media(prefers-reduced-motion:reduce){.app button.primary,.app button.secondary,.app button.ix-expand,.app .tranche-toggle,.app .ix-quality-tile{transition:none}}
