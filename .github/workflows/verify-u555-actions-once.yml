@@ -1,0 +1,175 @@
+name: Verify UI 5.55 Action Clarity Once
+on:
+  push:
+    branches: ['verify/u555-actions-vs-status-live-20261025']
+    paths: ['.github/workflows/verify-u555-actions-once.yml']
+permissions:
+  contents: read
+jobs:
+  verify-action-clarity:
+    if: github.repository == 'nakayama2536-happy/India_1400' && github.ref == 'refs/heads/verify/u555-actions-vs-status-live-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Pin approved main code and keep verifier isolated
+        run: |
+          git merge-base --is-ancestor 7cbc4d42539d0b4118cce9eb2c6fe002890720a6 HEAD
+          test "$(git diff --name-only 7cbc4d42539d0b4118cce9eb2c6fe002890720a6 HEAD)" = ".github/workflows/verify-u555-actions-once.yml"
+          grep -q '^UI_VERSION=5.55$' VERSION
+          node --test tests/action-affordance.test.cjs
+      - name: Compare actual mobile DOM controls to read-only status at five widths
+        run: |
+          python3 -m http.server 9896 --bind 127.0.0.1 >/tmp/india-ui555-server.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          node <<'JS'
+          'use strict';
+          const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const chrome=['/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>fs.existsSync(x))||'google-chrome';
+          const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'india-u555-controls-'));
+          const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu',
+           '--remote-debugging-port=9235','--remote-allow-origins=*','--user-data-dir='+tmp,'about:blank'],{stdio:['ignore','ignore','pipe']});
+          let diagnostics='';proc.stderr.on('data',s=>{diagnostics=(diagnostics+String(s)).slice(-1800)});
+          async function inspect(){
+            for(let i=0;i<90;i++){
+              if(document.querySelectorAll('#forecastCards .forecast').length===3 &&
+                 document.querySelectorAll('#purchaseProgress button.tranche-toggle').length===3 &&
+                 document.querySelectorAll('#qualityTopSummary button.ix-quality-tile').length===3)break;
+              await new Promise(r=>setTimeout(r,110));
+            }
+            const $=sel=>document.querySelector(sel);
+            const all=sel=>[...document.querySelectorAll(sel)];
+            const style=el=>el?getComputedStyle(el):null;
+            const shadow=el=>style(el)?.boxShadow||'missing';
+            const bg=el=>style(el)?.backgroundColor||'missing';
+            const after=el=>el?getComputedStyle(el,'::after').content:'missing';
+            const pressable=el=>!!el&&el.tagName==='BUTTON'&&
+              el.getBoundingClientRect().height>=44&&shadow(el)!=='none';
+            const fit=el=>!!el&&el.scrollWidth<=el.clientWidth+2;
+            const tab=name=>{const n=$('nav.tabs button.tab[data-page="'+name+'"]');if(!n)throw Error('tab_missing_'+name);n.click();};
+            const action=$('#qualityDetailsBtn'),pill=$('#qualityGate'),notification=$('#nextAction');
+            const d=$('#decisionCard details.decision-more'),summary=d?.querySelector('summary');
+            const closed=after(summary);
+            if(summary)summary.click();
+            await new Promise(r=>requestAnimationFrame(r));
+            const opened=after(summary),expanded=d?.open===true;
+            if(summary)summary.click();
+            const backClosed=after(summary),closedAgain=d?.open===false;
+            const decision={action:pressable(action),actionText:action?.textContent,
+              arrow:after(action),pillShadow:shadow(pill),pillText:pill?.textContent,
+              noticeShadow:shadow(notification),forecastShadow:shadow($('#forecastCards .forecast')),
+              plus:closed,minus:opened,plusAgain:backClosed,expanded,closedAgain,
+              referenceShadow:shadow($('#globalReferenceTimes .ref-compact-item'))};
+            tab('purchase');await new Promise(r=>requestAnimationFrame(r));
+            const purchase=all('#purchaseProgress button.tranche-toggle').map(x=>({
+              text:x.textContent,shadow:shadow(x),after:after(x),height:x.getBoundingClientRect().height,
+              border:style(x)?.borderColor,pressed:x.getAttribute('aria-pressed')
+            }));
+            const purchaseDisplays=all('#decisionTranchePlan .tranche-plan-card').map(shadow);
+            tab('indicators');await new Promise(r=>requestAnimationFrame(r));
+            const expand=$('#page-indicators button.ix-expand');
+            const indicator={expandHeight:expand?.getBoundingClientRect().height,shadow:shadow(expand),icon:after(expand)};
+            tab('forecast');await new Promise(r=>requestAnimationFrame(r));
+            const forecast={tiles:all('#verificationSummary .forecast').length,
+              allFlat:all('#verificationSummary .forecast').every(x=>shadow(x)==='none')};
+            tab('detail');await new Promise(r=>requestAnimationFrame(r));
+            const quality=all('#qualityTopSummary button.ix-quality-tile').map(x=>({
+              shadow:shadow(x),after:after(x),height:x.getBoundingClientRect().height,
+              stateClasses:x.className
+            }));
+            const selected=all('nav.tabs .tab.active');
+            const active={count:selected.length,tab:selected[0]?.dataset?.page,
+              shadow:shadow(selected[0]),bg:bg(selected[0])};
+            const disabled=$('#deepDiveShareBtn');
+            const disabledResult={exists:!!disabled,disabled:!!disabled?.disabled,
+              shadow:shadow(disabled),after:after(disabled)};
+            const review=all('button.review-utility').map(x=>({text:x.textContent,before:getComputedStyle(x,'::before').content,
+               shadow:shadow(x)}));
+            const tabs=all('nav.tabs .tab').map(x=>({label:x.textContent,height:x.getBoundingClientRect().height,
+              fit:fit(x)}));
+            const result={width:innerWidth,height:innerHeight,version:$('.version-badge')?.textContent.trim(),
+              decision,purchase,purchaseDisplays,indicator,forecast,quality,review,active,disabledResult,tabs,
+              pageOverflow:document.documentElement.scrollWidth-innerWidth};
+            result.pass=result.version==='v5.55'&&
+              decision.action&&decision.arrow.includes('›')&&decision.pillShadow==='none'&&
+              decision.noticeShadow==='none'&&decision.forecastShadow==='none'&&
+              decision.referenceShadow==='none'&&decision.plus.includes('＋')&&
+              decision.minus.includes('−')&&decision.plusAgain.includes('＋')&&expanded&&closedAgain&&
+              purchase.length===3&&purchase.every(x=>x.shadow!=='none'&&x.after.includes('›')&&
+                (x.after.includes('記録する')||x.after.includes('変更する'))&&x.height>=90)&&
+              purchaseDisplays.every(x=>x==='none')&&
+              indicator.expandHeight>=44&&indicator.shadow!=='none'&&indicator.icon.includes('⤢')&&
+              forecast.tiles===3&&forecast.allFlat&&
+              quality.length===3&&quality.every(x=>x.shadow!=='none'&&x.after.includes('詳細を見る')&&x.height>=54)&&
+              review.length===3&&review.every(x=>x.before.includes('○')||x.before.includes('✓'))&&
+              active.count===1&&active.tab==='detail'&&tabs.length===5&&tabs.every(x=>x.fit&&x.height>=46)&&
+              result.pageOverflow<=2;
+            return JSON.stringify(result);
+          }
+          async function main(){
+            let ready=false;
+            for(let i=0;i<160;i++){try{await(await fetch('http://127.0.0.1:9235/json/version')).json();ready=true;break}catch(_){if(proc.exitCode!==null)break;await sleep(140)}}
+            if(!ready)throw Error('CHROME_START_FAILED '+proc.exitCode+' '+diagnostics.slice(-1100));
+            const target=await(await fetch('http://127.0.0.1:9235/json/new?about:blank',{method:'PUT'})).json();
+            const ws=new WebSocket(target.webSocketDebuggerUrl);
+            await new Promise((resolve,reject)=>{ws.addEventListener('open',resolve,{once:true});ws.addEventListener('error',reject,{once:true})});
+            let serial=0;const callbacks=new Map();
+            ws.addEventListener('message',e=>{const msg=JSON.parse(e.data);if(!msg.id)return;const cb=callbacks.get(msg.id);if(cb){callbacks.delete(msg.id);msg.error?cb.reject(Error(JSON.stringify(msg.error))):cb.resolve(msg.result)}});
+            const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++serial;callbacks.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+            try{
+              await cdp('Page.enable');
+              // A read-only fixture must not let the app's actual SW cause a controllerchange reload.
+              await cdp('Page.addScriptToEvaluateOnNewDocument',{source:"Object.defineProperty(navigator,'serviceWorker',{configurable:true,value:{register:()=>Promise.resolve({}),addEventListener:()=>{}}})"});
+              for(const [width,height,dpr]of[[320,700,2],[375,812,3],[393,852,3],[402,874,3],[430,932,3]]){
+                await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:dpr,mobile:true,screenWidth:width,screenHeight:height});
+                await cdp('Page.navigate',{url:'http://127.0.0.1:9896/index.html?ui555='+width});
+                await sleep(430);
+                const response=await cdp('Runtime.evaluate',{expression:'('+inspect.toString()+')()',awaitPromise:true,returnByValue:true});
+                const raw=response?.result?.value;
+                if(!raw||!raw.startsWith('{'))throw Error('INVALID_DOM_RESULT '+width+' '+JSON.stringify(response).slice(0,1000));
+                const record=JSON.parse(raw);
+                console.log('UI555_ACTION_DOM '+JSON.stringify(record));
+                if(record.width!==width||!record.pass)throw Error('UI555_ACTION_DOM_FAIL '+width);
+              }
+              console.log('UI555_ACTION_BROWSER_PASS: blue action buttons, flat readonly cards, +/- disclosures, record/quality controls, 5 tabs at 320/375/393/402/430px. NOT real iPhone Safari acceptance.');
+            }finally{ws.close()}
+          }
+          main().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>proc.kill('SIGTERM'));
+          JS
+      - name: Check public Pages exact file bytes
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          from pathlib import Path
+          import hashlib,time
+          base='https://nakayama2536-happy.github.io/India_1400/'
+          for file in ['index.html','VERSION','sw.js','manifest.webmanifest','action-affordance.css']:
+              expected=Path(file).read_bytes()
+              digest=hashlib.sha256(expected).hexdigest()
+              suffix='' if file=='index.html' else file
+              url=base+suffix+'?v=5.55&verify='+file.replace('.','_')
+              failure=None
+              for i in range(1,7):
+                  try:
+                      req=Request(url,headers={'Cache-Control':'no-cache','Pragma':'no-cache','User-Agent':'India-UI555-ReadOnly-QA'})
+                      with urlopen(req,timeout=15) as resp:
+                          assert resp.status==200,(file,resp.status)
+                          actual=resp.read()
+                      got=hashlib.sha256(actual).hexdigest()
+                      if got==digest:
+                          print('UI555_LIVE_HASH_MATCH',file,len(actual),got)
+                          break
+                      failure=f'hash mismatch expected {digest} got {got}'
+                  except Exception as exc:
+                      failure=str(exc)
+                  print('UI555_LIVE_RETRY',file,i,failure)
+                  if i<6:time.sleep(4)
+              else:
+                  raise AssertionError('UI555_PUBLIC_BYTE_FAIL '+file+' '+str(failure))
+          print('UI555_PUBLIC_HTTP_PASS: 5 live files equal the pinned main release; device cache is separate.')
+          PY
