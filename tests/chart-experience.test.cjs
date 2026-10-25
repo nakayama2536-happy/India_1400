@@ -113,10 +113,10 @@ test('UI 5.53 deploy shell and stylesheet remain app-scoped',()=>{
   const html=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8');
   const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
   const version=fs.readFileSync('VERSION','utf8');
-  assert.match(version,/UI_VERSION=5\.55/);
-  assert.match(html,/v5\.55/);
-  assert.match(manifest.start_url,/v=5\.55/);
-  assert.match(sw,/india1400-v5-55-/);
+  assert.match(version,/UI_VERSION=5\.56/);
+  assert.match(html,/v5\.56/);
+  assert.match(manifest.start_url,/v=5\.56/);
+  assert.match(sw,/india1400-v5-56-/);
   for(const name of ['chart-experience.js','chart-experience.css']){
     assert.ok(html.includes(name));
     assert.ok(sw.includes('"'+name+'"'));
