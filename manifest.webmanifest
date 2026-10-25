@@ -1,8 +1,8 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "description": "インド株14:00定点確認 v5.55・iPhoneの5タブで操作ボタンと状態表示を区別・基準価額トレンド・判断理由・データ品質",
-  "start_url": "./?v=5.55",
+  "description": "インド株14:00定点確認 v5.56・管理カードの開閉・ChatGPT深掘りの対象明示・NIFTYチャート拡大",
+  "start_url": "./?v=5.56",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
