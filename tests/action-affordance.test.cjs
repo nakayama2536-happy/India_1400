@@ -1,5 +1,5 @@
 'use strict';
-// UI 5.55 contract: this tests semantics and style without changing trading logic.
+// UI 5.56 contract: this tests semantics and style without changing trading logic.
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const html=fs.readFileSync('index.html','utf8');
 const css=fs.readFileSync('action-affordance.css','utf8');
@@ -15,11 +15,11 @@ test('five tabs share a visible action distinction and no new runtime script',()
  }
  assert.match(html,/<link rel="stylesheet" href="cross-tab-readability\.css">\s*<link rel="stylesheet" href="action-affordance\.css">/);
  assert.match(sw,/"cross-tab-readability\.css", "action-affordance\.css"/);
- assert.match(version,/UI_VERSION=5\.55/);
- assert.match(html,/<title>India 14:00 Check v5\.55<\/title>/);
- assert.match(html,/<span class="version-badge">v5\.55<\/span>/);
- assert.match(manifest.start_url,/v=5\.55/);
- assert.match(sw,/india1400-v5-55-/);
+ assert.match(version,/UI_VERSION=5\.56/);
+ assert.match(html,/<title>India 14:00 Check v5\.56<\/title>/);
+ assert.match(html,/<span class="version-badge">v5\.56<\/span>/);
+ assert.match(manifest.start_url,/v=5\.56/);
+ assert.match(sw,/india1400-v5-56-/);
  assert.match(css,/\.tabs \.tab\.active\{/);
  assert.match(css,/\.tabs \.tab\{/);
  assert.match(html,/calc\(7px \+ env\(safe-area-inset-bottom\)\)/);
