@@ -1,0 +1,301 @@
+/* India UI 5.55: actions vs read-only evidence on iPhone 17.
+   Presentation only. Status/decision colors, text, storage and calculations stay authoritative.
+   Interactive controls get a bright edge, depth and a visible affordance.
+   Display-only cards, pills, forecasts and next-action notices remain flat. */
+:root{
+  --ui55-action-bg:#244872;
+  --ui55-action-border:#82baff;
+  --ui55-action-shadow:0 3px 0 #071523,0 1px 8px rgba(39,103,170,.15);
+  --ui55-disclosure-bg:#172e49;
+  --ui55-disclosure-border:#527eac;
+}
+
+/* Explicit action buttons in all five tabs; avoid changing chart modal controls. */
+button.primary,
+button.secondary,
+button.ix-expand,
+button.review-utility{
+  border:2px solid var(--ui55-action-border);
+  border-radius:12px;
+  background:var(--ui55-action-bg);
+  color:#f4f9ff;
+  box-shadow:var(--ui55-action-shadow);
+  cursor:pointer;
+  min-height:48px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:rgba(134,193,255,.16);
+  transition:background-color .14s ease,border-color .14s ease,
+             box-shadow .14s ease,transform .14s ease;
+}
+button.primary{
+  background:#a1d4ff;
+  border-color:#c5e6ff;
+  color:#091a30;
+  font-weight:800;
+}
+button.secondary{
+  background:#244872;
+  border-color:#82baff;
+  font-weight:750;
+}
+button.primary:not(:disabled)::after,
+button.secondary:not(:disabled)::after{
+  content:"›";
+  display:inline-block;
+  font-size:20px;
+  line-height:.8;
+  margin-left:8px;
+  font-weight:750;
+  vertical-align:middle;
+  color:inherit;
+}
+button.ix-expand{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  font-size:15px;
+  font-weight:760;
+  white-space:nowrap;
+  min-height:48px;
+}
+button.ix-expand::before{
+  content:"⤢";
+  font-size:19px;
+  line-height:1;
+  font-weight:600;
+}
+@media(hover:hover){
+  button.primary:hover:not(:disabled){background:#b9e2ff;border-color:#e0f3ff}
+  button.secondary:hover:not(:disabled),
+  button.ix-expand:hover:not(:disabled),
+  button.review-utility:hover:not(:disabled){
+    background:#315b8c;border-color:#c1dfff
+  }
+}
+button.primary:active:not(:disabled),
+button.secondary:active:not(:disabled),
+button.ix-expand:active:not(:disabled),
+button.review-utility:active:not(:disabled){
+  transform:translateY(2px);
+  box-shadow:0 1px 0 #071523;
+}
+button.primary:disabled,
+button.secondary:disabled,
+button.ix-expand:disabled,
+button.review-utility:disabled{
+  opacity:.42;
+  box-shadow:none;
+  cursor:not-allowed;
+}
+button.primary:focus-visible,
+button.secondary:focus-visible,
+button.ix-expand:focus-visible,
+button.review-utility:focus-visible,
+button.tranche-toggle:focus-visible,
+button.ix-quality-tile:focus-visible{
+  outline:3px solid #c1e2ff;
+  outline-offset:3px;
+}
+
+/* Real purchase-record controls are buttons, not just green/yellow status tiles.
+   Keep existing .done/.pending colors, dates, confirmation and local-only persistence. */
+#page-purchase #purchaseProgress button.tranche-toggle{
+  border-width:2px;
+  box-shadow:inset 0 0 0 1px rgba(144,198,255,.4),
+             0 3px 0 #061525;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:box-shadow .14s ease,transform .14s ease;
+}
+#page-purchase #purchaseProgress button.tranche-toggle::after{
+  content:"記録を変更 ›";
+  display:block;
+  font-size:12px;
+  line-height:1.4;
+  font-weight:760;
+  color:#b7d7ff;
+  margin-top:5px;
+}
+#page-purchase #purchaseProgress button.tranche-toggle:active:not(:disabled){
+  transform:translateY(2px);
+  box-shadow:inset 0 0 0 1px rgba(144,198,255,.4);
+}
+#page-purchase #purchaseProgress button.tranche-toggle:disabled{
+  opacity:.45;box-shadow:none;cursor:not-allowed;
+}
+
+/* Management quality tiles open details; health colors still determine their borders. */
+#page-detail button.ix-quality-tile{
+  border-width:2px;
+  box-shadow:inset 0 0 0 1px rgba(155,199,246,.22),
+             0 3px 0 #071523;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+#page-detail button.ix-quality-tile::after{
+  content:"詳細を開く ›";
+  color:#c7e1ff;
+  font-size:13px;
+  font-weight:760;
+  line-height:1.5;
+}
+#page-detail button.ix-quality-tile:active{
+  transform:translateY(2px);
+  box-shadow:inset 0 0 0 1px rgba(155,199,246,.22);
+}
+
+/* The three review ratings are selectable controls with a distinct checked state. */
+#page-detail button.review-utility{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+  padding:11px 6px;
+  min-height:50px;
+  text-align:center;
+}
+#page-detail button.review-utility::before{
+  content:"○";
+  font-size:16px;
+  font-weight:750;
+  color:#c7e1ff;
+}
+#page-detail button.review-utility.selected{
+  background:#c5e2ff;
+  color:#09172c;
+  border-color:#e7f4ff;
+  box-shadow:inset 0 0 0 1px #5681b1,0 3px 0 #071523;
+}
+#page-detail button.review-utility.selected::before{
+  content:"✓";
+  color:#0b5486;
+}
+
+/* Disclosure summaries are clickable: one common +/- affordance, unlike data cards.
+   Specialized chart-help (its own + marker) is preserved. */
+details:not(.chart-help):not(.dr-fold)>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-height:48px;
+  padding:13px 14px;
+  list-style:none;
+  cursor:pointer;
+  border:1.5px solid var(--ui55-disclosure-border);
+  border-radius:11px;
+  background:var(--ui55-disclosure-bg);
+  color:#f0f6ff;
+  box-shadow:0 2px 0 #0a1829;
+}
+details:not(.chart-help):not(.dr-fold)>summary::-webkit-details-marker{display:none}
+details:not(.chart-help):not(.dr-fold)>summary::marker{content:""}
+details:not(.chart-help):not(.dr-fold)>summary::after{
+  content:"＋";
+  flex:0 0 auto;
+  font-size:20px;
+  font-weight:650;
+  line-height:1;
+  color:#aad4ff;
+}
+details:not(.chart-help):not(.dr-fold)[open]>summary::after{content:"−"}
+details:not(.chart-help):not(.dr-fold)>summary:active{
+  background:#254367;
+}
+details:not(.chart-help):not(.dr-fold)>summary:focus-visible,
+details.chart-help>summary:focus-visible,
+details.dr-fold>summary:focus-visible{
+  outline:3px solid #b8dcff;
+  outline-offset:3px;
+}
+#page-indicators details.chart-help>summary{
+  background:#152b46;
+  border:1px solid #507cab;
+  border-radius:9px;
+  padding:12px;
+  box-shadow:0 2px 0 #0a1829;
+  cursor:pointer;
+}
+#page-decision .decision-reasons details.dr-fold>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-height:48px;
+  padding:12px;
+  list-style:none;
+  background:#172e49;
+  border:1.5px solid #527eac;
+  border-radius:10px;
+  box-shadow:0 2px 0 #0a1829;
+  cursor:pointer;
+}
+#page-decision .decision-reasons details.dr-fold>summary::-webkit-details-marker{display:none}
+#page-decision .decision-reasons details.dr-fold>summary::marker{content:""}
+#page-decision .decision-reasons details.dr-fold>summary::after{
+  content:"＋";
+  flex:0 0 auto;
+  font-size:20px;
+  line-height:1;
+  color:#aad4ff;
+}
+#page-decision .decision-reasons details.dr-fold[open]>summary::after{content:"−"}
+
+/* A report/status is not a pressable control. Keep warning colors and data text.
+   No clickable affordance, depth, or arrow is attached to these views. */
+span.pill{
+  box-shadow:none;
+  cursor:default;
+  background:rgba(157,176,203,.10);
+  border-color:rgba(151,173,202,.34);
+}
+span.pill.ok{background:rgba(41,199,119,.09)}
+span.pill.warn{background:rgba(244,193,75,.09)}
+span.pill.ng{background:rgba(255,114,114,.09)}
+#page-decision .next-action,
+#page-purchase .next-check{
+  border:1px solid #30475f;
+  border-left:4px solid #6e9fce;
+  background:#101f32;
+  box-shadow:none;
+  cursor:default;
+}
+:is(.ref-compact-item,.status-tile,.metric,.forecast,.tranche-plan-card,.fund-main,.fund-stat,.quality-top-summary .note){
+  box-shadow:none;
+  cursor:default;
+}
+
+/* Fixed five-tab navigation is selectable but not a content/status tile. */
+nav.tabs .tab{
+  border:1px solid transparent;
+  transition:background-color .14s ease,border-color .14s ease;
+}
+nav.tabs .tab.active{
+  background:#24466f;
+  border-color:#719fd0;
+  box-shadow:inset 0 -3px 0 #afd7ff;
+  color:#f6faff;
+}
+nav.tabs .tab:focus-visible{
+  outline:3px solid #b8dcff;
+  outline-offset:-2px;
+}
+
+/* Narrow phones: labels may wrap inside buttons; never clip their action text. */
+@media(max-width:359px){
+  button.primary,button.secondary{
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  button.primary:not(:disabled)::after,
+  button.secondary:not(:disabled)::after{margin-left:4px}
+  #page-detail button.review-utility::before{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  button.primary,button.secondary,button.ix-expand,button.review-utility,
+  #page-purchase #purchaseProgress button.tranche-toggle,nav.tabs .tab{
+    transition:none
+  }
+}
