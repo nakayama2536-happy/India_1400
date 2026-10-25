@@ -117,11 +117,11 @@ test('UI 5.53 retains all app cache and safe publication version bindings',()=>{
   const sw=fs.readFileSync('sw.js','utf8');
   const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
   const version=fs.readFileSync('VERSION','utf8');
-  assert.match(version,/UI_VERSION=5\.54/);
-  assert.match(html,/v5\.54/);
-  assert.match(sw,/india1400-v5-54-/);
-  assert.match(sw,/\?v=5\.54/);
-  assert.match(manifest.start_url,/v=5\.54/);
+  assert.match(version,/UI_VERSION=5\.55/);
+  assert.match(html,/v5\.55/);
+  assert.match(sw,/india1400-v5-55-/);
+  assert.match(sw,/\?v=5\.55/);
+  assert.match(manifest.start_url,/v=5\.55/);
   assert.match(html,/renderExpandedChart\(id,width,height\)/);
   assert.match(html,/data-ix-expand="niftyChart"/);
   assert.match(html,/data-ix-expand="rsiChart"/);
