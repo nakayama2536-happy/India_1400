@@ -25,10 +25,10 @@ test('four additional tabs have scoped readability without changing decision or 
  }
  assert.match(html,/<link rel="stylesheet" href="cross-tab-readability\.css">/);
  assert.match(sw,/"cross-tab-readability\.css"/);
- assert.match(version,/UI_VERSION=5\.54/);
- assert.match(html,/<span class="version-badge">v5\.54<\/span>/);
- assert.match(manifest.start_url,/v=5\.54/);
- assert.match(sw,/india1400-v5-54-/);
+ assert.match(version,/UI_VERSION=5\.55/);
+ assert.match(html,/<span class="version-badge">v5\.55<\/span>/);
+ assert.match(manifest.start_url,/v=5\.55/);
+ assert.match(sw,/india1400-v5-55-/);
  for(const id of ['decisionCard','qualityGate','globalReferenceTimes','decisionReasonsPanel','forecastCards']){
   assert.match(html,new RegExp('id="'+id+'"'));
  }
