@@ -1,8 +1,8 @@
 {
   "name": "India 14:00 Check",
   "short_name": "India 14:00",
-  "description": "インド株14:00定点確認 v5.54・iPhoneの5タブで読みやすい文字・状態・詳細表示・基準価額トレンド・判断理由・データ品質",
-  "start_url": "./?v=5.54",
+  "description": "インド株14:00定点確認 v5.55・操作ボタンと表示の見分けやすさ・5タブの視認性・グラフ・データ品質",
+  "start_url": "./?v=5.55",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07111f",
