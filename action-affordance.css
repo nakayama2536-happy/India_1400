@@ -73,3 +73,30 @@
 .tabs .tab.active{border-color:#6595d3;background:#203c62;color:#f4f8ff;box-shadow:inset 0 -3px 0 #83baff}
 .app a.fund-source{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
 @media(prefers-reduced-motion:reduce){.app button.primary,.app button.secondary,.app button.ix-expand,.app .tranche-toggle,.app .ix-quality-tile{transition:none}}
+
+/* UI 5.56: primary NIFTY expansion stays on the left; outer management cards open as a whole. */
+#page-indicators .indicator-primary .indicator-primary-actions{display:flex;justify-content:flex-start;align-items:center;margin:2px 0 12px}
+#page-indicators .indicator-primary .indicator-primary-actions .ix-expand{margin-left:0}
+.app #page-detail details.management-fold{padding:0;overflow:hidden;border-color:#304561}
+.app #page-detail details.management-fold>summary{
+  display:block;width:100%;min-height:84px;margin:0;border:0;border-radius:17px;
+  background:#152b47;padding:18px 62px 18px 18px!important;line-height:1.5
+}
+.app #page-detail details.management-fold[open]>summary{background:#1b3555;border-bottom:1px solid #395577;border-radius:17px 17px 0 0}
+.app #page-detail details.management-fold>summary::after{right:16px;width:34px;height:34px;font-size:20px;background:#2b4d72}
+.app #page-detail details.management-fold .management-heading{display:block;font-size:clamp(19px,5vw,22px);line-height:1.4;font-weight:850}
+.app #page-detail details.management-fold .management-subtitle{display:block;margin-top:5px;font-size:14px;line-height:1.5;font-weight:550;color:#b9cbe3;overflow-wrap:anywhere}
+.app #page-detail details.management-fold>.body{padding:15px 18px 20px;font-size:14px;line-height:1.75}
+.app #page-detail .management-intro{border-left:3px solid #7fb6f8;background:#0d1b2e;padding:11px 12px;border-radius:8px}
+.app #page-detail .management-intro strong{font-size:17px;line-height:1.5;color:#eff6ff}
+.app #page-detail .management-intro p{margin:6px 0 0;font-size:15px;line-height:1.7;color:#d5e3f6}
+.app #page-detail .management-flow{margin:12px 0;padding:11px 10px;background:#142944;border:1px solid #3c5e83;border-radius:10px;font-size:14px;line-height:1.7;color:#dbeaff;font-weight:720;overflow-wrap:anywhere}
+.app #page-detail details.management-review-subsection{margin-top:19px;border:1px solid #395573;border-radius:13px;background:#0d1b2d;overflow:hidden}
+.app #page-detail details.management-review-subsection>summary{display:block;padding:15px 55px 15px 14px!important;min-height:54px;font-size:16px;line-height:1.5;font-weight:780;margin:0;border-radius:12px}
+.app #page-detail details.management-review-subsection[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.app #page-detail details.management-review-subsection>.body{padding:14px 12px 17px;font-size:14px;line-height:1.7}
+@media(max-width:359px){
+ .app #page-detail details.management-fold>summary{padding:16px 53px 16px 14px!important}
+ .app #page-detail details.management-fold>.body{padding:12px 12px 18px}
+ .app #page-detail details.management-fold .management-subtitle{font-size:13px}
+}
