@@ -26,7 +26,7 @@
       "○ RSI改善：42.4 → 46.1",
       "○ 5日線回復：22753 / MA5 22748",
       "△ MACD悪化：Hist +53.17 → +52.36",
-      "△ 外部環境警戒：Brent 115.1"
+      "△ 外部環境警戒：Brent 115.0"
     ],
     "passed_conditions": [
       {
@@ -90,7 +90,7 @@
       {
         "id": "EXTERNAL_RISK_1",
         "category": "MARKET",
-        "label": "Brent 115.1",
+        "label": "Brent 115.0",
         "status": "WARN",
         "impact": "NEGATIVE",
         "source_group": "external_risk"
@@ -101,8 +101,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-26T19:01+09:00",
-    "fetched_at": "2026-10-26T19:35:20+09:00",
-    "calculated_at": "2026-10-26T19:35:20+09:00"
+    "fetched_at": "2026-10-26T19:54:15+09:00",
+    "calculated_at": "2026-10-26T19:54:15+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
