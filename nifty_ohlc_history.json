@@ -2424,12 +2424,6 @@
       "status": "ok",
       "rows": 200,
       "last_date": "2026-10-23"
-    },
-    {
-      "source": "NSE official daily index CSV",
-      "status": "ok",
-      "rows": 1,
-      "last_date": "2026-10-26"
     }
   ]
 }
