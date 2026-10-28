@@ -19,13 +19,13 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "POSTCHECK",
+    "phase": null,
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "WAIT",
     "reason_summary": [
       "○ 5日線回復：22699 / MA5 22698",
       "△ MACD悪化：Hist +50.80 → +45.71",
-      "△ 外部環境警戒：Brent 115.0"
+      "△ 外部環境警戒：Brent 116.3"
     ],
     "passed_conditions": [
       {
@@ -89,7 +89,7 @@
       {
         "id": "EXTERNAL_RISK_1",
         "category": "MARKET",
-        "label": "Brent 115.0",
+        "label": "Brent 116.3",
         "status": "WARN",
         "impact": "NEGATIVE",
         "source_group": "external_risk"
@@ -100,8 +100,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-28T19:01+09:00",
-    "fetched_at": "2026-10-28T20:10:46+09:00",
-    "calculated_at": "2026-10-28T20:10:46+09:00"
+    "fetched_at": "2026-10-29T01:49:31+09:00",
+    "calculated_at": "2026-10-29T01:49:31+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
