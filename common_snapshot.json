@@ -4,40 +4,30 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "CONFIRMED",
-    "legacy_code": "CONFIRMED"
+    "state": "OPEN",
+    "legacy_code": "LIVE"
   },
   "incident": {
-    "level": "WARNING",
+    "level": "NORMAL",
     "error_codes": []
   },
   "data_quality": {
-    "data_state": "PARTIAL",
-    "qc_state": "WARN",
+    "data_state": "FRESH",
+    "qc_state": "PASS",
     "completeness_pct": null,
-    "legacy_quality_code": "PARTIAL"
+    "legacy_quality_code": "OK"
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": null,
-    "eligibility": "NOT_ELIGIBLE",
+    "phase": "PREVIEW",
+    "eligibility": "ELIGIBLE",
     "strategy_action": "WAIT",
     "reason_summary": [
-      "○ 5日線回復：22750 / MA5 22720",
-      "△ MACD悪化：Hist +52.36 → +50.80",
-      "△ 外部環境警戒：Brent 113.8"
+      "△ MACD悪化：Hist +50.80 → +34.66",
+      "△ 5日線割れ：22526 / MA5 22663",
+      "△ 外部環境警戒：Brent 115.6"
     ],
-    "passed_conditions": [
-      {
-        "id": "above_ma5",
-        "category": "TECHNICAL",
-        "label": "5日線回復",
-        "status": "PASS",
-        "impact": "POSITIVE",
-        "observed": "22750 / MA5 22720",
-        "source_group": "buy_condition"
-      }
-    ],
+    "passed_conditions": [],
     "pending_conditions": [
       {
         "id": "low_zone",
@@ -45,7 +35,7 @@
         "label": "調整・低位",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "RSI 46.0 / 25日線乖離 -0.2%",
+        "observed": "RSI 41.5 / 25日線乖離 -1.0%",
         "source_group": "buy_condition"
       },
       {
@@ -54,7 +44,7 @@
         "label": "RSI改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "46.1 → 46.0",
+        "observed": "46.0 → 41.5",
         "source_group": "buy_condition"
       },
       {
@@ -63,7 +53,16 @@
         "label": "MACD改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "Hist +52.36 → +50.80",
+        "observed": "Hist +50.80 → +34.66",
+        "source_group": "buy_condition"
+      },
+      {
+        "id": "above_ma5",
+        "category": "TECHNICAL",
+        "label": "5日線回復",
+        "status": "PENDING",
+        "impact": "NEUTRAL",
+        "observed": "22526 / MA5 22663",
         "source_group": "buy_condition"
       },
       {
@@ -72,7 +71,7 @@
         "label": "25日線回復",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "22750 / MA25 22798",
+        "observed": "22526 / MA25 22763",
         "source_group": "buy_condition"
       }
     ],
@@ -83,13 +82,22 @@
         "label": "MACD悪化",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "Hist +52.36 → +50.80",
+        "observed": "Hist +50.80 → +34.66",
+        "source_group": "sell_condition"
+      },
+      {
+        "id": "below_ma5",
+        "category": "TECHNICAL",
+        "label": "5日線割れ",
+        "status": "WARN",
+        "impact": "NEGATIVE",
+        "observed": "22526 / MA5 22663",
         "source_group": "sell_condition"
       },
       {
         "id": "EXTERNAL_RISK_1",
         "category": "MARKET",
-        "label": "Brent 113.8",
+        "label": "Brent 115.6",
         "status": "WARN",
         "impact": "NEGATIVE",
         "source_group": "external_risk"
@@ -99,17 +107,17 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-10-27T19:01+09:00",
-    "fetched_at": "2026-10-28T01:01:18+09:00",
-    "calculated_at": "2026-10-28T01:01:18+09:00"
+    "market_as_of": "2026-10-28T14:00+09:00",
+    "fetched_at": "2026-10-28T14:04:20+09:00",
+    "calculated_at": "2026-10-28T14:04:20+09:00"
   },
   "market_specific": {
     "strategy_stage": "WAIT",
     "strategy_stage_label": "待機",
-    "decision_gate": "HOLD",
-    "buy_condition_count": 1,
+    "decision_gate": "READY",
+    "buy_condition_count": 0,
     "buy_condition_total": 5,
-    "sell_condition_count": 1,
+    "sell_condition_count": 2,
     "sell_condition_total": 4,
     "external_data_state": "OK"
   }
