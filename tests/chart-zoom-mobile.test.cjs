@@ -59,13 +59,15 @@ test('fixed-height NIFTY/RSI/MACD drawing retains meaning at normal and 250% wid
 test('long 200-candle opt-in zoom uses 3750x350 native geometry with no invented MA or volume',()=>{
   const verified=display.validateLongCandles(longHistory,historicalDetail);
   assert.equal(verified.ok,true,verified.reason);
-  const source=JSON.stringify(verified.rows);
-  const zoom=charts.candlestickChart(verified.rows,{width:3750,height:350});
+  const visible=display.rowsForPeriod(historicalDetail,verified.rows,'200');
+  assert.equal(visible.length,200);
+  const source=JSON.stringify(visible);
+  const zoom=charts.candlestickChart(visible,{width:3750,height:350});
   assert.match(zoom,/viewBox="0 0 3750\.00 350"/);
   assert.equal((zoom.match(/class="body-(up|down)"/g)||[]).length,200);
   assert.doesNotMatch(zoom,/class="ma5"|class="ma25"|class="ma75"|volume|NaN|Infinity/);
-  assert.equal(JSON.stringify(verified.rows),source);
-  const embedded=charts.candlestickChart(verified.rows,{width:1500});
+  assert.equal(JSON.stringify(visible),source);
+  const embedded=charts.candlestickChart(visible,{width:1500});
   assert.match(embedded,/viewBox="0 0 1500\.00 294"/,'normal display preserved');
 });
 
