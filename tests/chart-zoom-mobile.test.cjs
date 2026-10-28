@@ -8,6 +8,8 @@ const charts=require('../technical-charts.js');
 const index=fs.readFileSync('index.html','utf8');
 const market=JSON.parse(fs.readFileSync('market.json','utf8'));
 const longHistory=JSON.parse(fs.readFileSync('nifty_ohlc_history.json','utf8'));
+const {historicalAlignedDetail}=require('./ohlc-historical-case.cjs');
+const historicalDetail=historicalAlignedDetail(longHistory,market.detail_chart);
 
 test('iPhone zoom extends only horizontal viewport, never multiplies vertical height',()=>{
   for(const width of [320,375,393,430]){
@@ -55,15 +57,17 @@ test('fixed-height NIFTY/RSI/MACD drawing retains meaning at normal and 250% wid
 });
 
 test('long 200-candle opt-in zoom uses 3750x350 native geometry with no invented MA or volume',()=>{
-  const verified=display.validateLongCandles(longHistory,market.detail_chart);
+  const verified=display.validateLongCandles(longHistory,historicalDetail);
   assert.equal(verified.ok,true,verified.reason);
-  const source=JSON.stringify(verified.rows);
-  const zoom=charts.candlestickChart(verified.rows,{width:3750,height:350});
+  const visible=display.rowsForPeriod(historicalDetail,verified.rows,'200');
+  assert.equal(visible.length,200);
+  const source=JSON.stringify(visible);
+  const zoom=charts.candlestickChart(visible,{width:3750,height:350});
   assert.match(zoom,/viewBox="0 0 3750\.00 350"/);
   assert.equal((zoom.match(/class="body-(up|down)"/g)||[]).length,200);
   assert.doesNotMatch(zoom,/class="ma5"|class="ma25"|class="ma75"|volume|NaN|Infinity/);
-  assert.equal(JSON.stringify(verified.rows),source);
-  const embedded=charts.candlestickChart(verified.rows,{width:1500});
+  assert.equal(JSON.stringify(visible),source);
+  const embedded=charts.candlestickChart(visible,{width:1500});
   assert.match(embedded,/viewBox="0 0 1500\.00 294"/,'normal display preserved');
 });
 
@@ -235,7 +239,7 @@ test('landscape viewport Y geometry uses the same height as the modal CSS even b
     assert.match(markup,/height="190" viewBox="0 0 /);
     assert.match(markup,/ 190" preserveAspectRatio=/,'SVG and CSS height must match');
   }
-  const candleRows=display.validateLongCandles(longHistory,market.detail_chart).rows;
+  const candleRows=display.validateLongCandles(longHistory,historicalDetail).rows;
   const geom=display.expandedGeometry('detailCandleChart',viewWidth,viewHeight,2.5,1500);
   assert.equal(geom.height,190);
   assert.match(charts.candlestickChart(candleRows,{width:geom.width-16,height:geom.height}),/height="190"/);

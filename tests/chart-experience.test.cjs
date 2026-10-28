@@ -4,15 +4,22 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const charts=require('../chart-experience.js');
 const candleSvg=require('../technical-charts.js').candlestickChart;
-const snapshot=JSON.parse(fs.readFileSync('market.json','utf8')).detail_chart;
+const liveSnapshot=JSON.parse(fs.readFileSync('market.json','utf8')).detail_chart;
 const history=JSON.parse(fs.readFileSync('nifty_ohlc_history.json','utf8'));
+const {historicalAlignedDetail,assertLiveReconciliation}=require('./ohlc-historical-case.cjs');
+const snapshot=historicalAlignedDetail(history,liveSnapshot);
 const original=()=>structuredClone(history);
 const current=()=>structuredClone(snapshot);
 
-test('existing published 200 OHLC reconcile against the current 60 candles',()=>{
+test('live saved OHLC and confirmed daily basis obey fail-closed reconciliation',()=>{
+  assertLiveReconciliation(history,liveSnapshot);
+  assert.deepEqual(liveSnapshot,JSON.parse(fs.readFileSync('market.json','utf8')).detail_chart);
+});
+
+test('verified historical aligned OHLC reconciles against the matching 60 actual candles',()=>{
   const result=charts.validateLongCandles(history,snapshot);
   assert.equal(result.ok,true,result.reason);
-  assert.equal(result.rows.length,200);
+  assert.equal(result.rows.length,history.records.length);
   assert.equal(result.rows.at(-1).date,snapshot.latest_ohlc_date);
   assert.equal(result.rows.at(-1).close,snapshot.candles.at(-1).close);
 });
@@ -27,7 +34,7 @@ test('30/60/200 selectors reuse stored data and never alter snapshot',()=>{
   assert.equal(JSON.stringify(raw),JSON.stringify(history));
 });
 test('known 200-row candles render with observed dates, not zero or synthetic volume',()=>{
-  const xs=charts.validateLongCandles(history,snapshot).rows;
+  const xs=charts.rowsForPeriod(snapshot,charts.validateLongCandles(history,snapshot).rows,'200');
   const svg=candleSvg(xs,{width:1500});
   assert.match(svg,/viewBox="0 0 1500.00 294"/);
   assert.equal((svg.match(/class="body-(?:up|down)"/g)||[]).length,200);
@@ -57,7 +64,7 @@ test('never present an old or distinct OHLC basis as current long data',()=>{
     assert.equal(v.rows.length,0);
   });
 });
-test('stale/malformed current chart cannot be rehabilitated by valid long data',()=>{
+test('stale/malformed historical aligned chart cannot be rehabilitated by valid long data',()=>{
   const bads=[
     d=>{d.available=false;},
     d=>{d.latest_confirmed_date='2026-10-22';},
