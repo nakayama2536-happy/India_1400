@@ -4,6 +4,7 @@ const tech=require('../technical-charts.js'), experience=require('../chart-exper
 const market=JSON.parse(fs.readFileSync('market.json','utf8'));
 const history=JSON.parse(fs.readFileSync('nifty_ohlc_history.json','utf8'));
 const nifty=market.chart_data.nifty;
+const {historicalAlignedDetail}=require('./ohlc-historical-case.cjs');
 const parseDates=svg=>[...svg.matchAll(/<text x="([\d.]+)" y="[\d.]+" text-anchor="(?:start|middle|end)">(\d{2}\/\d{2})<\/text>/g)]
   .map(x=>({x:Number(x[1]),date:x[2]}));
 const price=[{key:'close',cls:'line-main'},{key:'ma5',cls:'line-ma5'},{key:'ma25',cls:'line-ma25'},{key:'ma75',cls:'line-ma75'}];
@@ -23,7 +24,7 @@ test('normal embedded price/RSI/MACD chart keeps the existing three-day axis',()
   }
 });
 
-test('250 percent NIFTY right-hand viewport shows multiple saved dates, not only 10/23',()=>{
+test('250 percent NIFTY right-hand viewport shows multiple saved dates, not only the last date',()=>{
   const shape=experience.expandedGeometry('niftyChart',375,812,2.5);
   const svg=tech.lineChart(nifty.price,price,[],{kind:'nifty',width:shape.width-16,height:shape.height});
   const labels=parseDates(svg);
@@ -31,8 +32,8 @@ test('250 percent NIFTY right-hand viewport shows multiple saved dates, not only
   const visible=labels.filter(x=>x.x>=visibleStart && x.x<=shape.width-16);
   assert.ok(visible.length>=3,'last 375px should show at least three observed dates');
   assert.equal(labels.at(-1).date,nifty.price.at(-1).date.slice(5).replace('-','/'));
-  assert.equal(visible.at(-1).date,'10/23');
-  assert.ok(visible.some(x=>x.date!=='10/23'));
+  assert.equal(visible.at(-1).date,nifty.price.at(-1).date.slice(5).replace('-','/'));
+  assert.ok(visible.some(x=>x.date!==visible.at(-1).date));
   assert.ok(visible.every(x=>nifty.price.some(p=>p.date.slice(5).replace('-','/')===x.date)));
   assert.match(svg,/height="320"/);
 });
@@ -70,7 +71,7 @@ test('NIFTY, RSI and MACD use matching expanded date positions for common basis'
 });
 
 test('expanded 60 and validated 200 OHLC use observed session dates without overlap',()=>{
-  const d=market.detail_chart;
+  const d=historicalAlignedDetail(history,market.detail_chart);
   const reviewed=experience.validateLongCandles(history,d);
   assert.equal(reviewed.ok,true,reviewed.reason);
   for(const [rows,width,height,visibleWidth] of [
@@ -149,7 +150,8 @@ test('expanded fund NAV trend also labels multiple actual dates without changing
   const g=experience.expandedGeometry('indiaCoreTrendChart',375,812,2.5);
   const displayed=extract(fn(input,[],{width:g.width-16,height:g.height}));
   assert.ok(displayed.length>3);
-  assert.equal(displayed.at(-1).date,'10/23');
+  const last=input.at(-1).date.split('-');
+  assert.equal(displayed.at(-1).date,Number(last[1])+'/'+Number(last[2]));
   const visible=displayed.filter(x=>x.x>=g.width-16-375);
   assert.ok(visible.length>=3,JSON.stringify(visible));
   for(let i=1;i<displayed.length;i++)assert.ok(displayed[i].x-displayed[i-1].x>=92);
