@@ -136,5 +136,6 @@ test('forecast provenance is explicitly labeled as a current calculation, not au
   assert.match(html,/NIFTY基準値：/);
   assert.match(html,/14:00代表値に保存された予測とは、基準値・計算時刻が異なる場合があります/);
   assert.match(html,/確定日足・参考/);
+  assert.match(html,/ms\.code==="LIVE"\?"ok":ms\.code==="DATA_ERROR"\?"ng":"warn"/);
   assert.doesNotMatch(html,/（保存値・参考）/);
 });
