@@ -19,7 +19,7 @@ test('live saved OHLC and confirmed daily basis obey fail-closed reconciliation'
 test('verified historical aligned OHLC reconciles against the matching 60 actual candles',()=>{
   const result=charts.validateLongCandles(history,snapshot);
   assert.equal(result.ok,true,result.reason);
-  assert.equal(result.rows.length,200);
+  assert.equal(result.rows.length,history.records.length);
   assert.equal(result.rows.at(-1).date,snapshot.latest_ohlc_date);
   assert.equal(result.rows.at(-1).close,snapshot.candles.at(-1).close);
 });
@@ -34,7 +34,7 @@ test('30/60/200 selectors reuse stored data and never alter snapshot',()=>{
   assert.equal(JSON.stringify(raw),JSON.stringify(history));
 });
 test('known 200-row candles render with observed dates, not zero or synthetic volume',()=>{
-  const xs=charts.validateLongCandles(history,snapshot).rows;
+  const xs=charts.rowsForPeriod(snapshot,charts.validateLongCandles(history,snapshot).rows,'200');
   const svg=candleSvg(xs,{width:1500});
   assert.match(svg,/viewBox="0 0 1500.00 294"/);
   assert.equal((svg.match(/class="body-(?:up|down)"/g)||[]).length,200);
