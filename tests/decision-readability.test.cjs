@@ -129,3 +129,12 @@ test('versioned PWA shell only changes display, not private or market sources',(
   assert.match(html,/id="rsiChart"/);
   assert.match(html,/id="macdChart"/);
 });
+
+test('forecast provenance is explicitly labeled as a current calculation, not automatically the 14:00 saved forecast',()=>{
+  assert.match(html,/予測基準日/);
+  assert.match(html,/f\.basis_date\|\|market\?\.technical_basis_snapshot\?\.date/);
+  assert.match(html,/NIFTY基準値：/);
+  assert.match(html,/14:00代表値に保存された予測とは、基準値・計算時刻が異なる場合があります/);
+  assert.match(html,/確定日足・参考/);
+  assert.doesNotMatch(html,/（保存値・参考）/);
+});
