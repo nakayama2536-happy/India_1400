@@ -2412,9 +2412,8 @@
       "close": 22753.2,
       "volume": null,
       "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
       "volume_usable_for_analysis": false,
-      "source": "NSE official daily index CSV",
-      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_26102026.csv",
       "close_consistency": "MATCH"
     },
     {
@@ -2425,9 +2424,8 @@
       "close": 22749.75,
       "volume": null,
       "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
       "volume_usable_for_analysis": false,
-      "source": "NSE official daily index CSV",
-      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_27102026.csv",
       "close_consistency": "MATCH"
     }
   ],
@@ -2435,8 +2433,19 @@
     {
       "source": "Tickjournal",
       "status": "ok",
-      "rows": 200,
-      "last_date": "2026-10-23"
+      "rows": 202,
+      "last_date": "2026-10-27"
+    },
+    {
+      "source": "NSE official daily index CSV",
+      "status": "error",
+      "date": "2026-10-28",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "source": "Yahoo Finance",
+      "status": "error",
+      "error": "HTTP 429; Retry-After=unspecified"
     }
   ]
 }
