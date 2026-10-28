@@ -4,12 +4,19 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const charts=require('../chart-experience.js');
 const candleSvg=require('../technical-charts.js').candlestickChart;
-const snapshot=JSON.parse(fs.readFileSync('market.json','utf8')).detail_chart;
+const liveSnapshot=JSON.parse(fs.readFileSync('market.json','utf8')).detail_chart;
 const history=JSON.parse(fs.readFileSync('nifty_ohlc_history.json','utf8'));
+const {historicalAlignedDetail,assertLiveReconciliation}=require('./ohlc-historical-case.cjs');
+const snapshot=historicalAlignedDetail(history,liveSnapshot);
 const original=()=>structuredClone(history);
 const current=()=>structuredClone(snapshot);
 
-test('existing published 200 OHLC reconcile against the current 60 candles',()=>{
+test('live saved OHLC and confirmed daily basis obey fail-closed reconciliation',()=>{
+  assertLiveReconciliation(history,liveSnapshot);
+  assert.deepEqual(liveSnapshot,JSON.parse(fs.readFileSync('market.json','utf8')).detail_chart);
+});
+
+test('verified historical aligned OHLC reconciles against the matching 60 actual candles',()=>{
   const result=charts.validateLongCandles(history,snapshot);
   assert.equal(result.ok,true,result.reason);
   assert.equal(result.rows.length,200);
@@ -57,7 +64,7 @@ test('never present an old or distinct OHLC basis as current long data',()=>{
     assert.equal(v.rows.length,0);
   });
 });
-test('stale/malformed current chart cannot be rehabilitated by valid long data',()=>{
+test('stale/malformed historical aligned chart cannot be rehabilitated by valid long data',()=>{
   const bads=[
     d=>{d.available=false;},
     d=>{d.latest_confirmed_date='2026-10-22';},
