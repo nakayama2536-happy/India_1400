@@ -59,7 +59,7 @@ test('all disclosure content remains and each tap target has explicit closed/ope
  assert.match(css,/content:"＋"/);
  assert.match(css,/content:"−"/);
  for(const s of ['詳細を見る','自動サポートラインの見方','為替の影響の見方',
-  '市場補足の見方','NIFTY 詳細チャートを見る','予測の読み方','前回14:00比較を見る',
+  '市場補足の見方','NIFTY 詳細チャートを見る','予測の読み方','14:00保存値と現在参照値の比較',
   '判定条件・計算根拠を見る']){
   assert.ok(html.includes(s)||fs.readFileSync('decision-reasons.js','utf8').includes(s),s);
  }
