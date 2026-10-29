@@ -68,3 +68,10 @@ test('main UI provides unambiguous waiting, comparison and current audit label',
   assert.match(html,/id="purchaseProgress"/);
   assert.match(html,/id="captureEvidence"/);
 });
+
+test('waiting-state panel is gated by acquisition evidence for the current JST day',()=>{
+  assert.match(html,/market\?\.acquisition_status\?\.date_jst===jstNowInfo\(\)\.date/);
+  assert.match(html,/market\?\.acquisition_status\?\.code==="WAITING_WINDOW"/);
+  assert.match(html,/14:00履歴 \$\{h\.record_count\?\?0\}件/);
+  assert.match(html,/checkWindowStatus\(\)/);
+});
