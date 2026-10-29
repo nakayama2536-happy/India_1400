@@ -2436,9 +2436,8 @@
       "close": 22698.85,
       "volume": null,
       "volume_status": "NOT_PROVIDED",
+      "source": "Tickjournal NIFTY 50 daily YTD",
       "volume_usable_for_analysis": false,
-      "source": "NSE official daily index CSV",
-      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_28102026.csv",
       "close_consistency": "MATCH"
     }
   ],
@@ -2446,8 +2445,19 @@
     {
       "source": "Tickjournal",
       "status": "ok",
-      "rows": 202,
-      "last_date": "2026-10-27"
+      "rows": 203,
+      "last_date": "2026-10-28"
+    },
+    {
+      "source": "NSE official daily index CSV",
+      "status": "error",
+      "date": "2026-10-29",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "source": "Yahoo Finance",
+      "status": "error",
+      "error": "HTTP 429; Retry-After=unspecified"
     }
   ]
 }
