@@ -13,7 +13,7 @@ const source=html.slice(start,end);
 const format=(v,d)=>v==null?'--':Number(v).toFixed(d);
 const context=vm.createContext({
   referenceText:s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'),
-  fmtJstShort:s=>String(s||'').slice(5,16).replace('T',' '),
+  fmtJstShort:s=>String(s||'').slice(5,16).replace('-','/').replace('T',' '),
   fmt:format,
   signedHtml:(v,d,s)=>v==null?'--':(v>0?'+':'')+format(v,d)+s,
 });
