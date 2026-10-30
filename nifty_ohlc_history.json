@@ -2460,6 +2460,17 @@
       "status": "ok",
       "rows": 203,
       "last_date": "2026-10-28"
+    },
+    {
+      "source": "NSE official daily index CSV",
+      "status": "error",
+      "date": "2026-10-30",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "source": "Yahoo Finance",
+      "status": "error",
+      "error": "HTTP 429; Retry-After=unspecified"
     }
   ]
 }
