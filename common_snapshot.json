@@ -4,8 +4,8 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "CONFIRMED",
-    "legacy_code": "CONFIRMED"
+    "state": "CLOSED",
+    "legacy_code": "CLOSED"
   },
   "incident": {
     "level": "WARNING",
@@ -19,7 +19,7 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "POSTCHECK",
+    "phase": null,
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "TRANCHE3",
     "reason_summary": [
@@ -27,7 +27,7 @@
       "○ MACD改善：Hist +56.99 → +70.06",
       "○ 5日線回復：23053 / MA5 22838",
       "○ 25日線回復：23053 / MA25 22738",
-      "△ 外部環境警戒：Brent 117.7"
+      "△ 外部環境警戒：Brent 117.6"
     ],
     "passed_conditions": [
       {
@@ -82,7 +82,7 @@
       {
         "id": "EXTERNAL_RISK_1",
         "category": "MARKET",
-        "label": "Brent 117.7",
+        "label": "Brent 117.6",
         "status": "WARN",
         "impact": "NEGATIVE",
         "source_group": "external_risk"
@@ -93,8 +93,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-10-30T19:01+09:00",
-    "fetched_at": "2026-10-30T20:15:38+09:00",
-    "calculated_at": "2026-10-30T20:15:38+09:00"
+    "fetched_at": "2026-10-31T01:49:23+09:00",
+    "calculated_at": "2026-10-31T01:49:23+09:00"
   },
   "market_specific": {
     "strategy_stage": "TRANCHE3",
