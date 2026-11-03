@@ -3099,6 +3099,194 @@
         }
       },
       "source_app_version": "5.3"
+    },
+    {
+      "date_jst": "2026-11-03",
+      "generated_at_jst": "2026-11-03T14:04:59+09:00",
+      "price_as_of_jst": "2026-11-03T13:57:00+09:00",
+      "distance_from_1400_seconds": 180,
+      "selection_quality": "EXCELLENT",
+      "history_method_version": "5.3-history-2",
+      "capture_origin": {
+        "code": "EXTERNAL_TRIGGER",
+        "label": "外部冗長",
+        "event": "workflow_dispatch",
+        "schedule_expression": null
+      },
+      "nifty": {
+        "symbol": "^NSEI",
+        "provider_symbol": "NIFTY_50:INDEXNSE",
+        "provider": "Google Finance + NSE Indices",
+        "price": 23659.5,
+        "as_of_jst": "2026-11-03T13:57+09:00",
+        "previous_close": 23440.8,
+        "change_pct": 0.933,
+        "technical_close": 23440.8,
+        "technical_date": "2026-11-02",
+        "ma5": 22975.85,
+        "ma25": 22753.54,
+        "ma75": 23593.25,
+        "rsi14": 61.03,
+        "rsi14_prev": 53.5,
+        "macd": -27.749,
+        "macd_signal": -128.471,
+        "macd_hist": 100.722,
+        "macd_hist_prev": 70.059,
+        "ret5_pct": 3.02,
+        "ret20_pct": 4.54,
+        "vol20_annualized_pct": 15.12,
+        "price_vs_ma5_pct": 2.98,
+        "price_vs_ma25_pct": 3.98,
+        "price_vs_ma75_pct": 0.28,
+        "technical_basis": "前営業日までの確定日足",
+        "provisional": {
+          "available": true,
+          "basis": "14:00時点価格を当日終値と仮定した暫定計算",
+          "date": "2026-11-03",
+          "price": 23659.5,
+          "ma5": 23157.8,
+          "ma25": 22774.3,
+          "ma75": 23587.74,
+          "rsi14": 64.52,
+          "rsi14_prev": 61.03,
+          "macd": 33.765,
+          "macd_signal": -96.024,
+          "macd_hist": 129.788,
+          "macd_hist_prev": 100.722,
+          "ret5_pct": 4.0,
+          "vol20_annualized_pct": 15.27,
+          "price_vs_ma5_pct": 2.17,
+          "price_vs_ma25_pct": 3.89,
+          "price_vs_ma75_pct": 0.3
+        }
+      },
+      "technical_basis_snapshot": {
+        "available": true,
+        "version": "5.2-basis-1",
+        "type": "provisional",
+        "label": "当日暫定テクニカル（同一時点）",
+        "date": "2026-11-03",
+        "price": 23659.5,
+        "quote_as_of_jst": "2026-11-03T13:57+09:00",
+        "source": "NIFTY現在値＋確定日足",
+        "ma5": 23157.8,
+        "ma25": 22774.3,
+        "ma75": 23587.74,
+        "rsi14": 64.52,
+        "rsi_method": "Wilder smoothed RSI14 (initial 14-difference mean)",
+        "macd_hist": 129.788,
+        "ret5_pct": 4.0,
+        "vol20_annualized_pct": 15.27,
+        "consistency": "price / MA / RSI / MACD / forecast all use this snapshot"
+      },
+      "trade_guide": {
+        "action_code": "TRANCHE3",
+        "action_label": "第3弾候補（慎重）",
+        "market_stage_code": "TRANCHE3",
+        "market_stage_label": "第3弾相当・中期回復",
+        "technical_basis_used": "当日暫定テクニカル（同一時点）",
+        "buy_condition_count": 4,
+        "buy_condition_total": 5,
+        "sell_condition_count": 0,
+        "sell_condition_total": 4,
+        "basis_date": "2026-11-03",
+        "basis_price": 23659.5
+      },
+      "forecast": {
+        "available": true,
+        "method_version": "4.8-stat-1",
+        "message": null,
+        "basis": "当日暫定テクニカル（同一時点）",
+        "basis_date": "2026-11-03",
+        "basis_price": 23659.5,
+        "basis_consistency": "OK",
+        "1": {
+          "label": "中立",
+          "median_return_pct": 0.12,
+          "q25_return_pct": -0.4,
+          "q75_return_pct": 0.51,
+          "median_price": 23686.87,
+          "q25_price": 23563.93,
+          "q75_price": 23780.37,
+          "historical_up_share_pct": 55.0,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        },
+        "3": {
+          "label": "中立",
+          "median_return_pct": -0.27,
+          "q25_return_pct": -1.42,
+          "q75_return_pct": 0.38,
+          "median_price": 23596.18,
+          "q25_price": 23323.98,
+          "q75_price": 23750.26,
+          "historical_up_share_pct": 45.0,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        },
+        "14": {
+          "label": "上向き",
+          "median_return_pct": 0.86,
+          "q25_return_pct": -2.65,
+          "q75_return_pct": 2.49,
+          "median_price": 23862.11,
+          "q25_price": 23031.97,
+          "q75_price": 24248.45,
+          "historical_up_share_pct": 57.5,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        }
+      },
+      "usdinr": {
+        "symbol": "INR=X",
+        "provider_symbol": "USD-INR",
+        "provider": "Google Finance",
+        "price": 94.7868,
+        "as_of_jst": "2026-11-03T14:01+09:00",
+        "change_5d_pct": null
+      },
+      "brent": {
+        "symbol": "BZ=F",
+        "provider_symbol": "BZW00:NYMEX",
+        "provider": "Google Finance",
+        "price": 117.7,
+        "as_of_jst": "2026-11-03T10:29+09:00",
+        "change_5d_pct": null
+      },
+      "india_vix": {
+        "symbol": "^INDIAVIX",
+        "provider": "Google Finance",
+        "price": 15.96,
+        "as_of_jst": "2026-11-03T13:56+09:00",
+        "change_5d_pct": null,
+        "data_status": "fresh"
+      },
+      "external_reference": {
+        "usdinr": {
+          "label": "USD/INR",
+          "price": 94.7868,
+          "as_of_jst": "2026-11-03T14:01+09:00",
+          "provider": "Google Finance",
+          "status": "fresh",
+          "age_minutes": null
+        },
+        "brent": {
+          "label": "Brent",
+          "price": 117.7,
+          "as_of_jst": "2026-11-03T10:29+09:00",
+          "provider": "Google Finance",
+          "status": "fresh",
+          "age_minutes": null
+        },
+        "india_vix": {
+          "label": "India VIX",
+          "price": 15.96,
+          "as_of_jst": "2026-11-03T13:56+09:00",
+          "provider": "Google Finance",
+          "status": "fresh"
+        }
+      },
+      "source_app_version": "5.3"
     }
   ]
 }
