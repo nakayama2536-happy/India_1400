@@ -3287,6 +3287,194 @@
         }
       },
       "source_app_version": "5.3"
+    },
+    {
+      "date_jst": "2026-11-04",
+      "generated_at_jst": "2026-11-04T14:04:52+09:00",
+      "price_as_of_jst": "2026-11-04T13:57:00+09:00",
+      "distance_from_1400_seconds": 180,
+      "selection_quality": "EXCELLENT",
+      "history_method_version": "5.3-history-2",
+      "capture_origin": {
+        "code": "EXTERNAL_TRIGGER",
+        "label": "外部冗長",
+        "event": "workflow_dispatch",
+        "schedule_expression": null
+      },
+      "nifty": {
+        "symbol": "^NSEI",
+        "provider_symbol": "NIFTY_50:INDEXNSE",
+        "provider": "Google Finance + NSE Indices",
+        "price": 23845.15,
+        "as_of_jst": "2026-11-04T13:57+09:00",
+        "previous_close": 23810.85,
+        "change_pct": 0.144,
+        "technical_close": 23810.85,
+        "technical_date": "2026-11-03",
+        "ma5": 23188.07,
+        "ma25": 22780.35,
+        "ma75": 23589.75,
+        "rsi14": 66.59,
+        "rsi14_prev": 61.03,
+        "macd": 45.838,
+        "macd_signal": -93.609,
+        "macd_hist": 139.447,
+        "macd_hist_prev": 100.722,
+        "ret5_pct": 4.66,
+        "ret20_pct": 5.56,
+        "vol20_annualized_pct": 15.79,
+        "price_vs_ma5_pct": 2.83,
+        "price_vs_ma25_pct": 4.67,
+        "price_vs_ma75_pct": 1.08,
+        "technical_basis": "前営業日までの確定日足",
+        "provisional": {
+          "available": true,
+          "basis": "14:00時点価格を当日終値と仮定した暫定計算",
+          "date": "2026-11-04",
+          "price": 23845.15,
+          "ma5": 23417.33,
+          "ma25": 22822.95,
+          "ma75": 23583.23,
+          "rsi14": 67.06,
+          "rsi14_prev": 66.59,
+          "macd": 105.706,
+          "macd_signal": -53.746,
+          "macd_hist": 159.452,
+          "macd_hist_prev": 139.447,
+          "ret5_pct": 5.05,
+          "vol20_annualized_pct": 15.58,
+          "price_vs_ma5_pct": 1.83,
+          "price_vs_ma25_pct": 4.48,
+          "price_vs_ma75_pct": 1.11
+        }
+      },
+      "technical_basis_snapshot": {
+        "available": true,
+        "version": "5.2-basis-1",
+        "type": "provisional",
+        "label": "当日暫定テクニカル（同一時点）",
+        "date": "2026-11-04",
+        "price": 23845.15,
+        "quote_as_of_jst": "2026-11-04T13:57+09:00",
+        "source": "NIFTY現在値＋確定日足",
+        "ma5": 23417.33,
+        "ma25": 22822.95,
+        "ma75": 23583.23,
+        "rsi14": 67.06,
+        "rsi_method": "Wilder smoothed RSI14 (initial 14-difference mean)",
+        "macd_hist": 159.452,
+        "ret5_pct": 5.05,
+        "vol20_annualized_pct": 15.58,
+        "consistency": "price / MA / RSI / MACD / forecast all use this snapshot"
+      },
+      "trade_guide": {
+        "action_code": "TRANCHE3",
+        "action_label": "第3弾候補（慎重）",
+        "market_stage_code": "TRANCHE3",
+        "market_stage_label": "第3弾相当・中期回復",
+        "technical_basis_used": "当日暫定テクニカル（同一時点）",
+        "buy_condition_count": 4,
+        "buy_condition_total": 5,
+        "sell_condition_count": 1,
+        "sell_condition_total": 4,
+        "basis_date": "2026-11-04",
+        "basis_price": 23845.15
+      },
+      "forecast": {
+        "available": true,
+        "method_version": "4.8-stat-1",
+        "message": null,
+        "basis": "当日暫定テクニカル（同一時点）",
+        "basis_date": "2026-11-04",
+        "basis_price": 23845.15,
+        "basis_consistency": "OK",
+        "1": {
+          "label": "中立",
+          "median_return_pct": 0.08,
+          "q25_return_pct": -0.26,
+          "q75_return_pct": 0.32,
+          "median_price": 23863.26,
+          "q25_price": 23782.48,
+          "q75_price": 23920.69,
+          "historical_up_share_pct": 55.0,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        },
+        "3": {
+          "label": "中立",
+          "median_return_pct": -0.29,
+          "q25_return_pct": -1.13,
+          "q75_return_pct": 0.35,
+          "median_price": 23775.57,
+          "q25_price": 23576.27,
+          "q75_price": 23928.84,
+          "historical_up_share_pct": 40.0,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        },
+        "14": {
+          "label": "中立",
+          "median_return_pct": 0.73,
+          "q25_return_pct": -2.55,
+          "q75_return_pct": 2.49,
+          "median_price": 24018.65,
+          "q25_price": 23236.03,
+          "q75_price": 24438.72,
+          "historical_up_share_pct": 57.5,
+          "sample_count": 40,
+          "statistical_reference": "中"
+        }
+      },
+      "usdinr": {
+        "symbol": "INR=X",
+        "provider_symbol": "USD-INR",
+        "provider": "Google Finance",
+        "price": 94.6545,
+        "as_of_jst": "2026-11-04T13:57+09:00",
+        "change_5d_pct": null
+      },
+      "brent": {
+        "symbol": "BZ=F",
+        "provider_symbol": "BZW00:NYMEX",
+        "provider": "Google Finance",
+        "price": 117.7,
+        "as_of_jst": "2026-11-04T10:27+09:00",
+        "change_5d_pct": null
+      },
+      "india_vix": {
+        "symbol": "^INDIAVIX",
+        "provider": "Google Finance",
+        "price": 15.87,
+        "as_of_jst": "2026-11-04T14:04+09:00",
+        "change_5d_pct": null,
+        "data_status": "fresh"
+      },
+      "external_reference": {
+        "usdinr": {
+          "label": "USD/INR",
+          "price": 94.6545,
+          "as_of_jst": "2026-11-04T13:57+09:00",
+          "provider": "Google Finance",
+          "status": "fresh",
+          "age_minutes": null
+        },
+        "brent": {
+          "label": "Brent",
+          "price": 117.7,
+          "as_of_jst": "2026-11-04T10:27+09:00",
+          "provider": "Google Finance",
+          "status": "fresh",
+          "age_minutes": null
+        },
+        "india_vix": {
+          "label": "India VIX",
+          "price": 15.87,
+          "as_of_jst": "2026-11-04T14:04+09:00",
+          "provider": "Google Finance",
+          "status": "fresh"
+        }
+      },
+      "source_app_version": "5.3"
     }
   ]
 }
