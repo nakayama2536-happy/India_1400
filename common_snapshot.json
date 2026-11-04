@@ -19,7 +19,7 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "POSTCHECK",
+    "phase": null,
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "TRANCHE3",
     "reason_summary": [
@@ -87,14 +87,6 @@
         "impact": "NEGATIVE",
         "observed": "RSI 68.5",
         "source_group": "sell_condition"
-      },
-      {
-        "id": "EXTERNAL_RISK_1",
-        "category": "MARKET",
-        "label": "Brent 117.7",
-        "status": "WARN",
-        "impact": "NEGATIVE",
-        "source_group": "external_risk"
       }
     ],
     "blocking_conditions": [],
@@ -102,8 +94,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-11-04T19:01+09:00",
-    "fetched_at": "2026-11-04T21:51:31+09:00",
-    "calculated_at": "2026-11-04T21:51:31+09:00"
+    "fetched_at": "2026-11-05T03:13:25+09:00",
+    "calculated_at": "2026-11-05T03:13:25+09:00"
   },
   "market_specific": {
     "strategy_stage": "TRANCHE3",
