@@ -4,8 +4,8 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "CONFIRMED",
-    "legacy_code": "CONFIRMED"
+    "state": "OPEN",
+    "legacy_code": "LIVE"
   },
   "incident": {
     "level": "WARNING",
@@ -19,15 +19,15 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": null,
-    "eligibility": "NOT_ELIGIBLE",
-    "strategy_action": "TRANCHE3",
+    "phase": "PREVIEW",
+    "eligibility": "ELIGIBLE",
+    "strategy_action": "SELL_CAUTION",
     "reason_summary": [
-      "○ RSI改善：66.6 → 68.5",
-      "○ MACD改善：Hist +139.45 → +166.82",
-      "○ 5日線回復：23961 / MA5 23440",
-      "○ 25日線回復：23961 / MA25 22828",
-      "△ RSI高位：RSI 68.5"
+      "○ RSI改善：68.5 → 73.3",
+      "○ MACD改善：Hist +166.82 → +202.54",
+      "○ 5日線回復：24381 / MA5 23729",
+      "○ 25日線回復：24381 / MA25 22894",
+      "△ RSI高位：RSI 73.3"
     ],
     "passed_conditions": [
       {
@@ -36,7 +36,7 @@
         "label": "RSI改善",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "66.6 → 68.5",
+        "observed": "68.5 → 73.3",
         "source_group": "buy_condition"
       },
       {
@@ -45,7 +45,7 @@
         "label": "MACD改善",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "Hist +139.45 → +166.82",
+        "observed": "Hist +166.82 → +202.54",
         "source_group": "buy_condition"
       },
       {
@@ -54,7 +54,7 @@
         "label": "5日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "23961 / MA5 23440",
+        "observed": "24381 / MA5 23729",
         "source_group": "buy_condition"
       },
       {
@@ -63,7 +63,7 @@
         "label": "25日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "23961 / MA25 22828",
+        "observed": "24381 / MA25 22894",
         "source_group": "buy_condition"
       }
     ],
@@ -74,7 +74,7 @@
         "label": "調整・低位",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "RSI 68.5 / 25日線乖離 +5.0%",
+        "observed": "RSI 73.3 / 25日線乖離 +6.5%",
         "source_group": "buy_condition"
       }
     ],
@@ -85,7 +85,16 @@
         "label": "RSI高位",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "RSI 68.5",
+        "observed": "RSI 73.3",
+        "source_group": "sell_condition"
+      },
+      {
+        "id": "ma25_extended",
+        "category": "TECHNICAL",
+        "label": "25日線上方乖離",
+        "status": "WARN",
+        "impact": "NEGATIVE",
+        "observed": "+6.5%",
         "source_group": "sell_condition"
       }
     ],
@@ -93,18 +102,18 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-11-04T19:01+09:00",
-    "fetched_at": "2026-11-05T03:13:25+09:00",
-    "calculated_at": "2026-11-05T03:13:25+09:00"
+    "market_as_of": "2026-11-05T14:03+09:00",
+    "fetched_at": "2026-11-05T14:04:17+09:00",
+    "calculated_at": "2026-11-05T14:04:17+09:00"
   },
   "market_specific": {
-    "strategy_stage": "TRANCHE3",
-    "strategy_stage_label": "第3弾相当・中期回復",
-    "decision_gate": "HOLD",
+    "strategy_stage": "SELL_CAUTION",
+    "strategy_stage_label": "売り・過熱注意",
+    "decision_gate": "READY",
     "buy_condition_count": 4,
     "buy_condition_total": 5,
-    "sell_condition_count": 1,
+    "sell_condition_count": 2,
     "sell_condition_total": 4,
-    "external_data_state": "OK"
+    "external_data_state": "PARTIAL"
   }
 }

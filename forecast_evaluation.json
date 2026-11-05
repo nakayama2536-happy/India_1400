@@ -2912,12 +2912,79 @@
           "reason": "NOT_DUE"
         }
       }
+    },
+    {
+      "forecast_id": "2026-11-05",
+      "snapshot_date_jst": "2026-11-05",
+      "generated_at_jst": "2026-11-05T14:04:17+09:00",
+      "price_as_of_jst": "2026-11-05T14:03:00+09:00",
+      "basis_date": "2026-11-05",
+      "basis_price": 24381.15,
+      "basis": "当日暫定テクニカル（同一時点）",
+      "basis_consistency": "OK",
+      "source_history_method_version": "5.3-history-2",
+      "source_forecast_method_version": "4.8-stat-1",
+      "forecast": {
+        "1": {
+          "label": "中立",
+          "median_return_pct": -0.05,
+          "q25_return_pct": -0.42,
+          "q75_return_pct": 0.14,
+          "median_price": 24369.33,
+          "q25_price": 24278.84,
+          "q75_price": 24416.21,
+          "historical_up_share_pct": 42.5,
+          "sample_count": 40,
+          "statistical_reference": "低"
+        },
+        "3": {
+          "label": "中立",
+          "median_return_pct": -0.32,
+          "q25_return_pct": -0.86,
+          "q75_return_pct": 0.35,
+          "median_price": 24302.02,
+          "q25_price": 24170.78,
+          "q75_price": 24466.72,
+          "historical_up_share_pct": 37.5,
+          "sample_count": 40,
+          "statistical_reference": "低"
+        },
+        "14": {
+          "label": "上向き",
+          "median_return_pct": 1.13,
+          "q25_return_pct": -2.07,
+          "q75_return_pct": 2.1,
+          "median_price": 24656.07,
+          "q25_price": 23875.68,
+          "q75_price": 24892.28,
+          "historical_up_share_pct": 60.0,
+          "sample_count": 40,
+          "statistical_reference": "低"
+        }
+      },
+      "results": {
+        "1": {
+          "status": "PENDING",
+          "target_date": "2026-11-06",
+          "reason": "NOT_DUE"
+        },
+        "3": {
+          "status": "PENDING",
+          "target_date": "2026-11-11",
+          "reason": "NOT_DUE"
+        },
+        "14": {
+          "status": "PENDING",
+          "target_date": "2026-11-27",
+          "reason": "NOT_DUE"
+        }
+      }
     }
   ],
   "summary": {
     "method_version": "5.6-eval-2",
-    "forecast_count": 17,
-    "pending_count": 13,
+    "forecast_count": 18,
+    "pending_count": 14,
     "horizons": {
       "1": {
         "evaluated_count": 16,
@@ -2951,24 +3018,24 @@
     "evaluation_states": {
       "1": {
         "EVALUATED": 16,
-        "PENDING": 1,
+        "PENDING": 2,
         "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       },
       "3": {
         "EVALUATED": 14,
-        "PENDING": 3,
+        "PENDING": 4,
         "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       },
       "14": {
         "EVALUATED": 4,
-        "PENDING": 13,
+        "PENDING": 14,
         "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       }
     },
-    "history_record_count": 20,
+    "history_record_count": 21,
     "excluded_history_records": [
       {
         "snapshot_date_jst": "2026-10-05",
