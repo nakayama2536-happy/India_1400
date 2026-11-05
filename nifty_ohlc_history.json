@@ -2500,6 +2500,19 @@
       "source": "NSE official daily index CSV",
       "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_04112026.csv",
       "close_consistency": "MATCH"
+    },
+    {
+      "date": "2026-11-05",
+      "open": 24378.05,
+      "high": 24579.9,
+      "low": 24296.3,
+      "close": 24536.6,
+      "volume": null,
+      "volume_status": "NOT_PROVIDED",
+      "volume_usable_for_analysis": false,
+      "source": "NSE official daily index CSV",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_05112026.csv",
+      "close_consistency": "MATCH"
     }
   ],
   "source_reports": [
@@ -2508,6 +2521,12 @@
       "status": "ok",
       "rows": 207,
       "last_date": "2026-11-03"
+    },
+    {
+      "source": "NSE official daily index CSV",
+      "status": "ok",
+      "rows": 1,
+      "last_date": "2026-11-05"
     }
   ]
 }
