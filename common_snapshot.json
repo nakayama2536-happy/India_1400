@@ -19,7 +19,7 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "POSTCHECK",
+    "phase": null,
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "SELL_CAUTION",
     "reason_summary": [
@@ -103,8 +103,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-11-05T19:01+09:00",
-    "fetched_at": "2026-11-05T21:59:32+09:00",
-    "calculated_at": "2026-11-05T21:59:32+09:00"
+    "fetched_at": "2026-11-06T03:16:36+09:00",
+    "calculated_at": "2026-11-06T03:16:36+09:00"
   },
   "market_specific": {
     "strategy_stage": "SELL_CAUTION",
