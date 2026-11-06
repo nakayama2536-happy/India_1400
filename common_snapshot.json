@@ -103,8 +103,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-11-06T19:01+09:00",
-    "fetched_at": "2026-11-06T21:32:30+09:00",
-    "calculated_at": "2026-11-06T21:32:30+09:00"
+    "fetched_at": "2026-11-06T21:47:35+09:00",
+    "calculated_at": "2026-11-06T21:47:35+09:00"
   },
   "market_specific": {
     "strategy_stage": "SELL_CAUTION",
