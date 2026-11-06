@@ -4,8 +4,8 @@
   "market": "INDIA",
   "adapter_status": "PARALLEL_SHADOW",
   "market_state": {
-    "state": "CONFIRMED",
-    "legacy_code": "CONFIRMED"
+    "state": "CLOSED",
+    "legacy_code": "CLOSED"
   },
   "incident": {
     "level": "WARNING",
@@ -19,7 +19,7 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": "POSTCHECK",
+    "phase": null,
     "eligibility": "NOT_ELIGIBLE",
     "strategy_action": "SELL_CAUTION",
     "reason_summary": [
@@ -103,8 +103,8 @@
   },
   "timestamps": {
     "market_as_of": "2026-11-06T19:01+09:00",
-    "fetched_at": "2026-11-06T21:47:35+09:00",
-    "calculated_at": "2026-11-06T21:47:35+09:00"
+    "fetched_at": "2026-11-07T02:40:28+09:00",
+    "calculated_at": "2026-11-07T02:40:28+09:00"
   },
   "market_specific": {
     "strategy_stage": "SELL_CAUTION",
