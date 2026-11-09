@@ -1424,9 +1424,17 @@
           "range_25_75_hit": false
         },
         "14": {
-          "status": "PENDING",
+          "status": "EVALUATED",
           "target_date": "2026-11-09",
-          "reason": "NOT_DUE"
+          "actual_close": 25044.65,
+          "actual_return_pct": 8.522,
+          "actual_direction": "上向き",
+          "forecast_direction": "中立",
+          "direction_match": false,
+          "median_return_error_pct": 7.702,
+          "absolute_median_return_error_pct": 7.702,
+          "median_price_error_pct": 7.702,
+          "range_25_75_hit": false
         }
       },
       "prior_evaluations": [
@@ -1497,6 +1505,89 @@
               "status": "PENDING",
               "target_date": "2026-10-23",
               "reason": "NOT_DUE"
+            },
+            "14": {
+              "status": "PENDING",
+              "target_date": "2026-11-09",
+              "reason": "NOT_DUE"
+            }
+          }
+        },
+        {
+          "forecast_id": "2026-10-19",
+          "snapshot_date_jst": "2026-10-19",
+          "generated_at_jst": "2026-10-19T14:04:38+09:00",
+          "price_as_of_jst": "2026-10-19T14:01:00+09:00",
+          "basis_date": "2026-10-19",
+          "basis_price": 23077.95,
+          "basis": "当日暫定テクニカル（同一時点）",
+          "basis_consistency": "OK",
+          "source_history_method_version": "5.3-history-2",
+          "source_forecast_method_version": "4.8-stat-1",
+          "forecast": {
+            "1": {
+              "label": "中立",
+              "median_return_pct": 0.04,
+              "q25_return_pct": -0.76,
+              "q75_return_pct": 0.57,
+              "median_price": 23086.73,
+              "q25_price": 22903.25,
+              "q75_price": 23208.8,
+              "historical_up_share_pct": 52.5,
+              "sample_count": 40,
+              "statistical_reference": "中"
+            },
+            "3": {
+              "label": "上向き",
+              "median_return_pct": 0.36,
+              "q25_return_pct": -0.96,
+              "q75_return_pct": 1.15,
+              "median_price": 23160.84,
+              "q25_price": 22856.44,
+              "q75_price": 23344.01,
+              "historical_up_share_pct": 62.5,
+              "sample_count": 40,
+              "statistical_reference": "中"
+            },
+            "14": {
+              "label": "中立",
+              "median_return_pct": 0.82,
+              "q25_return_pct": -2.22,
+              "q75_return_pct": 2.42,
+              "median_price": 23267.11,
+              "q25_price": 22565.72,
+              "q75_price": 23635.65,
+              "historical_up_share_pct": 55.0,
+              "sample_count": 40,
+              "statistical_reference": "中"
+            }
+          },
+          "results": {
+            "1": {
+              "status": "EVALUATED",
+              "target_date": "2026-10-21",
+              "actual_close": 22811.35,
+              "actual_return_pct": -1.155,
+              "actual_direction": "下向き",
+              "forecast_direction": "中立",
+              "direction_match": false,
+              "median_return_error_pct": -1.195,
+              "absolute_median_return_error_pct": 1.195,
+              "median_price_error_pct": 1.193,
+              "range_25_75_hit": false
+            },
+            "3": {
+              "status": "EVALUATED",
+              "target_date": "2026-10-23",
+              "actual_close": 22600.0,
+              "actual_return_pct": -2.071,
+              "actual_direction": "下向き",
+              "forecast_direction": "上向き",
+              "direction_match": false,
+              "median_return_error_pct": -2.431,
+              "absolute_median_return_error_pct": 2.431,
+              "median_price_error_pct": 2.43,
+              "range_25_75_hit": false
             },
             "14": {
               "status": "PENDING",
@@ -3171,16 +3262,101 @@
           "range_25_75_hit": false
         },
         "3": {
-          "status": "PENDING",
+          "status": "EVALUATED",
           "target_date": "2026-11-09",
-          "reason": "NOT_DUE"
+          "actual_close": 25044.65,
+          "actual_return_pct": 5.03,
+          "actual_direction": "上向き",
+          "forecast_direction": "中立",
+          "direction_match": false,
+          "median_return_error_pct": 5.32,
+          "absolute_median_return_error_pct": 5.32,
+          "median_price_error_pct": 5.322,
+          "range_25_75_hit": false
         },
         "14": {
           "status": "PENDING",
           "target_date": "2026-11-26",
           "reason": "NOT_DUE"
         }
-      }
+      },
+      "prior_evaluations": [
+        {
+          "forecast_id": "2026-11-04",
+          "snapshot_date_jst": "2026-11-04",
+          "generated_at_jst": "2026-11-04T14:04:52+09:00",
+          "price_as_of_jst": "2026-11-04T13:57:00+09:00",
+          "basis_date": "2026-11-04",
+          "basis_price": 23845.15,
+          "basis": "当日暫定テクニカル（同一時点）",
+          "basis_consistency": "OK",
+          "source_history_method_version": "5.3-history-2",
+          "source_forecast_method_version": "4.8-stat-1",
+          "forecast": {
+            "1": {
+              "label": "中立",
+              "median_return_pct": 0.08,
+              "q25_return_pct": -0.26,
+              "q75_return_pct": 0.32,
+              "median_price": 23863.26,
+              "q25_price": 23782.48,
+              "q75_price": 23920.69,
+              "historical_up_share_pct": 55.0,
+              "sample_count": 40,
+              "statistical_reference": "中"
+            },
+            "3": {
+              "label": "中立",
+              "median_return_pct": -0.29,
+              "q25_return_pct": -1.13,
+              "q75_return_pct": 0.35,
+              "median_price": 23775.57,
+              "q25_price": 23576.27,
+              "q75_price": 23928.84,
+              "historical_up_share_pct": 40.0,
+              "sample_count": 40,
+              "statistical_reference": "中"
+            },
+            "14": {
+              "label": "中立",
+              "median_return_pct": 0.73,
+              "q25_return_pct": -2.55,
+              "q75_return_pct": 2.49,
+              "median_price": 24018.65,
+              "q25_price": 23236.03,
+              "q75_price": 24438.72,
+              "historical_up_share_pct": 57.5,
+              "sample_count": 40,
+              "statistical_reference": "中"
+            }
+          },
+          "results": {
+            "1": {
+              "status": "EVALUATED",
+              "target_date": "2026-11-05",
+              "actual_close": 24536.6,
+              "actual_return_pct": 2.9,
+              "actual_direction": "上向き",
+              "forecast_direction": "中立",
+              "direction_match": false,
+              "median_return_error_pct": 2.82,
+              "absolute_median_return_error_pct": 2.82,
+              "median_price_error_pct": 2.824,
+              "range_25_75_hit": false
+            },
+            "3": {
+              "status": "PENDING",
+              "target_date": "2026-11-09",
+              "reason": "NOT_DUE"
+            },
+            "14": {
+              "status": "PENDING",
+              "target_date": "2026-11-26",
+              "reason": "NOT_DUE"
+            }
+          }
+        }
+      ]
     },
     {
       "forecast_id": "2026-11-05",
@@ -3308,9 +3484,17 @@
       },
       "results": {
         "1": {
-          "status": "PENDING",
+          "status": "EVALUATED",
           "target_date": "2026-11-09",
-          "reason": "NOT_DUE"
+          "actual_close": 25044.65,
+          "actual_return_pct": 1.496,
+          "actual_direction": "上向き",
+          "forecast_direction": "中立",
+          "direction_match": false,
+          "median_return_error_pct": 1.646,
+          "absolute_median_return_error_pct": 1.646,
+          "median_price_error_pct": 1.646,
+          "range_25_75_hit": false
         },
         "3": {
           "status": "PENDING",
@@ -3395,53 +3579,53 @@
   "summary": {
     "method_version": "5.6-eval-2",
     "forecast_count": 20,
-    "pending_count": 15,
+    "pending_count": 14,
     "horizons": {
       "1": {
-        "evaluated_count": 18,
+        "evaluated_count": 19,
         "sample_adequacy": "低",
-        "median_absolute_return_error_pct": 1.06,
-        "mean_absolute_return_error_pct": 1.194,
-        "median_price_error_pct": 1.056,
-        "range_25_75_hit_pct": 22.2,
-        "direction_match_pct": 33.3
+        "median_absolute_return_error_pct": 1.132,
+        "mean_absolute_return_error_pct": 1.218,
+        "median_price_error_pct": 1.128,
+        "range_25_75_hit_pct": 21.1,
+        "direction_match_pct": 31.6
       },
       "3": {
-        "evaluated_count": 16,
+        "evaluated_count": 17,
         "sample_adequacy": "低",
-        "median_absolute_return_error_pct": 1.869,
-        "mean_absolute_return_error_pct": 2.388,
-        "median_price_error_pct": 1.87,
-        "range_25_75_hit_pct": 50.0,
-        "direction_match_pct": 31.2
+        "median_absolute_return_error_pct": 2.043,
+        "mean_absolute_return_error_pct": 2.561,
+        "median_price_error_pct": 2.045,
+        "range_25_75_hit_pct": 47.1,
+        "direction_match_pct": 29.4
       },
       "14": {
-        "evaluated_count": 5,
+        "evaluated_count": 6,
         "sample_adequacy": "不足",
-        "median_absolute_return_error_pct": 3.982,
-        "mean_absolute_return_error_pct": 4.147,
-        "median_price_error_pct": 3.986,
-        "range_25_75_hit_pct": 20.0,
-        "direction_match_pct": 60.0
+        "median_absolute_return_error_pct": 4.861,
+        "mean_absolute_return_error_pct": 4.739,
+        "median_price_error_pct": 4.865,
+        "range_25_75_hit_pct": 16.7,
+        "direction_match_pct": 50.0
       }
     },
     "note": "誤差・レンジ内率・方向一致率は過去予測の検証指標であり、将来の上昇確率ではありません。",
     "evaluation_states": {
       "1": {
-        "EVALUATED": 18,
-        "PENDING": 2,
+        "EVALUATED": 19,
+        "PENDING": 1,
         "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       },
       "3": {
-        "EVALUATED": 16,
-        "PENDING": 4,
+        "EVALUATED": 17,
+        "PENDING": 3,
         "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       },
       "14": {
-        "EVALUATED": 5,
-        "PENDING": 15,
+        "EVALUATED": 6,
+        "PENDING": 14,
         "MISSING_DATA": 0,
         "UNEVALUABLE": 0
       }
