@@ -14,8 +14,8 @@
   "change_pct": 0.446,
   "net_assets_million_yen": 15230,
   "net_assets_oku_yen": 152.3,
-  "fetched_at_jst": "2026-11-11T21:14:28+09:00",
-  "attempted_at_jst": "2026-11-11T21:14:28+09:00",
+  "fetched_at_jst": "2026-11-12T02:54:39+09:00",
+  "attempted_at_jst": "2026-11-12T02:54:39+09:00",
   "status": "ok",
   "history_source": "保存履歴＋銀行CSV/Yahoo/SBI＋公式最新値",
   "history_source_url": "https://fs.bk.mufg.jp/webasp/mufg/fund/detail/chart/csv/m08320920.csv",
@@ -35,7 +35,7 @@
     {
       "source": "三菱UFJ銀行（基準価額CSV）",
       "status": "ok",
-      "count": 1046
+      "count": 1047
     },
     {
       "source": "Yahoo!ファイナンス",
