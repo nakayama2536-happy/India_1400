@@ -3,7 +3,7 @@
   "fund_key": "eastspring_india_core",
   "source": "保存履歴＋銀行CSV/Yahoo/SBI＋公式最新値",
   "source_url": "https://fs.bk.mufg.jp/webasp/mufg/fund/detail/chart/csv/m08320920.csv",
-  "updated_at_jst": "2026-11-17T08:31:21+09:00",
+  "updated_at_jst": "2026-11-17T22:55:56+09:00",
   "records": [
     {
       "date": "2022-07-29",
@@ -9387,6 +9387,13 @@
       "nav_yen": 16648,
       "change_yen": -156,
       "net_assets_million_yen": 15400,
+      "source": "イーストスプリング公式"
+    },
+    {
+      "date": "2026-11-17",
+      "nav_yen": 16635,
+      "change_yen": -13,
+      "net_assets_million_yen": 15380,
       "source": "イーストスプリング公式"
     }
   ]
