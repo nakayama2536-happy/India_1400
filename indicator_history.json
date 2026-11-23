@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_jst": "2026-11-24T00:47:54+09:00",
+  "updated_at_jst": "2026-11-24T07:13:20+09:00",
   "series": {
     "usdinr": [
       {
@@ -341,8 +341,8 @@
       },
       {
         "date": "2026-11-24",
-        "value": 92.9769,
-        "as_of_jst": "2026-11-24T00:46+09:00",
+        "value": 92.5013,
+        "as_of_jst": "2026-11-24T07:09+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -643,8 +643,8 @@
       },
       {
         "date": "2026-11-24",
-        "value": 89.22,
-        "as_of_jst": "2026-11-24T00:34+09:00",
+        "value": 89.34,
+        "as_of_jst": "2026-11-24T06:58+09:00",
         "provider": "Google Finance"
       }
     ],
@@ -1309,10 +1309,10 @@
       },
       {
         "date": "2026-11-24",
-        "value": 159.2765,
-        "as_of_jst": "2026-11-24T00:46+09:00",
+        "value": 158.959,
+        "as_of_jst": "2026-11-24T07:04+09:00",
         "provider": "Google Finance",
-        "recorded_at_jst": "2026-11-24T00:47:54+09:00",
+        "recorded_at_jst": "2026-11-24T07:13:20+09:00",
         "basis": "observed_reference_quote_not_session_close"
       }
     ]
