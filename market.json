@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-11-24T05:04:12+00:00",
-  "generated_at_jst": "2026-11-24T14:04:12+09:00",
+  "generated_at_utc": "2026-11-24T15:21:40+00:00",
+  "generated_at_jst": "2026-11-25T00:21:40+09:00",
   "status": "ok",
   "source": "Zero-cost provider priority: NIFTY current=Google Finance; NIFTY daily history=persistent local cache seeded from public GitHub mirrors + Tickjournal recent bridge, then self-maintained from Google previous/post-close values; official NSE sources are validation/gap-fill; USD/INR=Twelve Data free FX -> Google Finance; Brent=Google Finance; Yahoo Finance last-resort",
   "nifty": {
@@ -39,16 +39,16 @@
     "symbol": "INR=X",
     "provider_symbol": "USD-INR",
     "provider": "Google Finance",
-    "price": 92.7759,
-    "as_of_jst": "2026-11-24T13:53+09:00",
+    "price": 92.812,
+    "as_of_jst": "2026-11-25T00:18+09:00",
     "change_5d_pct": null
   },
   "brent": {
     "symbol": "BZ=F",
     "provider_symbol": "BZW00:NYMEX",
     "provider": "Google Finance",
-    "price": 88.73,
-    "as_of_jst": "2026-11-24T13:49+09:00",
+    "price": 90.41,
+    "as_of_jst": "2026-11-25T00:00+09:00",
     "change_5d_pct": null,
     "formal_5d": {
       "code": "UNKNOWN",
@@ -70,24 +70,21 @@
   },
   "crosscheck": {
     "available": false,
-    "skipped": true,
-    "source": "NSE Indices Live Indices Watch",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "source": "NSE Indices Live Indices Watch"
   },
   "breadth": {
     "available": false,
-    "skipped": true,
-    "source": "NSE India NIFTY 50 constituent live data",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "source": "NSE India NIFTY 50 constituent live data"
   },
   "fii_dii": {
     "available": false,
-    "skipped": true,
-    "source": "NSE India FII/FPI & DII activity",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "source": "NSE India FII/FPI & DII activity"
   },
   "schema_version": 4,
-  "optional_errors": [],
+  "optional_errors": [
+    "NIFTY official cross-check: <urlopen error [Errno -2] Name or service not known>",
+    "NSE session: HTTP Error 403: Forbidden"
+  ],
   "signals": {
     "buy_setup_score": 0,
     "sell_setup_score": 48,
@@ -722,7 +719,7 @@
         "provider": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
         "as_of_jst": "2026-11-23T19:01+09:00",
-        "age_minutes": 1143.2,
+        "age_minutes": 1760.7,
         "error": null
       },
       "usdinr": {
@@ -731,8 +728,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance",
         "provider_symbol": "USD-INR",
-        "as_of_jst": "2026-11-24T13:53+09:00",
-        "age_minutes": 11.2,
+        "as_of_jst": "2026-11-25T00:18+09:00",
+        "age_minutes": 3.7,
         "error": null
       },
       "brent": {
@@ -741,8 +738,8 @@
         "fetched_this_run": true,
         "provider": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
-        "as_of_jst": "2026-11-24T13:49+09:00",
-        "age_minutes": 15.2,
+        "as_of_jst": "2026-11-25T00:00+09:00",
+        "age_minutes": 21.7,
         "error": null
       }
     },
@@ -767,16 +764,16 @@
         "delta_pct": -0.641
       },
       "usdinr": {
-        "current": 92.7759,
+        "current": 92.812,
         "previous": 93.009,
-        "delta": -0.2331,
-        "delta_pct": -0.251
+        "delta": -0.197,
+        "delta_pct": -0.212
       },
       "brent": {
-        "current": 88.73,
+        "current": 90.41,
         "previous": 92.65,
-        "delta": -3.92,
-        "delta_pct": -4.231
+        "delta": -2.24,
+        "delta_pct": -2.418
       },
       "rsi14_confirmed": {
         "current": 66.34,
@@ -806,9 +803,9 @@
   },
   "summary": "短期は5日線を下回っています。25日線・75日線より上です。RSIは66.3で高位です。過去類似局面の20営業日見通しは「やや上向き」です。データ判定は「売買ルール判定保留」です。",
   "market_state": {
-    "code": "CLOSED",
-    "label": "休場",
-    "detail": "Prakash Gurpurb Sri Guru Nanak Dev。NIFTY価格は 2026/11/23 19:01 JST 時点です。",
+    "code": "PREVIOUS_SESSION",
+    "label": "前営業日データ",
+    "detail": "NIFTY価格は 2026/11/23 19:01 JST 時点です。",
     "calendar_source": "NSE 2026 holiday calendar"
   },
   "app_version": "5.7",
@@ -859,7 +856,7 @@
     "usdinr": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-11-24T13:53+09:00",
+      "as_of_jst": "2026-11-25T00:18+09:00",
       "provider": "Google Finance",
       "provider_symbol": "USD-INR",
       "error": null
@@ -867,7 +864,7 @@
     "usdjpy": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-11-24T14:01+09:00",
+      "as_of_jst": "2026-11-25T00:17+09:00",
       "provider": "Google Finance",
       "provider_symbol": "USD-JPY",
       "error": null
@@ -875,7 +872,7 @@
     "brent": {
       "status": "fresh",
       "fetched_this_run": true,
-      "as_of_jst": "2026-11-24T13:49+09:00",
+      "as_of_jst": "2026-11-25T00:00+09:00",
       "provider": "Google Finance",
       "provider_symbol": "BZW00:NYMEX",
       "error": null
@@ -898,19 +895,19 @@
       "series": {
         "usdinr": {
           "label": "USD/INR",
-          "observation_count": 57,
+          "observation_count": 58,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-20",
-          "latest_date": "2026-11-24",
-          "latest_as_of_jst": "2026-11-24T13:53:00+09:00",
-          "observed_reference_change_5obs_pct": -0.6852,
+          "latest_date": "2026-11-25",
+          "latest_as_of_jst": "2026-11-25T00:18:00+09:00",
+          "observed_reference_change_5obs_pct": -0.5132,
           "reference_window": {
-            "start_date": "2026-11-18",
-            "start_as_of_jst": "2026-11-18T22:43:00+09:00",
-            "start_value": 93.416,
-            "end_date": "2026-11-24",
-            "end_as_of_jst": "2026-11-24T13:53:00+09:00",
-            "end_value": 92.7759,
+            "start_date": "2026-11-19",
+            "start_as_of_jst": "2026-11-19T23:10:00+09:00",
+            "start_value": 93.2908,
+            "end_date": "2026-11-25",
+            "end_as_of_jst": "2026-11-25T00:18:00+09:00",
+            "end_value": 92.812,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -920,19 +917,19 @@
         },
         "usdjpy": {
           "label": "USD/JPY",
-          "observation_count": 50,
+          "observation_count": 51,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-29",
-          "latest_date": "2026-11-24",
-          "latest_as_of_jst": "2026-11-24T14:01:00+09:00",
-          "observed_reference_change_5obs_pct": -0.2456,
+          "latest_date": "2026-11-25",
+          "latest_as_of_jst": "2026-11-25T00:17:00+09:00",
+          "observed_reference_change_5obs_pct": -0.4177,
           "reference_window": {
-            "start_date": "2026-11-18",
-            "start_as_of_jst": "2026-11-18T22:37:00+09:00",
-            "start_value": 159.3905,
-            "end_date": "2026-11-24",
-            "end_as_of_jst": "2026-11-24T14:01:00+09:00",
-            "end_value": 158.999,
+            "start_date": "2026-11-19",
+            "start_as_of_jst": "2026-11-19T23:07:00+09:00",
+            "start_value": 159.93,
+            "end_date": "2026-11-25",
+            "end_as_of_jst": "2026-11-25T00:17:00+09:00",
+            "end_value": 159.262,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -942,19 +939,19 @@
         },
         "brent": {
           "label": "Brent",
-          "observation_count": 50,
+          "observation_count": 51,
           "invalid_or_duplicate_count": 0,
           "first_date": "2026-09-19",
-          "latest_date": "2026-11-24",
-          "latest_as_of_jst": "2026-11-24T13:49:00+09:00",
-          "observed_reference_change_5obs_pct": -4.3549,
+          "latest_date": "2026-11-25",
+          "latest_as_of_jst": "2026-11-25T00:00:00+09:00",
+          "observed_reference_change_5obs_pct": -2.6069,
           "reference_window": {
-            "start_date": "2026-11-18",
-            "start_as_of_jst": "2026-11-18T22:28:00+09:00",
-            "start_value": 92.77,
-            "end_date": "2026-11-24",
-            "end_as_of_jst": "2026-11-24T13:49:00+09:00",
-            "end_value": 88.73,
+            "start_date": "2026-11-19",
+            "start_as_of_jst": "2026-11-19T23:01:00+09:00",
+            "start_value": 92.83,
+            "end_date": "2026-11-25",
+            "end_as_of_jst": "2026-11-25T00:00:00+09:00",
+            "end_value": 90.41,
             "observation_count": 6
           },
           "ready_for_5obs_reference": true,
@@ -998,9 +995,9 @@
     "execution_plan_version": "5.8-execution-2"
   },
   "data_lineage": {
-    "fetched_at_jst": "2026-11-24T14:04:12+09:00",
+    "fetched_at_jst": "2026-11-25T00:21:40+09:00",
     "market_open": false,
-    "market_state": "CLOSED",
+    "market_state": "PREVIOUS_SESSION",
     "calendar_source": "NSE 2026 holiday calendar",
     "analytics_method_version": "4.8-stat-1",
     "analytics_window_years": 10,
@@ -1009,8 +1006,8 @@
         "source": "Google Finance + NSE Indices",
         "provider_symbol": "NIFTY_50:INDEXNSE",
         "quote_time_jst": "2026-11-23T19:01+09:00",
-        "fetched_at_jst": "2026-11-24T14:04:12+09:00",
-        "data_age_minutes": 1143.2,
+        "fetched_at_jst": "2026-11-25T00:21:40+09:00",
+        "data_age_minutes": 1760.7,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
@@ -1019,9 +1016,9 @@
       "usdinr": {
         "source": "Google Finance",
         "provider_symbol": "USD-INR",
-        "quote_time_jst": "2026-11-24T13:53+09:00",
-        "fetched_at_jst": "2026-11-24T14:04:12+09:00",
-        "data_age_minutes": 11.2,
+        "quote_time_jst": "2026-11-25T00:18+09:00",
+        "fetched_at_jst": "2026-11-25T00:21:40+09:00",
+        "data_age_minutes": 3.7,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
@@ -1030,9 +1027,9 @@
       "brent": {
         "source": "Google Finance",
         "provider_symbol": "BZW00:NYMEX",
-        "quote_time_jst": "2026-11-24T13:49+09:00",
-        "fetched_at_jst": "2026-11-24T14:04:12+09:00",
-        "data_age_minutes": 15.2,
+        "quote_time_jst": "2026-11-25T00:00+09:00",
+        "fetched_at_jst": "2026-11-25T00:21:40+09:00",
+        "data_age_minutes": 21.7,
         "status": "fresh",
         "fallback_used": false,
         "provisional": false,
@@ -1683,12 +1680,6 @@
     "external": {
       "usdinr": [
         {
-          "date": "2026-10-21",
-          "value": 94.4465,
-          "as_of_jst": "2026-10-21T18:53+09:00",
-          "provider": "Google Finance"
-        },
-        {
           "date": "2026-10-22",
           "value": 94.8028,
           "as_of_jst": "2026-10-22T18:53+09:00",
@@ -1861,15 +1852,15 @@
           "value": 92.7759,
           "as_of_jst": "2026-11-24T13:53+09:00",
           "provider": "Google Finance"
+        },
+        {
+          "date": "2026-11-25",
+          "value": 92.812,
+          "as_of_jst": "2026-11-25T00:18+09:00",
+          "provider": "Google Finance"
         }
       ],
       "brent": [
-        {
-          "date": "2026-10-13",
-          "value": 104.6,
-          "as_of_jst": "2026-10-13T21:20+09:00",
-          "provider": "Google Finance"
-        },
         {
           "date": "2026-10-14",
           "value": 105.88,
@@ -2042,6 +2033,12 @@
           "date": "2026-11-24",
           "value": 88.73,
           "as_of_jst": "2026-11-24T13:49+09:00",
+          "provider": "Google Finance"
+        },
+        {
+          "date": "2026-11-25",
+          "value": 90.41,
+          "as_of_jst": "2026-11-25T00:00+09:00",
           "provider": "Google Finance"
         }
       ],
@@ -2243,13 +2240,13 @@
   },
   "reference_data": {
     "version": "5.1-ref-2",
-    "generated_at_jst": "2026-11-24T14:04:12+09:00",
+    "generated_at_jst": "2026-11-25T00:21:40+09:00",
     "items": [
       {
         "key": "generated",
         "label": "判定生成",
         "role": "生成時刻",
-        "as_of_jst": "2026-11-24T14:04:12+09:00",
+        "as_of_jst": "2026-11-25T00:21:40+09:00",
         "date": null,
         "provider": "GitHub Actions",
         "age_minutes": 0,
@@ -2265,7 +2262,7 @@
         "as_of_jst": "2026-11-23T19:01+09:00",
         "date": null,
         "provider": "Google Finance + NSE Indices",
-        "age_minutes": 1143,
+        "age_minutes": 1760,
         "freshness": "参考",
         "basis": "現在値",
         "freshness_code": "REFERENCE",
@@ -2288,53 +2285,53 @@
         "key": "usdinr",
         "label": "USD/INR",
         "role": "外部参考",
-        "as_of_jst": "2026-11-24T13:53+09:00",
+        "as_of_jst": "2026-11-25T00:18+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 11,
-        "freshness": "参考",
+        "age_minutes": 3,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近取得値"
+        "freshness_code": "LATEST",
+        "status_note": "3分前"
       },
       {
         "key": "usdjpy",
         "label": "USD/JPY",
         "role": "円換算参考",
-        "as_of_jst": "2026-11-24T14:01+09:00",
+        "as_of_jst": "2026-11-25T00:17+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 3,
-        "freshness": "参考",
+        "age_minutes": 4,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近取得値"
+        "freshness_code": "LATEST",
+        "status_note": "4分前"
       },
       {
         "key": "inrjpy",
         "label": "INR/JPY",
         "role": "円換算参考",
-        "as_of_jst": "2026-11-24T13:53+09:00",
+        "as_of_jst": "2026-11-25T00:17+09:00",
         "date": null,
         "provider": "Derived: USD/JPY ÷ USD/INR",
-        "age_minutes": 11,
-        "freshness": "参考",
+        "age_minutes": 4,
+        "freshness": "最新",
         "basis": "円換算参考。2つの為替レートのうち古い時刻を基準時刻として表示。",
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の為替参考値から算出"
+        "freshness_code": "LATEST",
+        "status_note": "USD/JPY ÷ USD/INR"
       },
       {
         "key": "brent",
         "label": "Brent",
         "role": "外部参考",
-        "as_of_jst": "2026-11-24T13:49+09:00",
+        "as_of_jst": "2026-11-25T00:00+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 15,
-        "freshness": "参考",
+        "age_minutes": 21,
+        "freshness": "最新",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近取得値"
+        "freshness_code": "LATEST",
+        "status_note": "21分前"
       },
       {
         "key": "india_vix",
@@ -2343,11 +2340,11 @@
         "as_of_jst": "2026-11-23T19:14+09:00",
         "date": null,
         "provider": "Google Finance",
-        "age_minutes": 1130,
-        "freshness": "参考",
+        "age_minutes": 1747,
+        "freshness": "古い",
         "basis": null,
-        "freshness_code": "REFERENCE",
-        "status_note": "休場中の直近セッション値"
+        "freshness_code": "STALE",
+        "status_note": "1747分前"
       }
     ],
     "note": "時刻はすべてJST。NIFTYを判断主体、USD/JPY・INR/JPYを円換算参考、USD/INR・原油・VIXを外部参考として表示します。",
@@ -2392,19 +2389,19 @@
     "saved": false,
     "replaced_existing": false,
     "record_count": 32,
-    "date_jst": "2026-11-24",
+    "date_jst": "2026-11-25",
     "current_date_has_record": false,
     "current_date_selected_price_as_of_jst": null,
-    "message": "NSE通常営業日ではないため14:00履歴は保存しません。"
+    "message": "14:00保存時間帯外です。"
   },
   "operational_state": {
     "version": "5.4-status-2",
-    "code": "CLOSED",
-    "label": "休場",
-    "detail": "Prakash Gurpurb Sri Guru Nanak Dev。NIFTY価格は 2026/11/23 19:01 JST 時点です。",
-    "raw_code": "CLOSED",
-    "raw_label": "休場",
-    "regular_trading_day": false,
+    "code": "CONFIRMED",
+    "label": "確定済",
+    "detail": "最新確定日足 2026-11-23 を利用しています。",
+    "raw_code": "PREVIOUS_SESSION",
+    "raw_label": "前営業日データ",
+    "regular_trading_day": true,
     "technical_date": "2026-11-23"
   },
   "quality_state": {
@@ -2428,29 +2425,29 @@
         "note": "取引時間外は暫定値を使用しません。"
       },
       "usdinr": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "3分前"
       },
       "usdjpy": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "4分前"
       },
       "brent": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近取得値"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "21分前"
       },
       "inrjpy": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の為替参考値から算出"
+        "code": "LATEST",
+        "label": "最新",
+        "note": "USD/JPY ÷ USD/INR"
       },
       "india_vix": {
-        "code": "REFERENCE",
-        "label": "参考",
-        "note": "休場中の直近セッション値"
+        "code": "STALE",
+        "label": "古い",
+        "note": "1747分前"
       }
     },
     "principle": "NIFTY判断主体、円換算FX、その他外部参考を分離し、最新・参考・古い・利用不可の4分類で表示。"
@@ -3246,15 +3243,15 @@
     "symbol": "JPY=X",
     "provider_symbol": "USD-JPY",
     "provider": "Google Finance",
-    "price": 158.999,
-    "as_of_jst": "2026-11-24T14:01+09:00",
+    "price": 159.262,
+    "as_of_jst": "2026-11-25T00:17+09:00",
     "change_5d_pct": null
   },
   "inrjpy": {
     "symbol": "INR/JPY",
     "provider": "Derived: USD/JPY ÷ USD/INR",
-    "price": 1.7138,
-    "as_of_jst": "2026-11-24T13:53+09:00",
+    "price": 1.71596,
+    "as_of_jst": "2026-11-25T00:17+09:00",
     "change_5d_pct": null,
     "basis": "円換算参考。2つの為替レートのうち古い時刻を基準時刻として表示。"
   },
@@ -3270,14 +3267,13 @@
   },
   "sector_context": {
     "available": false,
-    "skipped": true,
     "source": "NSE Indices Live Indices Watch",
-    "reason": "休場日またはNIFTY最新取得失敗のため省略"
+    "reason": "公式指数データを取得できませんでした。"
   },
   "execution_plan": {
     "version": "5.8-execution-2",
     "basis_date": "2026-11-23",
-    "generated_at_jst": "2026-11-24T14:04:12+09:00",
+    "generated_at_jst": "2026-11-25T00:21:40+09:00",
     "market_stage_code": "SELL_CAUTION",
     "market_stage_label": "売り・過熱注意",
     "decision_gate_allow_rule": false,
@@ -3315,7 +3311,7 @@
             "label": "USD/INR 96未満",
             "state": "met",
             "met": true,
-            "detail": "現在 92.7759",
+            "detail": "現在 92.8120",
             "source": "USD/INR"
           },
           {
@@ -3406,10 +3402,10 @@
   },
   "acquisition_status": {
     "version": "acquisition-status-1",
-    "date_jst": "2026-11-24",
-    "code": "NOT_APPLICABLE",
-    "label": "対象外",
-    "detail": "Prakash Gurpurb Sri Guru Nanak Dev",
+    "date_jst": "2026-11-25",
+    "code": "WAITING_WINDOW",
+    "label": "取得前",
+    "detail": "14:00定点の保存時間帯前です。",
     "window_jst": "13:45-14:20",
     "record_count": 32,
     "same_date_row_count": 0,
