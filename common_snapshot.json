@@ -19,14 +19,14 @@
   },
   "decision": {
     "mode": "SHADOW",
-    "phase": null,
-    "eligibility": "NOT_ELIGIBLE",
+    "phase": "PREVIEW",
+    "eligibility": "ELIGIBLE",
     "strategy_action": "SELL_CAUTION",
     "reason_summary": [
-      "○ RSI改善：66.3 → 71.2",
-      "○ 5日線回復：25814 / MA5 25541",
-      "○ 25日線回復：25814 / MA25 24287",
-      "△ RSI高位：RSI 71.2",
+      "○ RSI改善：66.3 → 71.1",
+      "○ 5日線回復：25810 / MA5 25541",
+      "○ 25日線回復：25810 / MA25 24287",
+      "△ RSI高位：RSI 71.1",
       "△ 25日線上方乖離：+6.3%"
     ],
     "passed_conditions": [
@@ -36,7 +36,7 @@
         "label": "RSI改善",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "66.3 → 71.2",
+        "observed": "66.3 → 71.1",
         "source_group": "buy_condition"
       },
       {
@@ -45,7 +45,7 @@
         "label": "5日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "25814 / MA5 25541",
+        "observed": "25810 / MA5 25541",
         "source_group": "buy_condition"
       },
       {
@@ -54,7 +54,7 @@
         "label": "25日線回復",
         "status": "PASS",
         "impact": "POSITIVE",
-        "observed": "25814 / MA25 24287",
+        "observed": "25810 / MA25 24287",
         "source_group": "buy_condition"
       }
     ],
@@ -65,7 +65,7 @@
         "label": "調整・低位",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "RSI 71.2 / 25日線乖離 +6.3%",
+        "observed": "RSI 71.1 / 25日線乖離 +6.3%",
         "source_group": "buy_condition"
       },
       {
@@ -74,7 +74,7 @@
         "label": "MACD改善",
         "status": "PENDING",
         "impact": "NEUTRAL",
-        "observed": "Hist +61.19 → +56.85",
+        "observed": "Hist +61.19 → +56.60",
         "source_group": "buy_condition"
       }
     ],
@@ -85,7 +85,7 @@
         "label": "RSI高位",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "RSI 71.2",
+        "observed": "RSI 71.1",
         "source_group": "sell_condition"
       },
       {
@@ -103,7 +103,7 @@
         "label": "MACD悪化",
         "status": "WARN",
         "impact": "NEGATIVE",
-        "observed": "Hist +61.19 → +56.85",
+        "observed": "Hist +61.19 → +56.60",
         "source_group": "sell_condition"
       }
     ],
@@ -111,9 +111,9 @@
     "change_conditions": []
   },
   "timestamps": {
-    "market_as_of": "2026-11-25T13:44+09:00",
-    "fetched_at": "2026-11-25T13:50:43+09:00",
-    "calculated_at": "2026-11-25T13:50:43+09:00"
+    "market_as_of": "2026-11-25T13:55+09:00",
+    "fetched_at": "2026-11-25T14:04:30+09:00",
+    "calculated_at": "2026-11-25T14:04:30+09:00"
   },
   "market_specific": {
     "strategy_stage": "SELL_CAUTION",
